@@ -1,0 +1,16 @@
+<div class="amcommand">
+    <div class="amcommand__search">
+        <input class="text" type="text" name="search" value="" autocomplete="off">
+    </div>
+    <div class="amcommand__items">
+        {% if data|length %}
+            <ul>
+                {% for item in data %}
+                    <li data-id="{{ loop.index0 }}">
+                        <a href="{{ url(item.url) }}">{{ item.type }}: {{ item.name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</div>
