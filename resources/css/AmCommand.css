@@ -21,7 +21,9 @@
 }
 
 .amcommand__items {
+    max-height: 400px;
     margin-top: 10px;
+    overflow: auto;
 }
 .amcommand__items li {
     border-top: 1px dotted rgba(115, 127, 140, 0.15);

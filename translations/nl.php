@@ -1,4 +1,4 @@
 <?php
 return array(
-	'New entry' => 'Nieuwe entry'
+	'Loading' => 'Laden'
 );
