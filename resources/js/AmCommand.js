@@ -5,6 +5,7 @@ Craft.AmCommand = Garnish.Base.extend(
     $searchField:     $('.amcommand__search > input'),
     $container:       $('.amcommand'),
     $items:           $('.amcommand__items li'),
+    $button:          $('<li><span class="customicon customicon__lightning" title="Command palette"></span></li>').prependTo('#header-actions'),
     ignoreSearchKeys: [Garnish.UP_KEY, Garnish.DOWN_KEY, Garnish.RETURN_KEY, Garnish.ESC_KEY],
     fuzzyOptions:     {
         pre: "<b>",
@@ -34,6 +35,8 @@ Craft.AmCommand = Garnish.Base.extend(
     bindEvents: function() {
         var self = this;
 
+        self.addListener(self.$button, 'click', 'openCommand');
+
         self.addListener(self.$searchField, 'keyup', 'search');
 
         self.addListener(window, 'keydown', function(ev) {
@@ -52,6 +55,15 @@ Craft.AmCommand = Garnish.Base.extend(
             else if (ev.keyCode == Garnish.ESC_KEY) {
                 self.closeCommand(ev);
             }
+        });
+
+        self.addListener(self.$items.children('a'), 'click', 'triggerItem');
+
+        self.addListener(document.body, 'click', 'closeCommand');
+
+        // Don't close command when we click inside the command palette
+        self.addListener(self.$container, 'click', function(ev) {
+            ev.stopPropagation();
         });
     },
 
@@ -176,9 +188,13 @@ Craft.AmCommand = Garnish.Base.extend(
         var self = this;
 
         if (self.isOpen) {
-            var $current = self.$items.filter('.focus').children('a');
+            if (ev.type == 'click') {
+                var $current = $(ev.currentTarget);
+            } else{
+                var $current = self.$items.filter('.focus').children('a');
+            }
             if ($current.length) {
-                $current[0].click();
+                window.location = $current.attr('href');
                 Craft.cp.displayNotice(Craft.t('Loading') + ' - ' + $current.text());
                 self.closeCommand(ev);
             }
