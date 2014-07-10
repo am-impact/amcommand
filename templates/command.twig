@@ -4,11 +4,17 @@
     </div>
     <div class="amcommand__items">
         {% if data|length %}
+            {% set counter = 0 %}
             <ul>
-                {% for item in data %}
-                    <li data-id="{{ loop.index0 }}">
-                        <a href="{{ item.url }}">{{ item.type }}: {{ item.name }}</a>
-                    </li>
+                {% for type, items in data %}
+                    {% for itemName, itemUrl in items %}
+                        <li data-id="{{ loop.index0 + counter }}">
+                            <a href="{{ itemUrl }}">{{ type }}: {{ itemName }}</a>
+                        </li>
+                        {% if loop.last %}
+                            {% set counter = counter + loop.length %}
+                        {% endif %}
+                    {% endfor %}
                 {% endfor %}
             </ul>
         {% endif %}
