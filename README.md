@@ -28,6 +28,10 @@ When you hit the return key or click on a command, the command palette will navi
 
 You can close the command by either clicking anywhere on the page (besides the command palette) or by pressing the ESC key.
 
+## Todo
+
+- Be able to add custom commands.
+
 ## Contact
 
-If you have any questions or suggestions, don't hesitate to contact us.
+If you have any questions or suggestions, don't hesitate to contact us. We would like to add more commands to the palette, so if you have any ideas then please let us know!
