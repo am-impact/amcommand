@@ -16,7 +16,7 @@ class AmCommandPlugin extends BasePlugin
 
     public function getVersion()
     {
-        return '0.2';
+        return '0.5';
     }
 
     public function getDeveloper()
@@ -41,7 +41,7 @@ class AmCommandPlugin extends BasePlugin
         // Make sure we only run our code once on pages like Entries, by using: craft()->request->isAjaxRequest
         if (craft()->userSession->isLoggedIn() && craft()->request->isCpRequest() && ! craft()->request->isAjaxRequest()) {
             // Gather data
-            $data = craft()->amCommand->getAvailableSearches();
+            $data = craft()->amCommand->getCommands();
 
             // Get the HTML
             $html = craft()->templates->render('amcommand/command', array(
@@ -56,7 +56,7 @@ class AmCommandPlugin extends BasePlugin
             craft()->templates->includeJsResource('amcommand/js/fuzzy-min.js');
             craft()->templates->includeCssResource('amcommand/css/AmCommand.css');
 
-            craft()->templates->includeTranslations('Loading');
+            craft()->templates->includeTranslations('Command');
         }
     }
 }

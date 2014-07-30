@@ -1,0 +1,10 @@
+<ul>
+    {% for command in data %}
+        <li data-id="{{ loop.index0 }}">
+            <span class="amcommand__commands--name" data-url="{{ command.url }}"{% if command.call is defined %} data-callback="{{ command.call }}"{% endif %}{% if command.service is defined %} data-callback-service="{{ command.service }}"{% endif %}>{% if command.type|length %}{{ command.type }}: {% endif %}{{ command.name }}</span>
+            {% if command.info is defined %}
+                <span class="amcommand__commands--info">{{ command.info }}</span>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>

@@ -28,9 +28,57 @@ When you hit the return key or click on a command, the command palette will navi
 
 You can close the command by either clicking anywhere on the page (besides the command palette) or by pressing the ESC key.
 
-## Todo
+## Adding your own commands
 
-- Be able to add custom commands.
+If you'd like to add commands for a plugin you're developing, you can use the `__addCommands__` function.
+
+### Example
+
+Add this to your main plugin file:
+```
+public function addCommands() {
+    $commands = array(
+        array(
+            'name' => 'Search on Google',
+            'type' => 'Custom',
+            'url'  => 'http://www.google.nl'
+        ),
+        array(
+            'name' => 'My own plugin function in a service',
+            'type' => 'Custom',
+            'url'  => '',
+            'call' => 'yourPluginFunctionName',
+            'service' => 'yourPluginServiceName'
+        )
+    );
+    return $commands;
+}
+```
+
+That's it! a&m Command Palette will add these two commands.
+
+If you look at the second example, you see a call and service key. These can be used to load a new set of commands.
+
+In your plugin's service __yourPluginServiceName__ (e.g.: amCommand or amCommand_command), you'll create a new function called __yourPluginFunctionName__. In here you could do the same thing as you see in the example, and just return the new set of commands.
+
+## Changelog
+
+### v0.5
+
+- Ability to create your own commands in a plugin.
+- Ability to create commands that can load up a new set of commands.
+- If a new set of commands was loaded, and the palette was closed, you'll see the regular commands return when reopening the palette.
+- If a new set of commands can't be loaded, you'll see a notification and the regular set of commands return.
+- Clear notification of what command is being executed.
+- Added a few more commands (more are coming).
+- Added a loader that'll be shown when loading a new set of commands.
+- Styling edited.
+- Commands are no longer hyperlinks.
+- Alot of the old code was changed.
+
+### v0.2
+
+- Initial release.
 
 ## Contact
 

@@ -20,18 +20,47 @@
     width: 100%;
 }
 
-.amcommand__items {
+.amcommand__loader {
+    left: 185px;
+    position: relative;
+    margin-top: 5px;
+}
+
+.amcommand__commands {
     max-height: 400px;
     margin-top: 10px;
     overflow: auto;
 }
-.amcommand__items li {
+.amcommand__commands li {
     border-top: 1px dotted rgba(115, 127, 140, 0.15);
-    padding: 5px 0;
+    padding: 5px;
 }
 
-.amcommand__items li.focus {
-    background: #ebedef;
+.amcommand__commands li:hover {
+    background: #f5f6f6;
+    cursor: pointer;
+}
+
+.amcommand__commands li.focus {
+    background: #eff0f1;
+}
+
+.amcommand__commands--name {
+    color: #0d78f2;
+    display: block;
+    font-size: 100%;
+}
+
+.amcommand__commands--info {
+    color: #b9bfc6;
+    display: block;
+    font-style: italic;
+    font-size: 80%;
+}
+
+.amcommand__notice {
+    font-weight: bold;
+    padding-right: 10px;
 }
 
 .visuallyhidden {

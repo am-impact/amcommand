@@ -2,19 +2,17 @@
     <div class="amcommand__search">
         <input class="text" type="text" name="search" value="" autocomplete="off">
     </div>
-    <div class="amcommand__items">
+    <div class="amcommand__loader spinner hidden"></div>
+    <div class="amcommand__commands">
         {% if data|length %}
-            {% set counter = 0 %}
             <ul>
-                {% for type, items in data %}
-                    {% for itemName, itemUrl in items %}
-                        <li data-id="{{ loop.index0 + counter }}">
-                            <a href="{{ itemUrl }}">{{ type }}: {{ itemName }}</a>
-                        </li>
-                        {% if loop.last %}
-                            {% set counter = counter + loop.length %}
+                {% for command in data %}
+                    <li data-id="{{ loop.index0 }}">
+                        <span class="amcommand__commands--name" data-url="{{ command.url }}"{% if command.call is defined %} data-callback="{{ command.call }}"{% endif %}{% if command.service is defined %} data-callback-service="{{ command.service }}"{% endif %}>{% if command.type|length %}{{ command.type }}: {% endif %}{{ command.name }}</span>
+                        {% if command.info is defined %}
+                            <span class="amcommand__commands--info">{{ command.info }}</span>
                         {% endif %}
-                    {% endfor %}
+                    </li>
                 {% endfor %}
             </ul>
         {% endif %}
