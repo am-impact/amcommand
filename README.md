@@ -30,7 +30,7 @@ You can close the command by either clicking anywhere on the page (besides the c
 
 ## Adding your own commands
 
-If you'd like to add commands for a plugin you're developing, you can use the __addCommands__ function.
+If you'd like to add commands for a plugin you're developing, you can use the __addCommands__ hook!
 
 ### Example
 
