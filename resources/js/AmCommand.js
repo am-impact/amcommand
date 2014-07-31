@@ -8,7 +8,7 @@ Craft.AmCommand = Garnish.Base.extend(
     $loader:             $('.amcommand__loader'),
     $commands:           $('.amcommand__commands li'),
     $button:             $('<li><span class="customicon customicon__lightning" title="Command palette"></span></li>').prependTo('#header-actions'),
-    ignoreSearchKeys:    [Garnish.UP_KEY, Garnish.DOWN_KEY, Garnish.RETURN_KEY, Garnish.ESC_KEY],
+    ignoreSearchKeys:    [Garnish.UP_KEY, Garnish.DOWN_KEY, Garnish.LEFT_KEY, Garnish.RIGHT_KEY, Garnish.RETURN_KEY, Garnish.ESC_KEY],
     fuzzyOptions:        {
         pre: "<strong>",
         post: "</strong>"
@@ -19,6 +19,7 @@ Craft.AmCommand = Garnish.Base.extend(
         commandsContainer: null
     },
     isOpen:              false,
+    loading:             false,
     loadedNewCommands:   false,
     P_KEY:               80,
 
@@ -111,6 +112,7 @@ Craft.AmCommand = Garnish.Base.extend(
                     self.resetPalette(true);
                 }
                 self.isOpen = false;
+                self.loading = false; // Reset loading if the user cancels the page request
             });
             ev.preventDefault();
         }
@@ -238,7 +240,8 @@ Craft.AmCommand = Garnish.Base.extend(
     triggerCommand: function(ev) {
         var self = this;
 
-        if (self.isOpen) {
+        if (self.isOpen && ! self.loading) {
+            self.loading = true;
             if (ev.type == 'click') {
                 var $current = $(ev.currentTarget).children('.amcommand__commands--name');
             } else {
@@ -278,6 +281,7 @@ Craft.AmCommand = Garnish.Base.extend(
         Craft.postActionRequest('amCommand/commands/triggerCommand', {command: name, service: service}, $.proxy(function(response, textStatus)
         {
             if (textStatus == 'success') {
+                self.loading = false;
                 self.$loader.addClass('hidden');
                 if (response.success)
                 {

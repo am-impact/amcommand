@@ -30,6 +30,10 @@ class AmCommandService extends BaseApplicationComponent
         }
         // Add settings commands
         $commands = $this->_getSettings($commands);
+        // Sort commands
+        usort($commands, function($a, $b) {
+            return strcmp($a['type'] . $a['name'], $b['type'] . $b['name']);
+        });
         return $commands;
     }
 

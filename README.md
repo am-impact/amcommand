@@ -63,6 +63,12 @@ In your plugin's service __yourPluginServiceName__ (e.g.: amCommand or amCommand
 
 ## Changelog
 
+### v0.5.1
+
+- Commands are now nicely sorted on type and name.
+- Fixed a bug that could load the same command multiple time by bashing the return key.
+- Fixed a bug that would make the left and right arrow keys start searching.
+
 ### v0.5
 
 - Ability to create your own commands in a plugin.
