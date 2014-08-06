@@ -88,7 +88,7 @@ Craft.AmCommand = Garnish.Base.extend(
         var self = this;
 
         if (! self.isOpen) {
-            self.$container.fadeIn(0, function() {
+            self.$container.fadeIn(1, function() {
                 self.isOpen = true;
                 self.$searchField.focus();
             });
@@ -105,7 +105,7 @@ Craft.AmCommand = Garnish.Base.extend(
         var self = this;
 
         if (self.isOpen) {
-            self.$container.fadeOut(0, function() {
+            self.$container.fadeOut(1, function() {
                 // If we have any new commands, reset back to first set of commands
                 if (self.loadedNewCommands) {
                     self.loadedNewCommands = false;
