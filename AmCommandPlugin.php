@@ -16,7 +16,7 @@ class AmCommandPlugin extends BasePlugin
 
     public function getVersion()
     {
-        return '0.5.1';
+        return '0.6';
     }
 
     public function getDeveloper()
@@ -56,7 +56,7 @@ class AmCommandPlugin extends BasePlugin
             craft()->templates->includeJsResource('amcommand/js/fuzzy-min.js');
             craft()->templates->includeCssResource('amcommand/css/AmCommand.css');
 
-            craft()->templates->includeTranslations('Command');
+            craft()->templates->includeTranslations('Command executed', 'Are you sure you want to execute this command?');
         }
     }
 }

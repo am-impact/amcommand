@@ -63,6 +63,18 @@ In your plugin's service __yourPluginServiceName__ (e.g.: amCommand or amCommand
 
 ## Changelog
 
+### v0.6
+
+- Ability to execute commands that just perform an action.
+- Ability to add data to a command that'll be send with the triggerCommand function.
+- Ability to show a confirmation box per command, before executing it.
+- New command: Delete entries. Quickly delete all entries from a section of choice (with confirmation).
+- New command: Edit entries. Quickly edit an entry from a section of choice.
+- When a new command set has been loaded, they are not nicely sorted on type and name as well.
+- An url option for a command is no longer required.
+- Palette opens fasters.
+- Fixed a bug that wouldn't allow you to trigger a command anymore, if you tried to trigger a command when none were available.
+
 ### v0.5.1
 
 - Commands are now nicely sorted on type and name.

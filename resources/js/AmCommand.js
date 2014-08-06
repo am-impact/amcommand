@@ -88,7 +88,7 @@ Craft.AmCommand = Garnish.Base.extend(
         var self = this;
 
         if (! self.isOpen) {
-            self.$container.fadeIn(400, function() {
+            self.$container.fadeIn(0, function() {
                 self.isOpen = true;
                 self.$searchField.focus();
             });
@@ -105,7 +105,7 @@ Craft.AmCommand = Garnish.Base.extend(
         var self = this;
 
         if (self.isOpen) {
-            self.$container.fadeOut(400, function() {
+            self.$container.fadeOut(0, function() {
                 // If we have any new commands, reset back to first set of commands
                 if (self.loadedNewCommands) {
                     self.loadedNewCommands = false;
@@ -114,7 +114,9 @@ Craft.AmCommand = Garnish.Base.extend(
                 self.isOpen = false;
                 self.loading = false; // Reset loading if the user cancels the page request
             });
-            ev.preventDefault();
+            if (ev !== undefined) {
+                ev.preventDefault();
+            }
         }
     },
 
@@ -241,24 +243,40 @@ Craft.AmCommand = Garnish.Base.extend(
         var self = this;
 
         if (self.isOpen && ! self.loading) {
-            self.loading = true;
             if (ev.type == 'click') {
                 var $current = $(ev.currentTarget).children('.amcommand__commands--name');
+                $current.addClass('focus');
             } else {
                 var $current = self.$commands.filter('.focus').children('.amcommand__commands--name');
             }
             if ($current.length) {
-                var callback = $current.data('callback'),
-                    callbackService = $current.data('callback-service');
-                if (callback !== undefined) {
-                    if (callback === undefined) {
-                        callbackService = false;
+                var confirmed = true,
+                    warn = $current.data('warn'),
+                    url = $current.data('url'),
+                    callback = $current.data('callback'),
+                    callbackService = $current.data('callback-service'),
+                    callbackData = $current.data('callback-data');
+                // Do we have to show a warning?
+                if (warn !== undefined && warn == '1') {
+                    var confirmation = confirm(Craft.t('Are you sure you want to execute this command?'));
+                    if (! confirmation) {
+                        confirmed = false;
                     }
-                    self.triggerCallback(callback, callbackService);
-                } else {
-                    window.location = $current.data('url');
-                    Craft.cp.displayNotice('<span class="amcommand__notice">' + Craft.t('Command') + ' &raquo;</span>' + $current.text());
-                    self.closePalette(ev);
+                }
+                // Can we execute the command?
+                if (confirmed) {
+                    self.loading = true;
+                    if (callback !== undefined) {
+                        if (callback === undefined) {
+                            callbackService = false;
+                        }
+                        self.triggerCallback(callback, callbackService, callbackData);
+                    }
+                    else if (url !== undefined) {
+                        window.location = url;
+                        Craft.cp.displayNotice('<span class="amcommand__notice">' + Craft.t('Command executed') + ' &raquo;</span>' + $current.text());
+                        self.closePalette(ev);
+                    }
                 }
             }
             ev.preventDefault();
@@ -271,25 +289,32 @@ Craft.AmCommand = Garnish.Base.extend(
      * @param string name    Callback function.
      * @param string service Which service should be triggered.
      */
-    triggerCallback: function(name, service) {
-        var self = this;
+    triggerCallback: function(name, service, data) {
+        var self = this,
+            $current = self.$commands.filter('.focus').children('.amcommand__commands--name');
 
         // Hide current commands and display a loader
         self.$commands.hide();
         self.$loader.removeClass('hidden');
 
-        Craft.postActionRequest('amCommand/commands/triggerCommand', {command: name, service: service}, $.proxy(function(response, textStatus)
+        Craft.postActionRequest('amCommand/commands/triggerCommand', {command: name, service: service, data: data}, $.proxy(function(response, textStatus)
         {
             if (textStatus == 'success') {
                 self.loading = false;
                 self.$loader.addClass('hidden');
                 if (response.success)
                 {
-                    // Remember current commands
-                    self.loadedNewCommands = true;
-                    // Display new commands
-                    self.$commandsContainer.html(response.commands);
-                    self.resetPalette();
+                    if (response.isNewSet) {
+                        // Remember current commands
+                        self.loadedNewCommands = true;
+                        // Display new commands
+                        self.$commandsContainer.html(response.result);
+                        self.resetPalette();
+                    } else {
+                        // Show executed message and close palette
+                        Craft.cp.displayNotice('<span class="amcommand__notice">' + Craft.t('Command executed') + ' &raquo;</span>' + $current.text());
+                        self.closePalette();
+                    }
                 }
                 else
                 {
