@@ -63,6 +63,19 @@ In your plugin's service __yourPluginServiceName__ (e.g.: amCommand or amCommand
 
 ## Changelog
 
+### v0.7
+
+- Ability to open commands with URLs in a new window, if you hold down the CTRL or Command key when executing a command.
+- New command: Delete user. Return a list of users other than your own.
+- New command: Edit user.
+- User commands added, which are only available if the user has the right to edit users.
+- New command: Duplicate entry. If you are editing an (non Single section) entry, you have the command duplicate entry available.
+- New command: Delete entries. Quickly delete an entry from a section of choice (with confirmation).
+- The command 'Delete entries' has been renamed to 'Delete all entries' and is now only available to admins.
+- The command 'Settings: New...' command set type has been amended.
+- Added 'Assets', 'Image Transforms', 'Locales' and 'Plugins' to the settings commands.
+- Moved new command logic to new services.
+
 ### v0.6.1
 
 - If a scrollbar is shown in the list of commands, keep the current focused item visible by auto scroll while navigating with the arrow keys.
@@ -76,7 +89,7 @@ In your plugin's service __yourPluginServiceName__ (e.g.: amCommand or amCommand
 - New command: Edit entries. Quickly edit an entry from a section of choice.
 - When a new command set has been loaded, they are not nicely sorted on type and name as well.
 - An url option for a command is no longer required.
-- Palette opens fasters.
+- Palette opens faster.
 - Fixed a bug that wouldn't allow you to trigger a command anymore, if you tried to trigger a command when none were available.
 
 ### v0.5.1

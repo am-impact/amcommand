@@ -62,7 +62,7 @@ Craft.AmCommand = Garnish.Base.extend(
                 self.moveCommandFocus(ev, 'down');
             }
             else if (ev.keyCode == Garnish.RETURN_KEY) {
-                self.triggerCommand(ev);
+                self.triggerCommand(ev, (ev.metaKey || ev.ctrlKey));
             }
             else if (ev.keyCode == Garnish.ESC_KEY) {
                 self.closePalette(ev);
@@ -262,13 +262,17 @@ Craft.AmCommand = Garnish.Base.extend(
     /**
      * Navigate to the current focused command.
      *
-     * @param object ev The triggered event.
+     * @param object ev          The triggered event.
+     * @param bool   ctrlPressed Whether the CTRL or Command key was pressed.
      */
-    triggerCommand: function(ev) {
+    triggerCommand: function(ev, ctrlPressed) {
         var self = this;
 
         if (self.isOpen && ! self.loading) {
             if (ev.type == 'click') {
+                if (ev.ctrlKey || ev.metaKey) {
+                    ctrlPressed = true;
+                }
                 var $current = $(ev.currentTarget).children('.amcommand__commands--name');
                 $current.addClass('focus');
             } else {
@@ -298,7 +302,12 @@ Craft.AmCommand = Garnish.Base.extend(
                         self.triggerCallback(callback, callbackService, callbackData);
                     }
                     else if (url !== undefined) {
-                        window.location = url;
+                        // Open the URL in a new window if the CTRL or Command key was pressed
+                        if (ctrlPressed) {
+                            window.open(url);
+                        } else {
+                            window.location = url;
+                        }
                         Craft.cp.displayNotice('<span class="amcommand__notice">' + Craft.t('Command executed') + ' &raquo;</span>' + $current.text());
                         self.closePalette(ev);
                     }
