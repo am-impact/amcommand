@@ -63,6 +63,10 @@ In your plugin's service __yourPluginServiceName__ (e.g.: amCommand or amCommand
 
 ## Changelog
 
+### v0.6.1
+
+- If a scrollbar is shown in the list of commands, keep the current focused item visible by auto scroll while navigating with the arrow keys.
+
 ### v0.6
 
 - Ability to execute commands that just perform an action.

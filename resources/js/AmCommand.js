@@ -212,6 +212,7 @@ Craft.AmCommand = Garnish.Base.extend(
                     if ($prev.length) {
                         $current.removeClass('focus');
                         $prev.addClass('focus');
+                        self.keepCommandVisible($prev);
                     }
                     break;
                 case 'down':
@@ -223,6 +224,7 @@ Craft.AmCommand = Garnish.Base.extend(
                     if ($next.length) {
                         $current.removeClass('focus');
                         $next.addClass('focus');
+                        self.keepCommandVisible($next);
                     }
                     break;
                 case 'reset':
@@ -231,6 +233,29 @@ Craft.AmCommand = Garnish.Base.extend(
                     break;
             }
             ev.preventDefault();
+        }
+    },
+
+    /**
+     * Scroll to make the current focused item visible when necessary.
+     *
+     * @param object current Current focused item.
+     */
+    keepCommandVisible: function(current) {
+        var self = this,
+            currentTop = current.offset().top,
+            currentHeight = current.outerHeight(),
+            containerTop = self.$commandsContainer.offset().top,
+            containerScroll = self.$commandsContainer.scrollTop(),
+            containerHeight = self.$commandsContainer.height();
+
+        // Down
+        if ((currentTop + currentHeight) > (containerHeight + containerTop)) {
+            self.$commandsContainer.scrollTop((currentTop - containerTop - containerHeight) + currentHeight + containerScroll);
+        }
+        // Up
+        else if (currentTop < containerTop) {
+            self.$commandsContainer.scrollTop((containerScroll - containerTop) + currentTop);
         }
     },
 
