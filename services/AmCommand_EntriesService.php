@@ -186,34 +186,69 @@ class AmCommand_EntriesService extends BaseApplicationComponent
         if (! isset($data['entryId'])) {
             return false;
         }
-        $currentEntry = craft()->entries->getEntryById($data['entryId']);
-        $currentSection = $currentEntry->getSection();
-        if ($currentSection->type == SectionType::Single) {
-            return false;
-        }
-        // Current entry
-        $currentTitle      = $currentEntry->getContent()->title;
-        $currentContent    = $currentEntry->getContent()->getAttributes();
-        $currentAttributes = array();
-        // Set current attributes; Because we don't want to just copy all attributes like the id and elementId
-        $fieldLayout = $currentEntry->getFieldLayout();
-        foreach ($fieldLayout->getFields() as $fieldLayoutField) {
-            $field = $fieldLayoutField->getField();
-            if (isset($currentContent[$field->handle])) {
-                $currentAttributes[$field->handle] = $currentContent[$field->handle];
+        $result = false;
+        $duplicatePrimaryLocaleEntry = false;
+        foreach (craft()->i18n->getSiteLocales() as $locale) {
+            // Current entry based on locale
+            $currentEntry = craft()->entries->getEntryById($data['entryId'], $locale->getId());
+            if (is_null($currentEntry)) {
+                continue;
+            }
+
+            // We don't want to duplicate Single type entries
+            $currentSection = $currentEntry->getSection();
+            if ($currentSection->type == SectionType::Single) {
+                return false;
+            }
+
+            // Current entry data
+            $currentParent     = $currentEntry->getParent();
+            $currentTitle      = $currentEntry->getContent()->title;
+            $currentContent    = $currentEntry->getContent()->getAttributes();
+            $currentAttributes = array();
+
+            // Set current attributes; Because we don't want to just copy all attributes like the id and elementId
+            $fieldLayout = $currentEntry->getFieldLayout();
+            foreach ($fieldLayout->getFields() as $fieldLayoutField) {
+                $field = $fieldLayoutField->getField();
+                if (isset($currentContent[$field->handle])) {
+                    $currentAttributes[$field->handle] = $currentContent[$field->handle];
+                }
+            }
+
+            // New entry
+            $newEntry = new EntryModel();
+            $newEntry->sectionId  = $currentEntry->sectionId;
+            $newEntry->typeId     = $currentEntry->typeId;
+            $newEntry->locale     = $currentEntry->locale;
+            $newEntry->authorId   = $currentEntry->authorId;
+            $newEntry->enabled    = $currentEntry->enabled;
+            $newEntry->postDate   = $currentEntry->postDate;
+            $newEntry->expiryDate = $currentEntry->expiryDate;
+            if (! is_null($currentParent)) {
+                $newEntry->parentId = $currentParent->id; // Structure type entry
+            }
+
+            // Set element ID, because we already have created the duplicated primary locale entry
+            if ($duplicatePrimaryLocaleEntry !== false) {
+                $newEntry->id = $duplicatePrimaryLocaleEntry->id;
+            }
+
+            // Set entry title and content
+            $newEntry->getContent()->title = $currentTitle;
+            $newEntry->getContent()->setAttributes($currentAttributes);
+
+            // Save duplicate entry
+            $result = craft()->entries->saveEntry($newEntry);
+
+            // Remember element ID, because we don't want new entries for each locale...
+            if ($result && ! $duplicatePrimaryLocaleEntry) {
+                $duplicatePrimaryLocaleEntry = $newEntry;
             }
         }
-        // New entry
-        $newEntry = new EntryModel();
-        $newEntry->sectionId  = $currentEntry->sectionId;
-        $newEntry->typeId     = $currentEntry->typeId;
-        $newEntry->locale     = $currentEntry->locale;
-        $newEntry->authorId   = $currentEntry->authorId;
-        $newEntry->enabled    = $currentEntry->enabled;
-        // Set entry title and content
-        $newEntry->getContent()->title = $currentTitle;
-        $newEntry->getContent()->setAttributes($currentAttributes);
-        // Save duplicate entry
-        return craft()->entries->saveEntry($newEntry);
+        // Update other locales URIs since somehow the uri is the same as the primary locale
+        craft()->elements->updateElementSlugAndUriInOtherLocales($duplicatePrimaryLocaleEntry);
+        // Return duplication result
+        return $result;
     }
 }

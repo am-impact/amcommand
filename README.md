@@ -63,6 +63,11 @@ In your plugin's service __yourPluginServiceName__ (e.g.: amCommand or amCommand
 
 ## Changelog
 
+### v0.7.1
+
+- Fixed a bug where the 'Duplicate entry' wouldn't duplicate the other locales versions of an entry.
+- Fixed a bug that wouldn't allow the 'Duplicate entry' command to duplicate the parent's entry in case of a Structure type entry.
+
 ### v0.7
 
 - Ability to open commands with URLs in a new window, if you hold down the CTRL or Command key when executing a command.
