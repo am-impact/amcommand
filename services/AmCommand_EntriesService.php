@@ -211,7 +211,10 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             $fieldLayout = $currentEntry->getFieldLayout();
             foreach ($fieldLayout->getFields() as $fieldLayoutField) {
                 $field = $fieldLayoutField->getField();
-                if (isset($currentContent[$field->handle])) {
+                if ($currentEntry->{$field->handle} instanceof ElementCriteriaModel) {
+                    $currentAttributes[$field->handle] = $currentEntry->{$field->handle}->ids();
+                }
+                else if (isset($currentContent[$field->handle])) {
                     $currentAttributes[$field->handle] = $currentContent[$field->handle];
                 }
             }
@@ -242,12 +245,14 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             $result = craft()->entries->saveEntry($newEntry);
 
             // Remember element ID, because we don't want new entries for each locale...
-            if ($result && ! $duplicatePrimaryLocaleEntry) {
+            if ($result && $duplicatePrimaryLocaleEntry === false) {
                 $duplicatePrimaryLocaleEntry = $newEntry;
             }
         }
         // Update other locales URIs since somehow the uri is the same as the primary locale
-        craft()->elements->updateElementSlugAndUriInOtherLocales($duplicatePrimaryLocaleEntry);
+        if ($duplicatePrimaryLocaleEntry !== false) {
+            craft()->elements->updateElementSlugAndUriInOtherLocales($duplicatePrimaryLocaleEntry);
+        }
         // Return duplication result
         return $result;
     }
