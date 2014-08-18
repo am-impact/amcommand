@@ -4,6 +4,7 @@ Craft.AmCommand = Garnish.Base.extend(
 {
     $searchField:        $('.amcommand__search > input'),
     $container:          $('.amcommand'),
+    $tabsContainer:      $('.amcommand__tabs'),
     $commandsContainer:  $('.amcommand__commands'),
     $loader:             $('.amcommand__loader'),
     $commands:           $('.amcommand__commands li'),
@@ -20,6 +21,7 @@ Craft.AmCommand = Garnish.Base.extend(
     },
     isOpen:              false,
     loading:             false,
+    loadingCommand:      '',
     loadedNewCommands:   false,
     P_KEY:               80,
 
@@ -137,6 +139,8 @@ Craft.AmCommand = Garnish.Base.extend(
             self.$commandsContainer.html(self.rememberPalette.commandsContainer);
             self.$commands = $('.amcommand__commands li');
             self.$commands.show();
+            // Reset executed command
+            self.$tabsContainer.addClass('hidden');
         } else {
             // Reset variables
             self.$commands = $('.amcommand__commands li');
@@ -260,6 +264,25 @@ Craft.AmCommand = Garnish.Base.extend(
     },
 
     /**
+     * Display a notification message.
+     *
+     * @param bool  success         Whether the command was succesful.
+     * @param mixed customMessage   Whether the message was manually set.
+     * @param mixed executedCommand Which command was executed.
+     */
+    displayMessage: function(success, customMessage, executedCommand) {
+        if (success) {
+            if (customMessage !== false) {
+                Craft.cp.displayNotice(customMessage);
+            } else {
+                Craft.cp.displayNotice('<span class="amcommand__notice">' + Craft.t('Command executed') + ' &raquo;</span>' + executedCommand);
+            }
+        } else {
+            Craft.cp.displayError(customMessage);
+        }
+    },
+
+    /**
      * Navigate to the current focused command.
      *
      * @param object ev          The triggered event.
@@ -284,7 +307,10 @@ Craft.AmCommand = Garnish.Base.extend(
                     url = $current.data('url'),
                     callback = $current.data('callback'),
                     callbackService = $current.data('callback-service'),
-                    callbackData = $current.data('callback-data');
+                    callbackVars = $current.data('callback-vars');
+
+                // Remember command for when a new set is loaded
+                self.loadingCommand = $current.text();
                 // Do we have to show a warning?
                 if (warn !== undefined && warn == '1') {
                     var confirmation = confirm(Craft.t('Are you sure you want to execute this command?'));
@@ -299,7 +325,7 @@ Craft.AmCommand = Garnish.Base.extend(
                         if (callback === undefined) {
                             callbackService = false;
                         }
-                        self.triggerCallback(callback, callbackService, callbackData);
+                        self.triggerCallback(callback, callbackService, callbackVars);
                     }
                     else if (url !== undefined) {
                         // Open the URL in a new window if the CTRL or Command key was pressed
@@ -308,7 +334,7 @@ Craft.AmCommand = Garnish.Base.extend(
                         } else {
                             window.location = url;
                         }
-                        Craft.cp.displayNotice('<span class="amcommand__notice">' + Craft.t('Command executed') + ' &raquo;</span>' + $current.text());
+                        self.displayMessage(true, false, $current.text());
                         self.closePalette(ev);
                     }
                 }
@@ -322,8 +348,9 @@ Craft.AmCommand = Garnish.Base.extend(
      *
      * @param string name    Callback function.
      * @param string service Which service should be triggered.
+     * @param string vars    JSON string with optional variables.
      */
-    triggerCallback: function(name, service, data) {
+    triggerCallback: function(name, service, vars) {
         var self = this,
             $current = self.$commands.filter('.focus').children('.amcommand__commands--name');
 
@@ -331,30 +358,39 @@ Craft.AmCommand = Garnish.Base.extend(
         self.$commands.hide();
         self.$loader.removeClass('hidden');
 
-        Craft.postActionRequest('amCommand/commands/triggerCommand', {command: name, service: service, data: data}, $.proxy(function(response, textStatus)
-        {
+        Craft.postActionRequest('amCommand/commands/triggerCommand', {command: name, service: service, vars: vars}, $.proxy(function(response, textStatus) {
             if (textStatus == 'success') {
                 self.loading = false;
                 self.$loader.addClass('hidden');
-                if (response.success)
-                {
+                if (response.success) {
                     if (response.isNewSet) {
                         // Remember current commands
                         self.loadedNewCommands = true;
+                        // Display executed command
+                        self.$tabsContainer.text(self.loadingCommand);
+                        self.$tabsContainer.removeClass('hidden');
                         // Display new commands
                         self.$commandsContainer.html(response.result);
                         self.resetPalette();
+                        // Show message if set
+                        if (response.message) {
+                            self.displayMessage((response.result != ''), response.message, false);
+                        }
                     } else {
                         // Show executed message and close palette
-                        Craft.cp.displayNotice('<span class="amcommand__notice">' + Craft.t('Command executed') + ' &raquo;</span>' + $current.text());
+                        if (response.message) {
+                            //Custom message
+                            self.displayMessage(true, response.message, false);
+                        } else {
+                            // Standard message
+                            self.displayMessage(true, false, $current.text());
+                        }
                         self.closePalette();
                     }
-                }
-                else
-                {
+                } else {
                     // Show current commands again and display a message
                     self.$commands.show();
-                    Craft.cp.displayError(response.message);
+                    self.displayMessage(false, response.message, false);
                 }
             }
         }, self));

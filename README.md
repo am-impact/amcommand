@@ -46,7 +46,6 @@ public function addCommands() {
         array(
             'name' => 'My own plugin function in a service',
             'type' => 'Custom',
-            'url'  => '',
             'call' => 'yourPluginFunctionName',
             'service' => 'yourPluginServiceName'
         )
@@ -60,65 +59,6 @@ That's it! a&m Command Palette will add these two commands.
 If you look at the second example, you see a call and service key. These can be used to load a new set of commands.
 
 In your plugin's service __yourPluginServiceName__ (e.g.: amCommand or amCommand_command), you'll create a new function called __yourPluginFunctionName__. In here you could do the same thing as you see in the example, and just return the new set of commands.
-
-## Changelog
-
-### v0.7.1
-
-- Fixed a bug where the 'Duplicate entry' wouldn't duplicate the other locales versions of an entry.
-- Fixed a bug that wouldn't allow the 'Duplicate entry' command to duplicate the parent's entry in case of a Structure type entry.
-
-### v0.7
-
-- Ability to open commands with URLs in a new window, if you hold down the CTRL or Command key when executing a command.
-- New command: Delete user. Return a list of users other than your own.
-- New command: Edit user.
-- User commands added, which are only available if the user has the right to edit users.
-- New command: Duplicate entry. If you are editing an (non Single section) entry, you have the command duplicate entry available.
-- New command: Delete entries. Quickly delete an entry from a section of choice (with confirmation).
-- The command 'Delete entries' has been renamed to 'Delete all entries' and is now only available to admins.
-- The command 'Settings: New...' command set type has been amended.
-- Added 'Assets', 'Image Transforms', 'Locales' and 'Plugins' to the settings commands.
-- Moved new command logic to new services.
-
-### v0.6.1
-
-- If a scrollbar is shown in the list of commands, keep the current focused item visible by auto scroll while navigating with the arrow keys.
-
-### v0.6
-
-- Ability to execute commands that just perform an action.
-- Ability to add data to a command that'll be send with the triggerCommand function.
-- Ability to show a confirmation box per command, before executing it.
-- New command: Delete entries. Quickly delete all entries from a section of choice (with confirmation).
-- New command: Edit entries. Quickly edit an entry from a section of choice.
-- When a new command set has been loaded, they are not nicely sorted on type and name as well.
-- An url option for a command is no longer required.
-- Palette opens faster.
-- Fixed a bug that wouldn't allow you to trigger a command anymore, if you tried to trigger a command when none were available.
-
-### v0.5.1
-
-- Commands are now nicely sorted on type and name.
-- Fixed a bug that could load the same command multiple time by bashing the return key.
-- Fixed a bug that would make the left and right arrow keys start searching.
-
-### v0.5
-
-- Ability to create your own commands in a plugin.
-- Ability to create commands that can load up a new set of commands.
-- If a new set of commands was loaded, and the palette was closed, you'll see the regular commands return when reopening the palette.
-- If a new set of commands can't be loaded, you'll see a notification and the regular set of commands return.
-- Clear notification of what command is being executed.
-- Added a few more commands (more are coming).
-- Added a loader that'll be shown when loading a new set of commands.
-- Styling edited.
-- Commands are no longer hyperlinks.
-- Alot of the old code was changed.
-
-### v0.2
-
-- Initial release.
 
 ## Contact
 

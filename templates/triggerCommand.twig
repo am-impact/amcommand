@@ -1,10 +1,18 @@
-<ul>
-    {% for command in data %}
-        <li data-id="{{ loop.index0 }}">
-            <span class="amcommand__commands--name"{% if command.warn is defined %} data-warn="{{ command.warn }}"{% endif %}{% if command.url is defined %} data-url="{{ command.url }}"{% endif %}{% if command.call is defined %} data-callback="{{ command.call }}"{% endif %}{% if command.service is defined %} data-callback-service="{{ command.service }}"{% endif %}{% if command.data is defined %} data-callback-data="{{ command.data|json_encode }}"{% endif %}>{% if command.type|length %}{{ command.type }}: {% endif %}{{ command.name }}</span>
-            {% if command.info is defined %}
-                <span class="amcommand__commands--info">{{ command.info }}</span>
-            {% endif %}
-        </li>
-    {% endfor %}
-</ul>
+{% if commands|length %}
+    <ul>
+        {% for command in commands %}
+            <li data-id="{{ loop.index0 }}">
+                <span class="amcommand__commands--name{% if command.more is defined and command.more %} go{% endif %}"
+                    {%- if command.warn is defined %} data-warn="{{ command.warn }}"{% endif %}
+                    {%- if command.url is defined %} data-url="{{ command.url }}"{% endif %}
+                    {%- if command.call is defined %} data-callback="{{ command.call }}"{% endif %}
+                    {%- if command.service is defined %} data-callback-service="{{ command.service }}"{% endif %}
+                    {%- if command.vars is defined %} data-callback-vars="{{ command.vars|json_encode }}"{% endif %}>
+                    {%- if command.type is defined and command.type|length %}{{ command.type }}: {% endif %}{{ command.name }}</span>
+                {% if command.info is defined %}
+                    <span class="amcommand__commands--info">{{ command.info }}</span>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}

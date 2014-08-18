@@ -40,12 +40,12 @@ class AmCommandPlugin extends BasePlugin
         // User has to be logged in (or it will also work on the login page)
         // Make sure we only run our code once on pages like Entries, by using: craft()->request->isAjaxRequest
         if (craft()->userSession->isLoggedIn() && craft()->request->isCpRequest() && ! craft()->request->isAjaxRequest()) {
-            // Gather data
-            $data = craft()->amCommand->getCommands();
+            // Gather commands
+            $commands = craft()->amCommand->getCommands();
 
             // Get the HTML
             $html = craft()->templates->render('amcommand/command', array(
-                'data' => $data
+                'commands' => $commands
             ));
             craft()->templates->includeFootHtml($html);
 

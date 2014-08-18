@@ -3,6 +3,8 @@ namespace Craft;
 
 class AmCommandService extends BaseApplicationComponent
 {
+    private $_returnMessage;
+
     /**
      * Get all available commands.
      *
@@ -13,6 +15,8 @@ class AmCommandService extends BaseApplicationComponent
         $commands = array();
         // Add content commands
         $commands = $this->_getContentCommands($commands);
+        // Add global commands
+        $commands = $this->_getGlobalCommands($commands);
         // Add user commands
         $commands = $this->_getUserCommands($commands);
         // Add settings commands
@@ -31,34 +35,54 @@ class AmCommandService extends BaseApplicationComponent
     /**
      * Trigger a command that was called through ajax.
      *
-     * @param string $command Command as function name.
-     * @param string $service [Optional] Which service should be called instead.
-     * @param array  $data    [Optional] The optional data.
+     * @param string $command   Command as function name.
+     * @param string $service   [Optional] Which service should be called instead.
+     * @param array  $variables [Optional] The optional variables.
      *
      * @return mixed False on error otherwise an array with commands.
      */
-    public function triggerCommand($command, $service, $data)
+    public function triggerCommand($command, $service, $variables)
     {
         if ($service !== false) {
             if (! method_exists(craft()->$service, $command)) {
                 return false;
             }
-            $commandResult = craft()->$service->$command($data);
+            $commandResult = craft()->$service->$command($variables);
         } else {
             if (! method_exists($this, $command)) {
                 return false;
             }
-            $commandResult = $this->$command($data);
+            $commandResult = $this->$command($variables);
         }
         // Treat the result as a new list of commands
         if (is_array($commandResult)) {
             $newCommands = $this->_sortCommands($commandResult);
             return craft()->templates->render('amcommand/triggerCommand', array(
-                'data' => $newCommands
+                'commands' => $newCommands
             ));
         } else {
             return $commandResult;
         }
+    }
+
+    /**
+     * Set a message that'll be shown to the user upon page load.
+     *
+     * @param string $message
+     */
+    public function setReturnMessage($message)
+    {
+        $this->_returnMessage = $message;
+    }
+
+    /**
+     * Get the return message.
+     *
+     * @return int|string
+     */
+    public function getReturnMessage()
+    {
+        return isset($this->_returnMessage) ? $this->_returnMessage : false;
     }
 
     /**
@@ -71,7 +95,7 @@ class AmCommandService extends BaseApplicationComponent
     private function _sortCommands($commands)
     {
         usort($commands, function($a, $b) {
-            return strcmp($a['type'] . $a['name'], $b['type'] . $b['name']);
+            return strcmp((isset($a['type']) ? $a['type'] : '') . $a['name'], (isset($b['type']) ? $b['type'] : '') . $b['name']);
         });
         return $commands;
     }
@@ -88,7 +112,7 @@ class AmCommandService extends BaseApplicationComponent
         // Duplicate entry command
         $entrySegment = craft()->request->getSegment(1) == 'entries';
         $entryId = craft()->request->getSegment(3);
-        if (is_numeric($entryId)) {
+        if ($entrySegment && is_numeric($entryId)) {
             $currentCommands[] = array(
                 'name'    => Craft::t('Duplicate entry'),
                 'type'    => Craft::t('Content'),
@@ -96,7 +120,7 @@ class AmCommandService extends BaseApplicationComponent
                 'info'    => Craft::t('Duplicate the current entry.'),
                 'call'    => 'duplicateEntry',
                 'service' => 'amCommand_entries',
-                'data'    => array(
+                'vars'    => array(
                     'entryId' => $entryId
                 )
             );
@@ -108,6 +132,7 @@ class AmCommandService extends BaseApplicationComponent
                 'name'    => Craft::t('New Entry'),
                 'type'    => Craft::t('Content'),
                 'info'    => Craft::t('Create a new entry in one of the available sections.'),
+                'more'    => true,
                 'call'    => 'newEntry',
                 'service' => 'amCommand_entries'
             );
@@ -115,6 +140,7 @@ class AmCommandService extends BaseApplicationComponent
                 'name'    => Craft::t('Edit entries'),
                 'type'    => Craft::t('Content'),
                 'info'    => Craft::t('Edit an entry in one of the available sections.'),
+                'more'    => true,
                 'call'    => 'editEntries',
                 'service' => 'amCommand_entries'
             );
@@ -122,9 +148,10 @@ class AmCommandService extends BaseApplicationComponent
                 'name'    => Craft::t('Delete entries'),
                 'type'    => Craft::t('Content'),
                 'info'    => Craft::t('Delete an entry in one of the available sections.'),
+                'more'    => true,
                 'call'    => 'deleteEntries',
                 'service' => 'amCommand_entries',
-                'data'    => array(
+                'vars'    => array(
                     'deleteAll' => false
                 )
             );
@@ -133,13 +160,35 @@ class AmCommandService extends BaseApplicationComponent
                     'name'    => Craft::t('Delete all entries'),
                     'type'    => Craft::t('Content'),
                     'info'    => Craft::t('Delete all entries in one of the available sections.'),
+                    'more'    => true,
                     'call'    => 'deleteEntries',
                     'service' => 'amCommand_entries',
-                    'data'    => array(
+                    'vars'    => array(
                         'deleteAll' => true
                     )
                 );
             }
+        }
+        return $currentCommands;
+    }
+
+    /**
+     * Get useful globals commands.
+     *
+     * @param array $currentCommands
+     *
+     * @return array
+     */
+    private function _getGlobalCommands($currentCommands)
+    {
+        if (craft()->globals->getTotalEditableSets() > 0) {
+            $currentCommands[] = array(
+                'name'    => Craft::t('Edit'),
+                'type'    => Craft::t('Globals'),
+                'more'    => true,
+                'call'    => 'editGlobals',
+                'service' => 'amCommand_globals'
+            );
         }
         return $currentCommands;
     }
@@ -155,17 +204,10 @@ class AmCommandService extends BaseApplicationComponent
     {
         if (craft()->userSession->isAdmin() || craft()->userSession->getUser()->can('editUsers')) {
             $currentCommands[] = array(
-                'name'    => Craft::t('Edit users'),
-                'type'    => Craft::t('Users'),
-                'info'    => Craft::t('Edit an user.'),
-                'call'    => 'editUser',
-                'service' => 'amCommand_users'
-            );
-            $currentCommands[] = array(
-                'name'    => Craft::t('Delete users'),
-                'type'    => Craft::t('Users'),
-                'info'    => Craft::t('Delete an user other than your own.'),
-                'call'    => 'deleteUser',
+                'name'    => Craft::t('Administrate users'),
+                'info'    => Craft::t('Create, edit or delete a user.'),
+                'more'    => true,
+                'call'    => 'userCommands',
                 'service' => 'amCommand_users'
             );
         }
@@ -188,6 +230,7 @@ class AmCommandService extends BaseApplicationComponent
             'name' => Craft::t('New') . '...',
             'type' => Craft::t('Settings'),
             'info' => Craft::t('Add something new in the settings...'),
+            'more' => true,
             'call' => '_newSettings'
         );
         $currentCommands[] = array(

@@ -1,11 +1,12 @@
 <div class="amcommand">
-    <div class="amcommand__search">
-        <input class="text" type="text" name="search" value="" autocomplete="off">
-    </div>
-    <div class="amcommand__loader spinner hidden"></div>
-    <div class="amcommand__commands">
-        {% if data|length %}
+    <div class="amcommand__tabs hidden"></div>
+    <div class="amcommand__container">
+        <div class="amcommand__search">
+            <input class="text" type="text" name="search" value="" autocomplete="off">
+        </div>
+        <div class="amcommand__loader spinner hidden"></div>
+        <div class="amcommand__commands">
             {% include 'amcommand/triggerCommand' %}
-        {% endif %}
+        </div>
     </div>
 </div>
