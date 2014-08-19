@@ -16,7 +16,7 @@ class AmCommandPlugin extends BasePlugin
 
     public function getVersion()
     {
-        return '0.7.1';
+        return '0.8.1';
     }
 
     public function getDeveloper()
