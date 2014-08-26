@@ -19,6 +19,9 @@ class AmCommand_GlobalsService extends BaseApplicationComponent
                 );
             }
         }
+        if (! count($commands)) {
+            craft()->amCommand->setReturnMessage(Craft::t('No global sets exist yet.'));
+        }
         return $commands;
     }
 }

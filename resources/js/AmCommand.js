@@ -2,13 +2,15 @@
 
 Craft.AmCommand = Garnish.Base.extend(
 {
-    $searchField:        $('.amcommand__search > input'),
+    $searchField:        $('.amcommand__search input[type=text]'),
     $container:          $('.amcommand'),
     $tabsContainer:      $('.amcommand__tabs'),
+    $searchContainer:    $('.amcommand__search'),
     $commandsContainer:  $('.amcommand__commands'),
     $loader:             $('.amcommand__loader'),
     $commands:           $('.amcommand__commands li'),
     $button:             $('<li><span class="customicon customicon__lightning" title="Command palette"></span></li>').prependTo('#header-actions'),
+    $buttonExecute:      $('.amcommand__search input[type=button]'),
     ignoreSearchKeys:    [Garnish.UP_KEY, Garnish.DOWN_KEY, Garnish.LEFT_KEY, Garnish.RIGHT_KEY, Garnish.RETURN_KEY, Garnish.ESC_KEY],
     fuzzyOptions:        {
         pre: "<strong>",
@@ -20,6 +22,8 @@ Craft.AmCommand = Garnish.Base.extend(
         commandsContainer: null
     },
     isOpen:              false,
+    isAction:            false,
+    actionData:          [],
     loading:             false,
     loadingCommand:      '',
     loadedNewCommands:   false,
@@ -72,6 +76,7 @@ Craft.AmCommand = Garnish.Base.extend(
         });
 
         self.addListener(self.$commands, 'click', 'triggerCommand');
+        self.addListener(self.$buttonExecute, 'click', 'triggerCommand');
 
         self.addListener(document.body, 'click', 'closePalette');
 
@@ -108,11 +113,17 @@ Craft.AmCommand = Garnish.Base.extend(
 
         if (self.isOpen) {
             self.$container.fadeOut(1, function() {
+                // Hide execute button
+                self.$buttonExecute.addClass('hidden');
+                self.$searchContainer.removeClass('amcommand__search--hasButton');
                 // If we have any new commands, reset back to first set of commands
                 if (self.loadedNewCommands) {
+                    self.isAction = false;
+                    self.actionData = [];
                     self.loadedNewCommands = false;
                     self.resetPalette(true);
                 }
+                self.$searchField.val('');
                 self.isOpen = false;
                 self.loading = false; // Reset loading if the user cancels the page request
             });
@@ -297,7 +308,9 @@ Craft.AmCommand = Garnish.Base.extend(
                     ctrlPressed = true;
                 }
                 var $current = $(ev.currentTarget).children('.amcommand__commands--name');
-                $current.addClass('focus');
+                // Remove focus from all, and focus the clicked command
+                self.$commands.removeClass('focus');
+                $current.parent().addClass('focus');
             } else {
                 var $current = self.$commands.filter('.focus').children('.amcommand__commands--name');
             }
@@ -339,6 +352,13 @@ Craft.AmCommand = Garnish.Base.extend(
                     }
                 }
             }
+            else if (self.isAction) {
+                var variables = self.actionData.vars;
+                variables['searchText'] = self.$searchField.val();
+                // Trigger action
+                self.loading = true;
+                self.triggerCallback(self.actionData.call, self.actionData.service, variables);
+            }
             ev.preventDefault();
         }
     },
@@ -352,6 +372,7 @@ Craft.AmCommand = Garnish.Base.extend(
      */
     triggerCallback: function(name, service, vars) {
         var self = this,
+            displayDefaultMessage = false,
             $current = self.$commands.filter('.focus').children('.amcommand__commands--name');
 
         // Hide current commands and display a loader
@@ -363,29 +384,76 @@ Craft.AmCommand = Garnish.Base.extend(
                 self.loading = false;
                 self.$loader.addClass('hidden');
                 if (response.success) {
-                    if (response.isNewSet) {
-                        // Remember current commands
+                    // Reset action if set
+                    if (self.isAction) {
+                        self.isAction = false;
+                        self.actionData = [];
+                        self.$buttonExecute.addClass('hidden');
+                        self.$searchContainer.removeClass('amcommand__search--hasButton');
+                    }
+
+                    // What result do we have? An action, new command set or just a result message?
+                    if (response.isAction) {
+                        // Remember current commands and action information
                         self.loadedNewCommands = true;
-                        // Display executed command
-                        self.$tabsContainer.text(self.loadingCommand);
+                        self.isAction = true;
+                        self.actionData = response.isAction;
+                        // Display text and execute button above search field
+                        self.$tabsContainer.text(response.isAction.tabs);
                         self.$tabsContainer.removeClass('hidden');
-                        // Display new commands
-                        self.$commandsContainer.html(response.result);
+                        self.$buttonExecute.removeClass('hidden');
+                        self.$searchContainer.addClass('amcommand__search--hasButton');
+                        // Reset palette
+                        self.$commandsContainer.html('');
                         self.resetPalette();
-                        // Show message if set
-                        if (response.message) {
-                            self.displayMessage((response.result != ''), response.message, false);
+                        // Display text in search field
+                        self.$searchField.val(response.isAction.searchText);
+                        self.$searchField.focus();
+                    }
+                    else if (response.isNewSet) {
+                        // It is a command that loads a new set of commands, but did we get any?
+                        if (response.result == '') {
+                            self.$commands.show(); // Show current commands again
+                        } else {
+                            // Remember current commands
+                            self.loadedNewCommands = true;
+                            // Display executed command above search field
+                            self.$tabsContainer.text(self.loadingCommand);
+                            self.$tabsContainer.removeClass('hidden');
+                            // Display new commands
+                            self.$commandsContainer.html(response.result);
+                            self.resetPalette();
+                        }
+                    }
+                    else if (response.deleteCommand)
+                    {
+                        // We hide the current command, and keep the command palette open
+                        $current.parent().addClass('hidden');
+                        self.$commands.show();
+                        // Reset focus and focus the first
+                        self.$commands.removeClass('focus');
+                        self.$commands.filter(':visible').first().addClass('focus');
+                        self.$searchField.focus();
+                        // Close the command palette if all commands are hidden
+                        if (self.$commands.filter(':visible').length <= 0) {
+                            self.displayMessage(false, Craft.t('There are no more commands available.'), false);
+                            self.closePalette();
                         }
                     } else {
-                        // Show executed message and close palette
-                        if (response.message) {
-                            //Custom message
-                            self.displayMessage(true, response.message, false);
-                        } else {
-                            // Standard message
-                            self.displayMessage(true, false, $current.text());
-                        }
+                        // Command was executed, nothing special happened afterwards
+                        displayDefaultMessage = true;
                         self.closePalette();
+                    }
+                    // Show message
+                    if (response.message) {
+                        self.displayMessage((response.result != ''), response.message, false);
+                    }
+                    else if (displayDefaultMessage) {
+                        self.displayMessage(true, false, $current.text());
+                    }
+                    // Redirect?
+                    if (response.redirect) {
+                        window.location = response.redirect;
                     }
                 } else {
                     // Show current commands again and display a message

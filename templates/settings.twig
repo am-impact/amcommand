@@ -1,0 +1,20 @@
+{% import "_includes/forms" as forms %}
+
+<h1>{{ 'Enabled commands'|t }}</h1>
+<p>
+    {{ 'By default, the command palette will only allow users to see and use commands they have permissions for.'|t }}
+    <br>
+    {{ 'E.g.: Users that do not have permission to edit entries within a specific section, that section won’t even show for them.'|t }}
+</p>
+<p>{{ 'You can disable commands you do not wish to use, by unchecking the checkboxes below.'|t }}</p>
+<hr>
+
+{% for commandSetting, command in commands %}
+    {{ forms.lightswitchField({
+        id:           commandSetting,
+        name:         commandSetting,
+        label:        command.name,
+        on:           attribute(settings, commandSetting),
+        instructions: command.info
+    }) }}
+{% endfor %}

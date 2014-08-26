@@ -165,6 +165,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             } else {
                 craft()->amCommand->setReturnMessage(Craft::t('Couldn’t delete entries.'));
             }
+            return $result;
         } else {
             // Return entries with the option to delete one
             $commands = array();
@@ -202,11 +203,33 @@ class AmCommand_EntriesService extends BaseApplicationComponent
         $entry  = craft()->entries->getEntryById($variables['entryId']);
         $result = craft()->entries->deleteEntry($entry);
         if ($result) {
+            craft()->amCommand->deleteCurrentCommand();
             craft()->amCommand->setReturnMessage(Craft::t('Entry deleted.'));
         } else {
             craft()->amCommand->setReturnMessage(Craft::t('Couldn’t delete entry.'));
         }
         return $result;
+    }
+
+    /**
+     * Get the duplicate entry action.
+     *
+     * @param array $variables
+     *
+     * @return bool
+     */
+    public function duplicateEntry($variables)
+    {
+        if (! isset($variables['entryId'])) {
+            return false;
+        }
+        $currentEntry = craft()->entries->getEntryById($variables['entryId']);
+        if (is_null($currentEntry)) {
+            return false;
+        }
+        $variables['locale'] = $currentEntry->locale;
+        craft()->amCommand->setReturnAction(Craft::t('Title of new entry:'), $currentEntry->getContent()->title, 'duplicateAnEntry', 'amCommand_entries', $variables);
+        return true;
     }
 
     /**
@@ -216,9 +239,13 @@ class AmCommand_EntriesService extends BaseApplicationComponent
      *
      * @return bool
      */
-    public function duplicateEntry($variables)
+    public function duplicateAnEntry($variables)
     {
-        if (! isset($variables['entryId'])) {
+        if (! isset($variables['entryId']) || ! isset($variables['searchText'])) {
+            return false;
+        }
+        elseif (empty($variables['searchText'])) {
+            craft()->amCommand->setReturnMessage(Craft::t('Title isn’t set.'));
             return false;
         }
         $result = false;
@@ -241,6 +268,11 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             $currentTitle      = $currentEntry->getContent()->title;
             $currentContent    = $currentEntry->getContent()->getAttributes();
             $currentAttributes = array();
+
+            // Override title?
+            if ($locale->id == $variables['locale']) {
+                $currentTitle = $variables['searchText'];
+            }
 
             // Set current attributes; Because we don't want to just copy all attributes like the id and elementId
             $fieldLayout = $currentEntry->getFieldLayout();
@@ -294,6 +326,9 @@ class AmCommand_EntriesService extends BaseApplicationComponent
         }
         // Return duplication result
         if ($result) {
+            if ($duplicatePrimaryLocaleEntry !== false) {
+                craft()->amCommand->setReturnUrl($duplicatePrimaryLocaleEntry->getCpEditUrl());
+            }
             craft()->amCommand->setReturnMessage(Craft::t('Entry duplicated.'));
         } else {
             craft()->amCommand->setReturnMessage(Craft::t('Couldn’t duplicate entry.'));

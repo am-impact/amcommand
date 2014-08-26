@@ -32,6 +32,14 @@ class AmCommand_UsersService extends BaseApplicationComponent
                 'service' => 'amCommand_users'
             )
         );
+        if (craft()->userSession->isAdmin()) {
+            $commands[] = array(
+                'name'    => Craft::t('Login as user'),
+                'more'    => true,
+                'call'    => 'loginUser',
+                'service' => 'amCommand_users'
+            );
+        }
         return $commands;
     }
     /**
@@ -89,7 +97,7 @@ class AmCommand_UsersService extends BaseApplicationComponent
      *
      * @param array $variables
      *
-     * @return type
+     * @return bool
      */
     public function deleteAnUser($variables)
     {
@@ -99,11 +107,71 @@ class AmCommand_UsersService extends BaseApplicationComponent
         $user   = craft()->users->getUserById($variables['userId']);
         $result = craft()->users->deleteUser($user);
         if ($result) {
+            craft()->amCommand->deleteCurrentCommand();
             craft()->amCommand->setReturnMessage(Craft::t('User deleted.'));
         } else {
             craft()->amCommand->setReturnMessage(Craft::t('Couldn’t delete “{name}”.', array('name', $user->username)));
         }
         return $result;
+    }
+
+    /**
+     * List of users you're able to login as.
+     *
+     * @return array
+     */
+    public function loginUser()
+    {
+        $commands = array();
+        $users = $this->_getUsers();
+        foreach ($users as $user) {
+            $userInfo = $this->_getUserInfo($user);
+            if (! $user->isCurrent()) {
+                $commands[] = array(
+                    'name'    => $user->username,
+                    'info'    => implode(' - ', $userInfo),
+                    'warn'    => true,
+                    'call'    => 'loginAsUser',
+                    'service' => 'amCommand_users',
+                    'vars'    => array(
+                        'userId' => $user->id
+                    )
+                );
+            }
+        }
+        if (! count($commands)) {
+            craft()->amCommand->setReturnMessage(Craft::t('Besides your account, no other account could be found.'));
+        }
+        return $commands;
+    }
+
+    /**
+     * Login as user.
+     *
+     * @param array $variables
+     *
+     * @return bool
+     */
+    public function loginAsUser($variables)
+    {
+        if (! isset($variables['userId'])) {
+            return false;
+        }
+        if (craft()->userSession->impersonate($variables['userId'])) {
+            craft()->userSession->setNotice(Craft::t('Logged in.'));
+            craft()->amCommand->setReturnMessage(Craft::t('Login as user'));
+
+            if (craft()->userSession->getUser()->can('accessCp')) {
+                craft()->amCommand->setReturnUrl(UrlHelper::getCpUrl('dashboard'));
+            } else {
+                craft()->amCommand->setReturnUrl(UrlHelper::getSiteUrl(''));
+            }
+            return true;
+        } else {
+            craft()->amCommand->setReturnMessage(Craft::t('There was a problem impersonating this user.'));
+            Craft::log(craft()->userSession->getUser()->username.' tried to impersonate userId: '.$variables['userId'].' but something went wrong.', LogLevel::Error);
+            return false;
+        }
     }
 
     /**

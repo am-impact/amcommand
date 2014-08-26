@@ -14,6 +14,11 @@
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
 }
 
+.amcommand__execute {
+    float: right;
+    margin: 6px 15px 0 0;
+}
+
 .amcommand__tabs {
     padding: 8px 15px;
     border-radius: 5px 5px 0 0;
@@ -30,16 +35,43 @@
     padding: 15px;
 }
 
-.amcommand__search > input {
+
+/**
+ * Input
+ */
+.amcommand__search input[type=text] {
     width: 100%;
 }
 
+.amcommand__search--hasButton {
+    overflow: hidden;
+}
+
+.amcommand__search--hasButton input[type=text] {
+    float: left;
+    width: 88%;
+}
+
+.amcommand__search--hasButton input[type=button] {
+    float: right;
+    width: 10%;
+    outline: none;
+}
+
+
+/**
+ * Loaders
+ */
 .amcommand__loader {
     left: 175px;
     position: relative;
     margin-top: 5px;
 }
 
+
+/**
+ * Commands
+ */
 .amcommand__commands {
     max-height: 400px;
     margin-top: 15px;
@@ -59,6 +91,10 @@
     background: #eff0f1;
 }
 
+.amcommand__commands li.focus .go:after {
+    color: #0d78f2;
+}
+
 .amcommand__commands--name {
     color: #0d78f2;
     display: block;
@@ -72,11 +108,20 @@
     font-size: 80%;
 }
 
+
+/**
+ * Notices
+ */
+
 .amcommand__notice {
     font-weight: bold;
     padding-right: 10px;
 }
 
+
+/**
+ * Icon
+ */
 .visuallyhidden {
     display: none;
 }
