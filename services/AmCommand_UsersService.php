@@ -4,45 +4,6 @@ namespace Craft;
 class AmCommand_UsersService extends BaseApplicationComponent
 {
     /**
-     * List of user commands.
-     *
-     * @return array
-     */
-    public function userCommands()
-    {
-        // We don't need to check for permissions anymore, the command calling this already did
-        $commands = array(
-            array(
-                'name'    => Craft::t('New User'),
-                'info'    => Craft::t('Create a user.'),
-                'url'     => UrlHelper::getUrl('users/new')
-            ),
-            array(
-                'name'    => Craft::t('Edit users'),
-                'info'    => Craft::t('Edit a user.'),
-                'more'    => true,
-                'call'    => 'editUser',
-                'service' => 'amCommand_users'
-            ),
-            array(
-                'name'    => Craft::t('Delete users'),
-                'info'    => Craft::t('Delete a user other than your own.'),
-                'more'    => true,
-                'call'    => 'deleteUser',
-                'service' => 'amCommand_users'
-            )
-        );
-        if (craft()->userSession->isAdmin()) {
-            $commands[] = array(
-                'name'    => Craft::t('Login as user'),
-                'more'    => true,
-                'call'    => 'loginUser',
-                'service' => 'amCommand_users'
-            );
-        }
-        return $commands;
-    }
-    /**
      * List of users you're able to edit.
      *
      * @return array

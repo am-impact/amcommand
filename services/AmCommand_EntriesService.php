@@ -37,8 +37,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             if ($section->type != SectionType::Single) {
                 // We have to get the entries for this section first
                 $commands[] = array(
-                    'name'    => $section->name,
-                    'type'    => $type,
+                    'name'    => $type . ': ' . $section->name,
                     'more'    => true,
                     'call'    => 'editEntry',
                     'service' => 'amCommand_entries',
@@ -54,8 +53,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
                 $entry = $criteria->first();
 
                 $commands[] = array(
-                    'name' => $section->name,
-                    'type' => $type,
+                    'name' => $type . ': ' . $section->name,
                     'url'  => $entry->getCpEditUrl()
                 );
             }

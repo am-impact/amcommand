@@ -16,7 +16,7 @@ class AmCommandPlugin extends BasePlugin
 
     public function getVersion()
     {
-        return '0.9';
+        return '1.0';
     }
 
     public function getDeveloper()
@@ -93,13 +93,11 @@ class AmCommandPlugin extends BasePlugin
             $commands = craft()->amCommand->getCommands($this->getSettings());
 
             // Get the HTML
-            $html = craft()->templates->render('amcommand/command', array(
-                'commands' => $commands
-            ));
+            $html = craft()->templates->render('amcommand/command');
             craft()->templates->includeFootHtml($html);
 
             // Load javascript
-            $js = 'new Craft.AmCommand();';
+            $js = sprintf('new Craft.AmCommand(%s);', $commands);
             craft()->templates->includeJs($js);
             craft()->templates->includeJsResource('amcommand/js/AmCommand.min.js');
             craft()->templates->includeJsResource('amcommand/js/fuzzy-min.js');

@@ -72,7 +72,7 @@
 /**
  * Commands
  */
-.amcommand__commands {
+.amcommand__commands > ul {
     max-height: 400px;
     margin-top: 15px;
     overflow: auto;

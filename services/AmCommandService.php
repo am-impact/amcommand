@@ -37,7 +37,7 @@ class AmCommandService extends BaseApplicationComponent
             }
         }
         // Return the commands nicely sorted
-        return $this->_sortCommands($commands);
+        return json_encode($this->_sortCommands($commands));
     }
 
     /**
@@ -47,7 +47,7 @@ class AmCommandService extends BaseApplicationComponent
      * @param string $service   [Optional] Which service should be called instead.
      * @param array  $variables [Optional] The optional variables.
      *
-     * @return mixed False on error otherwise an array with commands.
+     * @return mixed False on error otherwise JSON with commands.
      */
     public function triggerCommand($command, $service, $variables)
     {
@@ -64,10 +64,7 @@ class AmCommandService extends BaseApplicationComponent
         }
         // Treat the result as a new list of commands
         if (is_array($commandResult)) {
-            $newCommands = $this->_sortCommands($commandResult);
-            return craft()->templates->render('amcommand/triggerCommand', array(
-                'commands' => $newCommands
-            ));
+            return $this->_sortCommands($commandResult);
         } else {
             return $commandResult;
         }
@@ -174,7 +171,7 @@ class AmCommandService extends BaseApplicationComponent
     }
 
     /**
-     * Order the commands by type and name.
+     * Order the commands by name.
      *
      * @param array $commands
      *
@@ -183,7 +180,7 @@ class AmCommandService extends BaseApplicationComponent
     private function _sortCommands($commands)
     {
         usort($commands, function($a, $b) {
-            return strcmp((isset($a['type']) ? $a['type'] : '') . $a['name'], (isset($b['type']) ? $b['type'] : '') . $b['name']);
+            return strcmp($a['name'], $b['name']);
         });
         return $commands;
     }
@@ -200,18 +197,22 @@ class AmCommandService extends BaseApplicationComponent
         // Duplicate entry command
         if ($this->_isEnabled('duplicateEntry')) {
             $entrySegment = craft()->request->getSegment(1) == 'entries';
-            $entryId = craft()->request->getSegment(3);
+            $entryId = current(explode('-', craft()->request->getSegment(3)));
             if ($entrySegment && is_numeric($entryId)) {
-                $currentCommands[] = array(
-                    'name'    => Craft::t('Duplicate entry'),
-                    'type'    => Craft::t('Content'),
-                    'info'    => Craft::t('Duplicate the current entry.'),
-                    'call'    => 'duplicateEntry',
-                    'service' => 'amCommand_entries',
-                    'vars'    => array(
-                        'entryId' => $entryId
-                    )
-                );
+                // We don't want to duplicate Single type entries
+                $entry = craft()->entries->getEntryById($entryId);
+                $entrySection = $entry->getSection();
+                if ($entrySection->type != SectionType::Single) {
+                    $currentCommands[] = array(
+                        'name'    => Craft::t('Content') . ': ' . Craft::t('Duplicate entry'),
+                        'info'    => Craft::t('Duplicate the current entry.'),
+                        'call'    => 'duplicateEntry',
+                        'service' => 'amCommand_entries',
+                        'vars'    => array(
+                            'entryId' => $entryId
+                        )
+                    );
+                }
             }
         }
 
@@ -223,8 +224,7 @@ class AmCommandService extends BaseApplicationComponent
         if (($newEnabled || $editEnabled || $deleteEnabled || $deleteAllEnabled) && (craft()->userSession->isAdmin() || craft()->sections->getTotalEditableSections() > 0)) {
             if ($newEnabled) {
                 $currentCommands[] = array(
-                    'name'    => Craft::t('New Entry'),
-                    'type'    => Craft::t('Content'),
+                    'name'    => Craft::t('Content') . ': ' . Craft::t('New Entry'),
                     'info'    => Craft::t('Create a new entry in one of the available sections.'),
                     'more'    => true,
                     'call'    => 'newEntry',
@@ -233,8 +233,7 @@ class AmCommandService extends BaseApplicationComponent
             }
             if ($editEnabled) {
                 $currentCommands[] = array(
-                    'name'    => Craft::t('Edit entries'),
-                    'type'    => Craft::t('Content'),
+                    'name'    => Craft::t('Content') . ': ' . Craft::t('Edit entries'),
                     'info'    => Craft::t('Edit an entry in one of the available sections.'),
                     'more'    => true,
                     'call'    => 'editEntries',
@@ -243,8 +242,7 @@ class AmCommandService extends BaseApplicationComponent
             }
             if ($deleteEnabled) {
                 $currentCommands[] = array(
-                    'name'    => Craft::t('Delete entries'),
-                    'type'    => Craft::t('Content'),
+                    'name'    => Craft::t('Content') . ': ' . Craft::t('Delete entries'),
                     'info'    => Craft::t('Delete an entry in one of the available sections.'),
                     'more'    => true,
                     'call'    => 'deleteEntries',
@@ -256,8 +254,7 @@ class AmCommandService extends BaseApplicationComponent
             }
             if ($deleteAllEnabled && craft()->userSession->isAdmin()) {
                 $currentCommands[] = array(
-                    'name'    => Craft::t('Delete all entries'),
-                    'type'    => Craft::t('Content'),
+                    'name'    => Craft::t('Content') . ': ' . Craft::t('Delete all entries'),
                     'info'    => Craft::t('Delete all entries in one of the available sections.'),
                     'more'    => true,
                     'call'    => 'deleteEntries',
@@ -282,8 +279,7 @@ class AmCommandService extends BaseApplicationComponent
     {
         if ($this->_isEnabled('editGlobals') && (craft()->userSession->isAdmin() || craft()->globals->getTotalEditableSets() > 0)) {
             $currentCommands[] = array(
-                'name'    => Craft::t('Edit'),
-                'type'    => Craft::t('Globals'),
+                'name'    => Craft::t('Globals') . ': ' . Craft::t('Edit'),
                 'more'    => true,
                 'call'    => 'editGlobals',
                 'service' => 'amCommand_globals'
@@ -303,12 +299,39 @@ class AmCommandService extends BaseApplicationComponent
     {
         if ($this->_isEnabled('userCommands') && (craft()->userSession->isAdmin() || craft()->userSession->getUser()->can('editUsers'))) {
             $currentCommands[] = array(
-                'name'    => Craft::t('Administrate users'),
-                'info'    => Craft::t('Create, edit or delete a user.'),
+                'name'    => Craft::t('Users') . ': ' . Craft::t('New User'),
+                'info'    => Craft::t('Create a user.'),
+                'url'     => UrlHelper::getUrl('users/new')
+            );
+            $currentCommands[] = array(
+                'name'    => Craft::t('Users') . ': ' . Craft::t('Edit users'),
+                'info'    => Craft::t('Edit a user.'),
                 'more'    => true,
-                'call'    => 'userCommands',
+                'call'    => 'editUser',
                 'service' => 'amCommand_users'
             );
+            $currentCommands[] = array(
+                'name'    => Craft::t('Users') . ': ' . Craft::t('Delete users'),
+                'info'    => Craft::t('Delete a user other than your own.'),
+                'more'    => true,
+                'call'    => 'deleteUser',
+                'service' => 'amCommand_users'
+            );
+            $currentCommands[] = array(
+                'name'    => Craft::t('Users') . ': ' . Craft::t('Sign out'),
+                'info'    => Craft::t('End current session.'),
+                'more'    => true,
+                'url'     => UrlHelper::getUrl('logout')
+            );
+            if (craft()->userSession->isAdmin()) {
+                $currentCommands[] = array(
+                    'name'    => Craft::t('Users') . ': ' . Craft::t('Login as user'),
+                    'info'    => Craft::t('Log in as a different user, and navigate to their dashboard.'),
+                    'more'    => true,
+                    'call'    => 'loginUser',
+                    'service' => 'amCommand_users'
+                );
+            }
         }
         return $currentCommands;
     }
@@ -336,105 +359,55 @@ class AmCommandService extends BaseApplicationComponent
         }
         if ($this->_isEnabled('settings')) {
             $currentCommands[] = array(
-                'name' => Craft::t('New') . '...',
-                'type' => Craft::t('Settings'),
-                'info' => Craft::t('Add something new in the settings...'),
-                'more' => true,
-                'call' => '_newSettings'
+                'name'    => Craft::t('Settings') . ': ' . Craft::t('New') . '...',
+                'info'    => Craft::t('Add something new in the settings...'),
+                'more'    => true,
+                'call'    => 'newSettings',
+                'service' => 'amCommand_settings'
             );
             $currentCommands[] = array(
-                'name' => Craft::t('Fields'),
-                'type' => Craft::t('Settings'),
+                'name' => Craft::t('Settings') . ': ' . Craft::t('Fields'),
                 'url'  => UrlHelper::getUrl('settings/fields')
             );
             $currentCommands[] = array(
-                'name' => Craft::t('Sections'),
-                'type' => Craft::t('Settings'),
+                'name' => Craft::t('Settings') . ': ' . Craft::t('Sections'),
                 'url'  => UrlHelper::getUrl('settings/sections')
             );
             $currentCommands[] = array(
-                'name' => Craft::t('Globals'),
-                'type' => Craft::t('Settings'),
+                'name'    => Craft::t('Settings') . ': ' . Craft::t('Sections') . ' - ' . Craft::t('Edit entry type'),
+                'more'    => true,
+                'call'    => 'sectionEntryTypes',
+                'service' => 'amCommand_settings'
+            );
+            $currentCommands[] = array(
+                'name' => Craft::t('Settings') . ': ' . Craft::t('Globals'),
                 'url'  => UrlHelper::getUrl('settings/globals')
             );
             $currentCommands[] = array(
-                'name' => Craft::t('Users'),
-                'type' => Craft::t('Settings'),
+                'name' => Craft::t('Settings') . ': ' . Craft::t('Users'),
                 'url'  => UrlHelper::getUrl('settings/users')
             );
             $currentCommands[] = array(
-                'name' => Craft::t('Routes'),
-                'type' => Craft::t('Settings'),
+                'name' => Craft::t('Settings') . ': ' . Craft::t('Routes'),
                 'url'  => UrlHelper::getUrl('settings/routes')
             );
             $currentCommands[] = array(
-                'name' => Craft::t('Categories'),
-                'type' => Craft::t('Settings'),
+                'name' => Craft::t('Settings') . ': ' . Craft::t('Categories'),
                 'url'  => UrlHelper::getUrl('settings/categories')
             );
             $currentCommands[] = array(
-                'name' => Craft::t('Assets'),
-                'type' => Craft::t('Settings'),
+                'name' => Craft::t('Settings') . ': ' . Craft::t('Assets'),
                 'url'  => UrlHelper::getUrl('settings/assets')
             );
             $currentCommands[] = array(
-                'name' => Craft::t('Locales'),
-                'type' => Craft::t('Settings'),
+                'name' => Craft::t('Settings') . ': ' . Craft::t('Locales'),
                 'url'  => UrlHelper::getUrl('settings/locales')
             );
             $currentCommands[] = array(
-                'name' => Craft::t('Plugins'),
-                'type' => Craft::t('Settings'),
+                'name' => Craft::t('Settings') . ': ' . Craft::t('Plugins'),
                 'url'  => UrlHelper::getUrl('settings/plugins')
             );
         }
         return $currentCommands;
-    }
-
-    /**
-     * Get settings that you're able to add new things to.
-     *
-     * @return array
-     */
-    private function _newSettings()
-    {
-        $commands = array(
-            array(
-                'name' => Craft::t('New Field'),
-                'type' => Craft::t('Fields'),
-                'url'  => UrlHelper::getUrl('settings/fields/new')
-            ),
-            array(
-                'name' => Craft::t('New Section'),
-                'type' => Craft::t('Sections'),
-                'url'  => UrlHelper::getUrl('settings/sections/new')
-            ),
-            array(
-                'name' => Craft::t('New Global Set'),
-                'type' => Craft::t('Globals'),
-                'url'  => UrlHelper::getUrl('settings/globals/new')
-            ),
-            array(
-                'name' => Craft::t('New Group'),
-                'type' => Craft::t('User Groups'),
-                'url'  => UrlHelper::getUrl('settings/users/groups/new')
-            ),
-            array(
-                'name' => Craft::t('New Category Group'),
-                'type' => Craft::t('Categories'),
-                'url'  => UrlHelper::getUrl('settings/categories/new')
-            ),
-            array(
-                'name' => Craft::t('New Source'),
-                'type' => Craft::t('Assets'),
-                'url'  => UrlHelper::getUrl('settings/assets/sources/new')
-            ),
-            array(
-                'name' => Craft::t('New Transform'),
-                'type' => Craft::t('Image Transforms'),
-                'url'  => UrlHelper::getUrl('settings/assets/transforms/new')
-            )
-        );
-        return $commands;
     }
 }
