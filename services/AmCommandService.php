@@ -297,40 +297,42 @@ class AmCommandService extends BaseApplicationComponent
      */
     private function _getUserCommands($currentCommands)
     {
-        if ($this->_isEnabled('userCommands') && (craft()->userSession->isAdmin() || craft()->userSession->getUser()->can('editUsers'))) {
-            $currentCommands[] = array(
-                'name'    => Craft::t('Users') . ': ' . Craft::t('New User'),
-                'info'    => Craft::t('Create a user.'),
-                'url'     => UrlHelper::getUrl('users/new')
-            );
-            $currentCommands[] = array(
-                'name'    => Craft::t('Users') . ': ' . Craft::t('Edit users'),
-                'info'    => Craft::t('Edit a user.'),
-                'more'    => true,
-                'call'    => 'editUser',
-                'service' => 'amCommand_users'
-            );
-            $currentCommands[] = array(
-                'name'    => Craft::t('Users') . ': ' . Craft::t('Delete users'),
-                'info'    => Craft::t('Delete a user other than your own.'),
-                'more'    => true,
-                'call'    => 'deleteUser',
-                'service' => 'amCommand_users'
-            );
+        if ($this->_isEnabled('userCommands')) {
             $currentCommands[] = array(
                 'name'    => Craft::t('Users') . ': ' . Craft::t('Sign out'),
                 'info'    => Craft::t('End current session.'),
                 'more'    => true,
                 'url'     => UrlHelper::getUrl('logout')
             );
-            if (craft()->userSession->isAdmin()) {
+            if (craft()->userSession->isAdmin() || craft()->userSession->getUser()->can('editUsers')) {
                 $currentCommands[] = array(
-                    'name'    => Craft::t('Users') . ': ' . Craft::t('Login as user'),
-                    'info'    => Craft::t('Log in as a different user, and navigate to their dashboard.'),
+                    'name'    => Craft::t('Users') . ': ' . Craft::t('New User'),
+                    'info'    => Craft::t('Create a user.'),
+                    'url'     => UrlHelper::getUrl('users/new')
+                );
+                $currentCommands[] = array(
+                    'name'    => Craft::t('Users') . ': ' . Craft::t('Edit users'),
+                    'info'    => Craft::t('Edit a user.'),
                     'more'    => true,
-                    'call'    => 'loginUser',
+                    'call'    => 'editUser',
                     'service' => 'amCommand_users'
                 );
+                $currentCommands[] = array(
+                    'name'    => Craft::t('Users') . ': ' . Craft::t('Delete users'),
+                    'info'    => Craft::t('Delete a user other than your own.'),
+                    'more'    => true,
+                    'call'    => 'deleteUser',
+                    'service' => 'amCommand_users'
+                );
+                if (craft()->userSession->isAdmin()) {
+                    $currentCommands[] = array(
+                        'name'    => Craft::t('Users') . ': ' . Craft::t('Login as user'),
+                        'info'    => Craft::t('Log in as a different user, and navigate to their dashboard.'),
+                        'more'    => true,
+                        'call'    => 'loginUser',
+                        'service' => 'amCommand_users'
+                    );
+                }
             }
         }
         return $currentCommands;
@@ -382,6 +384,12 @@ class AmCommandService extends BaseApplicationComponent
             $currentCommands[] = array(
                 'name' => Craft::t('Settings') . ': ' . Craft::t('Globals'),
                 'url'  => UrlHelper::getUrl('settings/globals')
+            );
+            $currentCommands[] = array(
+                'name'    => Craft::t('Settings') . ': ' . Craft::t('Globals') . ' - ' . Craft::t('Global Sets'),
+                'more'    => true,
+                'call'    => 'globalSets',
+                'service' => 'amCommand_settings'
             );
             $currentCommands[] = array(
                 'name' => Craft::t('Settings') . ': ' . Craft::t('Users'),

@@ -16,6 +16,12 @@ class AmCommand_SettingsService extends BaseApplicationComponent
                 'url'  => UrlHelper::getUrl('settings/fields/new')
             ),
             array(
+                'name'    => Craft::t('Fields') . ': ' . Craft::t('New Field') . ' - ' . Craft::t('Group'),
+                'more'    => true,
+                'call'    => 'newFieldInGroup',
+                'service' => 'amCommand_settings'
+            ),
+            array(
                 'name' => Craft::t('Sections') . ': ' . Craft::t('New Section'),
                 'url'  => UrlHelper::getUrl('settings/sections/new')
             ),
@@ -62,6 +68,46 @@ class AmCommand_SettingsService extends BaseApplicationComponent
                     'url'  => $entryType->getCpEditUrl()
                 );
             }
+        }
+        return $commands;
+    }
+
+    /**
+     * Get Global Sets to edit.
+     *
+     * @return array
+     */
+    public function globalSets()
+    {
+        $commands = array();
+        $criteria = craft()->elements->getCriteria(ElementType::GlobalSet);
+        $globalSets = $criteria->find();
+        foreach ($globalSets as $globalSet) {
+            $commands[] = array(
+                'name' => $globalSet->name,
+                'url'  => UrlHelper::getUrl('settings/globals/' . $globalSet->id)
+            );
+        }
+        if (! count($commands)) {
+            craft()->amCommand->setReturnMessage(Craft::t('No global sets exist yet.'));
+        }
+        return $commands;
+    }
+
+    /**
+     * Get Field Groups to add a field to.
+     *
+     * @return array
+     */
+    public function newFieldInGroup()
+    {
+        $commands = array();
+        $groups = craft()->fields->getAllGroups();
+        foreach ($groups as $group) {
+            $commands[] = array(
+                'name' => $group->name,
+                'url'  => UrlHelper::getUrl('settings/fields/new?groupId=' . $group->id)
+            );
         }
         return $commands;
     }
