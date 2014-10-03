@@ -201,17 +201,19 @@ class AmCommandService extends BaseApplicationComponent
             if ($entrySegment && is_numeric($entryId)) {
                 // We don't want to duplicate Single type entries
                 $entry = craft()->entries->getEntryById($entryId);
-                $entrySection = $entry->getSection();
-                if ($entrySection->type != SectionType::Single) {
-                    $currentCommands[] = array(
-                        'name'    => Craft::t('Content') . ': ' . Craft::t('Duplicate entry'),
-                        'info'    => Craft::t('Duplicate the current entry.'),
-                        'call'    => 'duplicateEntry',
-                        'service' => 'amCommand_entries',
-                        'vars'    => array(
-                            'entryId' => $entryId
-                        )
-                    );
+                if ($entry) {
+                    $entrySection = $entry->getSection();
+                    if ($entrySection->type != SectionType::Single) {
+                        $currentCommands[] = array(
+                            'name'    => Craft::t('Content') . ': ' . Craft::t('Duplicate entry'),
+                            'info'    => Craft::t('Duplicate the current entry.'),
+                            'call'    => 'duplicateEntry',
+                            'service' => 'amCommand_entries',
+                            'vars'    => array(
+                                'entryId' => $entryId
+                            )
+                        );
+                    }
                 }
             }
         }
