@@ -166,7 +166,7 @@ Craft.AmCommand = Garnish.Base.extend(
     search: function(ev, allowSearch) {
         var self = this;
 
-        if (! allowSearch && self.isOpen) {
+        if (! allowSearch && self.isOpen && ! self.loading) {
             // Make sure we don't trigger ignored keys
             if (self.ignoreSearchKeys.indexOf(ev.keyCode) < 0) {
                 allowSearch = true;

@@ -301,6 +301,10 @@ class AmCommandService extends BaseApplicationComponent
     {
         if ($this->_isEnabled('userCommands')) {
             $currentCommands[] = array(
+                'name'    => Craft::t('Dashboard'),
+                'url'     => UrlHelper::getUrl('dashboard')
+            );
+            $currentCommands[] = array(
                 'name'    => Craft::t('Users') . ': ' . Craft::t('Sign out'),
                 'info'    => Craft::t('End current session.'),
                 'more'    => true,
