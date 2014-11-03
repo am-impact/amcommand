@@ -264,28 +264,11 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             // Current entry data
             $currentParent     = $currentEntry->getParent();
             $currentTitle      = $currentEntry->getContent()->title;
-            $currentContent    = $currentEntry->getContent()->getAttributes();
-            $currentAttributes = array();
+            $currentAttributes = $this->_getAttributesForModel($currentEntry);
 
             // Override title?
             if ($locale->id == $variables['locale']) {
                 $currentTitle = $variables['searchText'];
-            }
-
-            // Set current attributes; Because we don't want to just copy all attributes like the id and elementId
-            $fieldLayout = $currentEntry->getFieldLayout();
-            foreach ($fieldLayout->getFields() as $fieldLayoutField) {
-                $field = $fieldLayoutField->getField();
-                if ($currentEntry->{$field->handle} instanceof ElementCriteriaModel) {
-                    if ($field->type == 'Matrix') {
-                        $currentAttributes[$field->handle] = $currentEntry->{$field->handle}->find();
-                    } else {
-                        $currentAttributes[$field->handle] = $currentEntry->{$field->handle}->ids();
-                    }
-                }
-                else if (isset($currentContent[$field->handle])) {
-                    $currentAttributes[$field->handle] = $currentContent[$field->handle];
-                }
             }
 
             // New entry
@@ -332,5 +315,49 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             craft()->amCommand->setReturnMessage(Craft::t('Couldn’t duplicate entry.'));
         }
         return $result;
+    }
+
+    /**
+     * Get attributes for a Model.
+     *
+     * @param EntryModel/MatrixBlockModel $model
+     *
+     * @return array
+     */
+    private function _getAttributesForModel($model)
+    {
+        $attributes = array();
+        $content    = $model->getContent()->getAttributes();
+        $fieldLayout = $model->getFieldLayout();
+        foreach ($fieldLayout->getFields() as $fieldLayoutField) {
+            $field = $fieldLayoutField->getField();
+            if ($model->{$field->handle} instanceof ElementCriteriaModel) {
+                if ($field->type == 'Matrix') {
+                    $blocks = array();
+                    foreach ($model->{$field->handle}->find() as $matrixBlock) {
+                        // Create Matrix Block
+                        $newMatrixBlock = new MatrixBlockModel();
+                        $newMatrixBlock->fieldId = $matrixBlock->fieldId;
+                        $newMatrixBlock->typeId  = $matrixBlock->typeId;
+                        $newMatrixBlock->ownerId = null;
+                        $newMatrixBlock->locale  = $model->locale;
+
+                        // Set content
+                        $blockData = $this->_getAttributesForModel($matrixBlock);
+                        $newMatrixBlock->setContentFromPost($blockData);
+
+                        // Add block to Matrix Field
+                        $blocks[] = $newMatrixBlock;
+                    }
+                    $attributes[$field->handle] = $blocks;
+                } else {
+                    $attributes[$field->handle] = $model->{$field->handle}->ids();
+                }
+            }
+            else if (isset($content[$field->handle])) {
+                $attributes[$field->handle] = $content[$field->handle];
+            }
+        }
+        return $attributes;
     }
 }
