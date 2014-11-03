@@ -307,7 +307,6 @@ class AmCommandService extends BaseApplicationComponent
             $currentCommands[] = array(
                 'name'    => Craft::t('Users') . ': ' . Craft::t('Sign out'),
                 'info'    => Craft::t('End current session.'),
-                'more'    => true,
                 'url'     => UrlHelper::getUrl('logout')
             );
             if (craft()->userSession->isAdmin() || craft()->userSession->getUser()->can('editUsers')) {
