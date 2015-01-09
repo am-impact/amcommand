@@ -50,12 +50,15 @@ class AmCommand_EntriesService extends BaseApplicationComponent
                 $criteria = craft()->elements->getCriteria(ElementType::Entry);
                 $criteria->sectionId = $section->id;
                 $criteria->limit = 1;
+                $criteria->status = null;
                 $entry = $criteria->first();
 
-                $commands[] = array(
-                    'name' => $type . ': ' . $section->name,
-                    'url'  => $entry->getCpEditUrl()
-                );
+                if ($entry) {
+                    $commands[] = array(
+                        'name' => $type . ': ' . $section->name,
+                        'url'  => $entry->getCpEditUrl()
+                    );
+                }
             }
         }
         return $commands;
@@ -77,6 +80,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
         $criteria = craft()->elements->getCriteria(ElementType::Entry);
         $criteria->section = $variables['sectionHandle'];
         $criteria->limit = null;
+        $criteria->status = null;
         $entries = $criteria->find();
         foreach ($entries as $entry) {
             $commands[] = array(
@@ -114,6 +118,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
                 $criteria = craft()->elements->getCriteria(ElementType::Entry);
                 $criteria->sectionId = $section->id;
                 $criteria->limit = null;
+                $criteria->status = null;
                 $totalEntries = $criteria->total();
 
                 // Only add the command if the section has any entries
@@ -154,6 +159,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
         $criteria = craft()->elements->getCriteria(ElementType::Entry);
         $criteria->sectionId = $variables['sectionId'];
         $criteria->limit = null;
+        $criteria->status = null;
         $entries = $criteria->find();
         if ($deleteAll) {
             // Delete all entries
