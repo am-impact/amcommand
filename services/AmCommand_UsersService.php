@@ -118,7 +118,7 @@ class AmCommand_UsersService extends BaseApplicationComponent
         if (! isset($variables['userId'])) {
             return false;
         }
-        if (craft()->userSession->impersonate($variables['userId'])) {
+        if (craft()->userSession->loginByUserId($variables['userId'])) {
             craft()->userSession->setNotice(Craft::t('Logged in.'));
             craft()->amCommand->setReturnMessage(Craft::t('Login as user'));
 
@@ -130,7 +130,7 @@ class AmCommand_UsersService extends BaseApplicationComponent
             return true;
         } else {
             craft()->amCommand->setReturnMessage(Craft::t('There was a problem impersonating this user.'));
-            Craft::log(craft()->userSession->getUser()->username.' tried to impersonate userId: '.$variables['userId'].' but something went wrong.', LogLevel::Error);
+            Craft::log(craft()->userSession->getUser()->username . ' tried to log in using userId: '.$variables['userId'].' but something went wrong.', LogLevel::Error);
             return false;
         }
     }
