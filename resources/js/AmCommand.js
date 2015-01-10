@@ -473,7 +473,11 @@ Craft.AmCommand = Garnish.Base.extend(
                     }
                     // Redirect?
                     if (response.redirect) {
-                        window.location = response.redirect;
+                        if (response.redirect.newWindow) {
+                            window.open(response.redirect.url);
+                        } else {
+                            window.location = response.redirect.url;
+                        }
                     }
                 } else {
                     // Show current commands again and display a message
@@ -482,7 +486,7 @@ Craft.AmCommand = Garnish.Base.extend(
                     self.displayMessage(false, response.message, false);
                 }
             }
-        }, self));
+        }, self), {async: ! self.isAction});
     },
 
     /**

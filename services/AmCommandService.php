@@ -6,6 +6,7 @@ class AmCommandService extends BaseApplicationComponent
     private $_settings;
     private $_returnMessage;
     private $_returnUrl;
+    private $_returnUrlWindow;
     private $_returnAction;
     private $_deleteCurrentCommand = false;
 
@@ -27,6 +28,8 @@ class AmCommandService extends BaseApplicationComponent
         $commands = $this->_getGlobalCommands($commands);
         // Add user commands
         $commands = $this->_getUserCommands($commands);
+        // Add search commands
+        $commands = $this->_getSearchCommands($commands);
         // Add settings commands
         $commands = $this->_getSettingCommands($commands);
         // Add other plugin's commands
@@ -94,10 +97,12 @@ class AmCommandService extends BaseApplicationComponent
      * Set an URL to redirect to after executing a command.
      *
      * @param string $url
+     * @param bool   $newWindow [Optional] Whether to redirect in a new window.
      */
-    public function setReturnUrl($url)
+    public function setReturnUrl($url, $newWindow = false)
     {
         $this->_returnUrl = $url;
+        $this->_returnUrlWindow = $newWindow;
     }
 
     /**
@@ -107,7 +112,7 @@ class AmCommandService extends BaseApplicationComponent
      */
     public function getReturnUrl()
     {
-        return isset($this->_returnUrl) ? $this->_returnUrl : false;
+        return isset($this->_returnUrl) ? array('url' => $this->_returnUrl, 'newWindow' => $this->_returnUrlWindow) : false;
     }
 
     /**
@@ -340,6 +345,32 @@ class AmCommandService extends BaseApplicationComponent
                 }
             }
         }
+        return $currentCommands;
+    }
+
+    /**
+     * Get useful search commands.
+     *
+     * @param array $currentCommands
+     *
+     * @return array
+     */
+    private function _getSearchCommands($currentCommands)
+    {
+        $currentCommands[] = array(
+            'name'    => Craft::t('Search on {option}', array('option' => 'Craft')),
+            'info'    => 'http://www.buildwithcraft.com',
+            'more'    => true,
+            'call'    => 'searchOptionCraft',
+            'service' => 'amCommand_search'
+        );
+        $currentCommands[] = array(
+            'name'    => Craft::t('Search on {option}', array('option' => 'StackExchange')),
+            'info'    => 'http://craftcms.stackexchange.com',
+            'more'    => true,
+            'call'    => 'searchOptionStackExchange',
+            'service' => 'amCommand_search'
+        );
         return $currentCommands;
     }
 
