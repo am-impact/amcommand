@@ -25,6 +25,7 @@ return array(
     'Entries deleted.' => 'Berichten verwijderd.',
     'Entry duplicated.' => 'Bericht gedupliceerd.',
     'Log in as a different user, and navigate to their dashboard.' => 'Meld u aan als een andere gebruiker, en navigeer naar hun dashboard.',
+    'Login as user' => 'Inloggen als gebruiker',
     'New' => 'Nieuw',
     'No entries in this section exist yet.' => 'Er bestaat nog geen inhoud in deze sectie.',
     'There are no entries within the available sections.' => 'Er zijn geen berichten in de beschikbare secties.',
