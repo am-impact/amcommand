@@ -357,20 +357,22 @@ class AmCommandService extends BaseApplicationComponent
      */
     private function _getSearchCommands($currentCommands)
     {
-        $currentCommands[] = array(
-            'name'    => Craft::t('Search on {option}', array('option' => 'Craft')),
-            'info'    => 'http://www.buildwithcraft.com',
-            'more'    => true,
-            'call'    => 'searchOptionCraft',
-            'service' => 'amCommand_search'
-        );
-        $currentCommands[] = array(
-            'name'    => Craft::t('Search on {option}', array('option' => 'StackExchange')),
-            'info'    => 'http://craftcms.stackexchange.com',
-            'more'    => true,
-            'call'    => 'searchOptionStackExchange',
-            'service' => 'amCommand_search'
-        );
+        if ($this->_isEnabled('searchCommands')) {
+            $currentCommands[] = array(
+                'name'    => Craft::t('Search on {option}', array('option' => 'Craft')),
+                'info'    => 'http://www.buildwithcraft.com',
+                'more'    => true,
+                'call'    => 'searchOptionCraft',
+                'service' => 'amCommand_search'
+            );
+            $currentCommands[] = array(
+                'name'    => Craft::t('Search on {option}', array('option' => 'StackExchange')),
+                'info'    => 'http://craftcms.stackexchange.com',
+                'more'    => true,
+                'call'    => 'searchOptionStackExchange',
+                'service' => 'amCommand_search'
+            );
+        }
         return $currentCommands;
     }
 

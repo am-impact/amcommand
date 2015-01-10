@@ -35,5 +35,6 @@ return array(
     'Title isn’t set.' => 'De titel is niet ingevuld.',
     'Title of new entry:' => 'Titel van het nieuwe bericht:',
     'Use one of the most used tools.' => 'Gebruik één van de meest gebruikte tools.',
-    'You can disable commands you do not wish to use, by unchecking the checkboxes below.' => 'U kunt commando\'s uitschakelen die u niet wenst te gebruiken, door de boxen hieronder uit te vinken.'
+    'You can disable commands you do not wish to use, by unchecking the checkboxes below.' => 'U kunt commando\'s uitschakelen die u niet wenst te gebruiken, door de boxen hieronder uit te vinken.',
+    'You’re able to search within a site that offers help.' => 'Je hebt de mogelijkheid om te zoeken binnen een site die hulp bied.'
 );

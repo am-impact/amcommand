@@ -63,6 +63,10 @@ class AmCommandPlugin extends BasePlugin
                 'name' => Craft::t('Administrate users'),
                 'info' => Craft::t('Create, edit or delete a user.')
             ),
+            'searchCommands' => array(
+                'name' => Craft::t('Search'),
+                'info' => Craft::t('You’re able to search within a site that offers help.')
+            ),
             'settings' => array(
                 'name' => Craft::t('Settings'),
                 'info' => Craft::t('This action may only be performed by admins.')
@@ -121,6 +125,7 @@ class AmCommandPlugin extends BasePlugin
             'deleteAllEntries' => array(AttributeType::Bool, 'default' => true),
             'editGlobals'      => array(AttributeType::Bool, 'default' => true),
             'userCommands'     => array(AttributeType::Bool, 'default' => true),
+            'searchCommands'   => array(AttributeType::Bool, 'default' => true),
             'settings'         => array(AttributeType::Bool, 'default' => true),
             'tools'            => array(AttributeType::Bool, 'default' => true)
         );
