@@ -134,6 +134,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
         $criteria = craft()->elements->getCriteria($elementType, $searchCriteria);
         $criteria->search = $searchCriteria;
         $criteria->status = null;
+        $criteria->locale = craft()->i18n->getPrimarySiteLocaleId();
         $elements = $criteria->find();
 
         $commands = array();

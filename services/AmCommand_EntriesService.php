@@ -51,6 +51,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
                 $criteria->sectionId = $section->id;
                 $criteria->limit = 1;
                 $criteria->status = null;
+                $criteria->locale = craft()->i18n->getPrimarySiteLocaleId();
                 $entry = $criteria->first();
 
                 if ($entry) {
@@ -81,6 +82,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
         $criteria->section = $variables['sectionHandle'];
         $criteria->limit = null;
         $criteria->status = null;
+        $criteria->locale = craft()->i18n->getPrimarySiteLocaleId();
         $entries = $criteria->find();
         foreach ($entries as $entry) {
             $commands[] = array(
@@ -119,6 +121,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
                 $criteria->sectionId = $section->id;
                 $criteria->limit = null;
                 $criteria->status = null;
+                $criteria->locale = craft()->i18n->getPrimarySiteLocaleId();
                 $totalEntries = $criteria->total();
 
                 // Only add the command if the section has any entries
@@ -160,6 +163,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
         $criteria->sectionId = $variables['sectionId'];
         $criteria->limit = null;
         $criteria->status = null;
+        $criteria->locale = craft()->i18n->getPrimarySiteLocaleId();
         $entries = $criteria->find();
         if ($deleteAll) {
             // Delete all entries
