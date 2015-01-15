@@ -118,20 +118,24 @@ class AmCommandService extends BaseApplicationComponent
     /**
      * Set an action that'll be returned after a command was executed.
      *
-     * @param string $tabs       Text above the search field.
-     * @param string $searchText Text in the search field.
-     * @param string $callback   Which callback should be called.
-     * @param string $service    In which service the callback is callable.
-     * @param array  $variables  [Optional] Variables for the callback.
+     * @param string $tabs         Text above the search field.
+     * @param string $searchText   Text in the search field.
+     * @param string $callback     Which callback should be called.
+     * @param string $service      In which service the callback is callable.
+     * @param array  $variables    [Optional] Variables for the callback.
+     * @param bool   $asynchronous [Optional] Whether the action should be submitted asynchronously.
+     * @param bool   $realtime     [Optional] Whether this action should be submitted while the user types in the search field.
      */
-    public function setReturnAction($tabs, $searchText, $callback, $service, $variables = array())
+    public function setReturnAction($tabs, $searchText, $callback, $service, $variables = array(), $asynchronous = true, $realtime = false)
     {
         $this->_returnAction = array(
             'tabs'       => $tabs,
             'searchText' => $searchText,
             'call'       => $callback,
             'service'    => $service,
-            'vars'       => $variables
+            'vars'       => $variables,
+            'async'      => $asynchronous,
+            'realtime'   => $realtime
         );
     }
 
@@ -370,6 +374,24 @@ class AmCommandService extends BaseApplicationComponent
                 'info'    => 'http://craftcms.stackexchange.com',
                 'more'    => true,
                 'call'    => 'searchOptionStackExchange',
+                'service' => 'amCommand_search'
+            );
+            $currentCommands[] = array(
+                'name'    => Craft::t('Search for {option}', array('option' => Craft::t('Categories'))),
+                'more'    => true,
+                'call'    => 'searchOptionCategories',
+                'service' => 'amCommand_search'
+            );
+            $currentCommands[] = array(
+                'name'    => Craft::t('Search for {option}', array('option' => Craft::t('Entries'))),
+                'more'    => true,
+                'call'    => 'searchOptionEntries',
+                'service' => 'amCommand_search'
+            );
+            $currentCommands[] = array(
+                'name'    => Craft::t('Search for {option}', array('option' => Craft::t('Users'))),
+                'more'    => true,
+                'call'    => 'searchOptionUsers',
                 'service' => 'amCommand_search'
             );
         }

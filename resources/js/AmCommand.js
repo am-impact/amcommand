@@ -28,7 +28,10 @@ Craft.AmCommand = Garnish.Base.extend(
     },
     isOpen:              false,
     isAction:            false,
+    isActionAsync:       true,
+    isActionRealtime:    false,
     actionData:          [],
+    actionTimer:         false,
     loading:             false,
     loadingCommand:      '',
     P_KEY:               80,
@@ -129,6 +132,8 @@ Craft.AmCommand = Garnish.Base.extend(
                 // If we have any new commands, reset back to first set of commands
                 if (self.rememberPalette.currentSet > 0) {
                     self.isAction = false;
+                    self.isActionAsync = true;
+                    self.isActionRealtime = false;
                     self.actionData = [];
                     self.rememberPalette.currentSet = 0;
                     self.commandsArray = self.rememberPalette.commandsArray[1];
@@ -162,8 +167,9 @@ Craft.AmCommand = Garnish.Base.extend(
      *
      * @param object ev          The triggered event.
      * @param bool   allowSearch Override for command palette init.
+     * @param bool   realtime    Whether the search was triggered by a realtime action.
      */
-    search: function(ev, allowSearch) {
+    search: function(ev, allowSearch, realtime) {
         var self = this;
 
         if (! allowSearch && self.isOpen && ! self.loading) {
@@ -172,19 +178,29 @@ Craft.AmCommand = Garnish.Base.extend(
                 allowSearch = true;
             }
         }
-        if (! self.isAction && allowSearch) {
-            var searchValue = self.$searchField.val(),
-                filtered = fuzzy.filter(searchValue, self.commandsArray, self.fuzzyOptions),
-                totalResults = filtered.length;
+        if (allowSearch) {
+            if (! self.isAction || realtime) {
+                var searchValue = realtime ? '' : self.$searchField.val(),
+                    filtered = fuzzy.filter(searchValue, self.commandsArray, self.fuzzyOptions),
+                    totalResults = filtered.length;
 
-            // Find matches
-            var results = filtered.map(function(el) {
-                var name = '<span class="amcommand__commands--name' + ('more' in el.original && el.original.more ? ' go' : '') + '">' + el.string + '</span>';
-                var info = ('info' in el.original) ? '<span class="amcommand__commands--info">' + el.original.info + '</span>' : '';
-                return '<li data-id="' + el.index + '">' + name + info + '</li>';
-            });
-            self.$commandsContainer.html(results.join(''));
-            self.resetPalette();
+                // Find matches
+                var results = filtered.map(function(el) {
+                    var name = '<span class="amcommand__commands--name' + ('more' in el.original && el.original.more ? ' go' : '') + '">' + el.string + '</span>';
+                    var info = ('info' in el.original) ? '<span class="amcommand__commands--info">' + el.original.info + '</span>' : '';
+                    return '<li data-id="' + el.index + '">' + name + info + '</li>';
+                });
+                self.$commandsContainer.html(results.join(''));
+                self.resetPalette();
+            }
+            else if (self.isAction && self.isActionRealtime) {
+                if (self.actionTimer) {
+                    clearTimeout(self.actionTimer);
+                }
+                self.actionTimer = setTimeout($.proxy(function() {
+                    self.triggerRealtimeAction();
+                }, this), 600);
+            }
         }
     },
 
@@ -285,6 +301,8 @@ Craft.AmCommand = Garnish.Base.extend(
         // Reset action if set
         if (self.isAction) {
             self.isAction = false;
+            self.isActionAsync = true;
+            self.isActionRealtime = false;
             self.actionData = [];
             self.$buttonExecute.addClass('hidden');
             self.$searchContainer.removeClass('amcommand__search--hasButton');
@@ -307,6 +325,27 @@ Craft.AmCommand = Garnish.Base.extend(
     },
 
     /**
+     * Submit current criteria in the textfield to current action.
+     */
+    triggerRealtimeAction: function()
+    {
+        var self = this;
+
+        // Disable timer if set
+        if (self.actionTimer) {
+            clearTimeout(self.actionTimer);
+            self.actionTimer = false;
+        }
+
+        // Set action data
+        var variables = self.actionData.vars;
+        variables['searchText'] = self.$searchField.val();
+        // Trigger action
+        self.loading = true;
+        self.triggerCallback(self.actionData.call, self.actionData.service, variables);
+    },
+
+    /**
      * Navigate to the current focused command.
      *
      * @param object ev          The triggered event.
@@ -316,7 +355,7 @@ Craft.AmCommand = Garnish.Base.extend(
         var self = this;
 
         if (self.isOpen && ! self.loading) {
-            if (self.isAction) {
+            if (self.isAction && ! self.isActionRealtime) {
                 var variables = self.actionData.vars;
                 variables['searchText'] = self.$searchField.val();
                 // Trigger action
@@ -401,24 +440,34 @@ Craft.AmCommand = Garnish.Base.extend(
                 self.$loader.addClass('hidden');
                 if (response.success) {
                     // Reset action if set
-                    if (self.isAction) {
+                    if (self.isAction && ! self.isActionRealtime) {
                         self.isAction = false;
+                        self.isActionAsync = true;
                         self.actionData = [];
                         self.$buttonExecute.addClass('hidden');
                         self.$searchContainer.removeClass('amcommand__search--hasButton');
                     }
 
                     // What result do we have? An action, new command set or just a result message?
-                    if (response.isAction) {
+                    if (self.isAction && self.isActionRealtime && response.isNewSet) {
+                        self.commandsArray = response.result;
+                        self.search(undefined, true, true);
+                    }
+                    else if (response.isAction) {
                         // Remember current commands and action information
                         self.rememberCommands();
                         self.isAction = true;
+                        self.isActionAsync = response.isAction.async;
+                        self.isActionRealtime = response.isAction.realtime;
                         self.actionData = response.isAction;
-                        // Display text and execute button above search field
+                        // Display text
                         self.$tabsContainer.text(response.isAction.tabs);
                         self.$tabsContainer.removeClass('hidden');
-                        self.$buttonExecute.removeClass('hidden');
-                        self.$searchContainer.addClass('amcommand__search--hasButton');
+                        // Only display the execute button next to search field when it's not realtime
+                        if (! response.isAction.realtime) {
+                            self.$buttonExecute.removeClass('hidden');
+                            self.$searchContainer.addClass('amcommand__search--hasButton');
+                        }
                         // Reset palette
                         self.commandsArray = [];
                         self.$commandsContainer.html('');
@@ -480,13 +529,18 @@ Craft.AmCommand = Garnish.Base.extend(
                         }
                     }
                 } else {
+                    // Delete current commands if realtime action
+                    if (self.isAction && self.isActionRealtime) {
+                        self.commandsArray = [];
+                        self.$commandsContainer.html('');
+                    }
                     // Show current commands again and display a message
                     self.$commands.show();
                     self.$searchField.focus();
                     self.displayMessage(false, response.message, false);
                 }
             }
-        }, self), {async: ! self.isAction});
+        }, self), {async: self.isActionAsync});
     },
 
     /**

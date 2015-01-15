@@ -29,6 +29,7 @@ return array(
     'New' => 'Nieuw',
     'No entries in this section exist yet.' => 'Er bestaat nog geen inhoud in deze sectie.',
     'Search criteria isn’t set.' => 'Zoekcriteria is niet ingesteld.',
+    'Search for {option}' => 'Zoeken naar {option}',
     'Search on {option}' => 'Zoeken op {option}',
     'There are no entries within the available sections.' => 'Er zijn geen berichten in de beschikbare secties.',
     'There are no more commands available.' => 'Er zijn geen commando\'s meer beschikbaar.',
