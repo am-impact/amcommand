@@ -16,7 +16,7 @@ class AmCommandPlugin extends BasePlugin
 
     public function getVersion()
     {
-        return '1.1';
+        return '1.1.1';
     }
 
     public function getDeveloper()
@@ -92,7 +92,7 @@ class AmCommandPlugin extends BasePlugin
         // We only want to see the command palette in the backend
         // User has to be logged in (or it will also work on the login page)
         // Make sure we only run our code once on pages like Entries, by using: craft()->request->isAjaxRequest
-        if (craft()->userSession->isLoggedIn() && craft()->request->isCpRequest() && ! craft()->request->isAjaxRequest()) {
+        if (craft()->request->isCpRequest() && craft()->userSession->isLoggedIn() && ! craft()->request->isAjaxRequest()) {
             // Gather commands
             $commands = craft()->amCommand->getCommands($this->getSettings());
 
