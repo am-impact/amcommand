@@ -11,7 +11,7 @@ class AmCommandPlugin extends BasePlugin
 {
     public function getName()
     {
-         return 'a&m command';
+         return 'Command';
     }
 
     public function getVersion()
@@ -27,6 +27,11 @@ class AmCommandPlugin extends BasePlugin
     public function getDeveloperUrl()
     {
         return 'http://www.am-impact.nl';
+    }
+
+    public function hasCpSection()
+    {
+        return true;
     }
 
     /**
@@ -103,7 +108,7 @@ class AmCommandPlugin extends BasePlugin
             // Load javascript
             $js = sprintf('new Craft.AmCommand(%s);', $commands);
             craft()->templates->includeJs($js);
-            craft()->templates->includeJsResource('amcommand/js/AmCommand.min.js');
+            craft()->templates->includeJsResource('amcommand/js/AmCommand.js');
             craft()->templates->includeJsResource('amcommand/js/fuzzy-min.js');
             craft()->templates->includeCssResource('amcommand/css/AmCommand.css');
             craft()->templates->includeTranslations('Command executed', 'Are you sure you want to execute this command?', 'There are no more commands available.');

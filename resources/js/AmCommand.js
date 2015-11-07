@@ -9,7 +9,7 @@ Craft.AmCommand = Garnish.Base.extend(
     $commandsContainer:  $('.amcommand__commands ul'),
     $loader:             $('.amcommand__loader'),
     $commands:           $('.amcommand__commands li'),
-    $button:             $('<li><span class="customicon customicon__lightning" title="Command palette"></span></li>').prependTo('#header-actions'),
+    $button:             $('#nav-amcommand'),
     $buttonExecute:      $('.amcommand__search input[type=button]'),
     ignoreSearchKeys:    [Garnish.UP_KEY, Garnish.DOWN_KEY, Garnish.LEFT_KEY, Garnish.RIGHT_KEY, Garnish.RETURN_KEY, Garnish.ESC_KEY],
     fuzzyOptions:        {
@@ -60,7 +60,10 @@ Craft.AmCommand = Garnish.Base.extend(
     bindEvents: function() {
         var self = this;
 
-        self.addListener(self.$button, 'click', 'openPalette');
+        self.addListener(self.$button, 'click', function(ev) {
+            ev.preventDefault();
+            self.openPalette();
+        });
 
         self.addListener(self.$searchField, 'keyup', 'search');
 

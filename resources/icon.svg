@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="116px" height="116px" viewBox="0 0 116 116" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.3.3 (12081) - http://www.bohemiancoding.com/sketch -->
+    <title>Untitled</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#E1F803" offset="0%"></stop>
+            <stop stop-color="#5BC61D" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <circle id="Oval-1" fill="url(#linearGradient-1)" sketch:type="MSShapeGroup" cx="58" cy="58" r="58"></circle>
+        <g id="icon-mask" sketch:type="MSLayerGroup" transform="translate(41.000000, 26.000000)" fill="#FFFFFF">
+            <path d="M34.5697917,0 L10.395,0 L0.7284375,34.8604494 L10.4146875,34.8604494 L2.17875,64.5676404 L5.08010417,64.5676404 L33.1172917,29.7057303 L18.9138542,29.7057303 L34.5697917,0 Z" id="Shape" sketch:type="MSShapeGroup"></path>
+        </g>
+    </g>
+</svg>
