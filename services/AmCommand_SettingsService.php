@@ -12,37 +12,37 @@ class AmCommand_SettingsService extends BaseApplicationComponent
     {
         $commands = array(
             array(
-                'name' => Craft::t('Fields') . ': ' . Craft::t('New Field'),
+                'name' => Craft::t('Create a new field'),
                 'url'  => UrlHelper::getUrl('settings/fields/new')
             ),
             array(
-                'name'    => Craft::t('Fields') . ': ' . Craft::t('New Field') . ' - ' . Craft::t('Group'),
+                'name'    => Craft::t('Create a new field') . ' - ' . Craft::t('Group'),
                 'more'    => true,
                 'call'    => 'newFieldInGroup',
                 'service' => 'amCommand_settings'
             ),
             array(
-                'name' => Craft::t('Sections') . ': ' . Craft::t('New Section'),
+                'name' => Craft::t('Create a new section'),
                 'url'  => UrlHelper::getUrl('settings/sections/new')
             ),
             array(
-                'name' => Craft::t('Globals') . ': ' . Craft::t('New Global Set'),
+                'name' => Craft::t('Create a new global set'),
                 'url'  => UrlHelper::getUrl('settings/globals/new')
             ),
             array(
-                'name' => Craft::t('User Groups') . ': ' . Craft::t('New Group'),
+                'name' => Craft::t('Create a new user group'),
                 'url'  => UrlHelper::getUrl('settings/users/groups/new')
             ),
             array(
-                'name' => Craft::t('Categories') . ': ' . Craft::t('New Category Group'),
+                'name' => Craft::t('Create a new category group'),
                 'url'  => UrlHelper::getUrl('settings/categories/new')
             ),
             array(
-                'name' => Craft::t('Assets') . ': ' . Craft::t('New Source'),
+                'name' => Craft::t('Create a new asset source'),
                 'url'  => UrlHelper::getUrl('settings/assets/sources/new')
             ),
             array(
-                'name' => Craft::t('Image Transforms') . ': ' . Craft::t('New Transform'),
+                'name' => Craft::t('Create a new image transform'),
                 'url'  => UrlHelper::getUrl('settings/assets/transforms/new')
             )
         );

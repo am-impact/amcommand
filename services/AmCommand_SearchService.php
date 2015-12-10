@@ -77,7 +77,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
         }
         switch ($variables['option']) {
             case 'Craft':
-                craft()->amCommand->setReturnUrl('http://buildwithcraft.com/search?q=' . $searchCriteria, true);
+                craft()->amCommand->setReturnUrl('https://craftcms.com/search?q=' . $searchCriteria, true);
                 break;
             case 'StackExchange':
                 craft()->amCommand->setReturnUrl('http://craftcms.stackexchange.com/search?q=' . $searchCriteria, true);
@@ -132,9 +132,10 @@ class AmCommand_SearchService extends BaseApplicationComponent
     private function _searchForElement($elementType, $searchCriteria)
     {
         $criteria = craft()->elements->getCriteria($elementType, $searchCriteria);
-        $criteria->search = $searchCriteria;
+        $criteria->search = '*' . $searchCriteria . '*';
         $criteria->status = null;
         $criteria->locale = craft()->i18n->getPrimarySiteLocaleId();
+        $criteria->order = 'score';
         $elements = $criteria->find();
 
         $commands = array();

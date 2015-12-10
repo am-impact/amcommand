@@ -67,6 +67,9 @@ class AmCommandService extends BaseApplicationComponent
         }
         // Treat the result as a new list of commands
         if (is_array($commandResult)) {
+            if ($service == 'amCommand_search') {
+                return $commandResult;
+            }
             return $this->_sortCommands($commandResult);
         } else {
             return $commandResult;
@@ -235,7 +238,7 @@ class AmCommandService extends BaseApplicationComponent
         if (($newEnabled || $editEnabled || $deleteEnabled || $deleteAllEnabled) && (craft()->userSession->isAdmin() || craft()->sections->getTotalEditableSections() > 0)) {
             if ($newEnabled) {
                 $currentCommands[] = array(
-                    'name'    => Craft::t('Content') . ': ' . Craft::t('New Entry'),
+                    'name'    => Craft::t('Content') . ': ' . Craft::t('New entry'),
                     'info'    => Craft::t('Create a new entry in one of the available sections.'),
                     'more'    => true,
                     'call'    => 'newEntry',
@@ -320,7 +323,7 @@ class AmCommandService extends BaseApplicationComponent
             );
             if (craft()->userSession->isAdmin() || craft()->userSession->getUser()->can('editUsers')) {
                 $currentCommands[] = array(
-                    'name'    => Craft::t('Users') . ': ' . Craft::t('New User'),
+                    'name'    => Craft::t('Users') . ': ' . Craft::t('New user'),
                     'info'    => Craft::t('Create a user.'),
                     'url'     => UrlHelper::getUrl('users/new')
                 );
@@ -364,7 +367,7 @@ class AmCommandService extends BaseApplicationComponent
         if ($this->_isEnabled('searchCommands')) {
             $currentCommands[] = array(
                 'name'    => Craft::t('Search on {option}', array('option' => 'Craft')),
-                'info'    => 'http://www.buildwithcraft.com',
+                'info'    => 'https://craftcms.com',
                 'more'    => true,
                 'call'    => 'searchOptionCraft',
                 'service' => 'amCommand_search'
