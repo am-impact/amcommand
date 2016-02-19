@@ -3,6 +3,13 @@ namespace Craft;
 
 class AmCommand_UsersService extends BaseApplicationComponent
 {
+    private $_currentUser;
+
+    public function init()
+    {
+        $this->_currentUser = craft()->userSession->getUser();
+    }
+
     /**
      * List of users you're able to edit.
      *
@@ -11,14 +18,17 @@ class AmCommand_UsersService extends BaseApplicationComponent
     public function editUser()
     {
         $commands = array();
-        $users = $this->_getUsers();
-        foreach ($users as $user) {
-            $userInfo = $this->_getUserInfo($user);
-            $commands[] = array(
-                'name' => $user->username,
-                'info' => implode(' - ', $userInfo),
-                'url'  => $user->getCpEditUrl()
-            );
+        $users = craft()->amCommand_elements->getElements(ElementType::User);
+        if ($users) {
+            foreach ($users as $user) {
+                $commands[] = array(
+                    'name' => $this->_getUserInfo($user),
+                    'url'  => $this->_getCpEditUrl($user)
+                );
+            }
+        }
+        if (! count($commands)) {
+            craft()->amCommand->setReturnMessage(Craft::t('Besides your account, no other account could be found.'));
         }
         return $commands;
     }
@@ -31,18 +41,16 @@ class AmCommand_UsersService extends BaseApplicationComponent
     public function deleteUser()
     {
         $commands = array();
-        $users = $this->_getUsers();
+        $users = craft()->amCommand_elements->getElements(ElementType::User);
         foreach ($users as $user) {
-            $userInfo = $this->_getUserInfo($user);
-            if (! $user->isCurrent()) {
+            if ($this->_currentUser && $this->_currentUser->id != $user['id']) {
                 $commands[] = array(
-                    'name'    => $user->username,
-                    'info'    => implode(' - ', $userInfo),
+                    'name'    => $this->_getUserInfo($user),
                     'warn'    => true,
                     'call'    => 'deleteAnUser',
                     'service' => 'amCommand_users',
                     'vars'    => array(
-                        'userId' => $user->id
+                        'userId' => $user['id']
                     )
                 );
             }
@@ -84,18 +92,16 @@ class AmCommand_UsersService extends BaseApplicationComponent
     public function loginUser()
     {
         $commands = array();
-        $users = $this->_getUsers();
+        $users = craft()->amCommand_elements->getElements(ElementType::User);
         foreach ($users as $user) {
-            $userInfo = $this->_getUserInfo($user);
-            if (! $user->isCurrent()) {
+            if ($this->_currentUser && $this->_currentUser->id != $user['id']) {
                 $commands[] = array(
-                    'name'    => $user->username,
-                    'info'    => implode(' - ', $userInfo),
+                    'name'    => $this->_getUserInfo($user),
                     'warn'    => true,
                     'call'    => 'loginAsUser',
                     'service' => 'amCommand_users',
                     'vars'    => array(
-                        'userId' => $user->id
+                        'userId' => $user['id']
                     )
                 );
             }
@@ -136,35 +142,47 @@ class AmCommand_UsersService extends BaseApplicationComponent
     }
 
     /**
-     * Get users from any status.
+     * Get user information.
+     *
+     * @param array $user
      *
      * @return array
      */
-    private function _getUsers()
+    private function _getUserInfo($user)
     {
-        $criteria = craft()->elements->getCriteria(ElementType::User);
-        $criteria->status = null;
-        $criteria->limit = null;
-        return $criteria->find();
+        $userInfo = array();
+        if ($user['firstName']) {
+            $userInfo[] = $user['firstName'];
+        }
+        if ($user['lastName']) {
+            $userInfo[] = $user['lastName'];
+        }
+        $userInfo[] = '(' . $user['email'] . ')';
+        return implode(' ', $userInfo);
     }
 
     /**
-     * Get user information.
+     * Get CP edit URL.
      *
-     * @param UserModel $user
-     *
-     * @return array
+     * @return string|false
      */
-    private function _getUserInfo(UserModel $user)
+    private function _getCpEditUrl($user)
     {
-        $userInfo = array();
-        if ($user->firstName) {
-            $userInfo[] = $user->firstName;
+        if (! $this->_currentUser) {
+            return false;
         }
-        if ($user->lastName) {
-            $userInfo[] = $user->lastName;
+
+        if ($this->_currentUser->id == $user['id']) {
+            return UrlHelper::getCpUrl('myaccount');
         }
-        $userInfo[] = $user->email;
-        return $userInfo;
+        else if (craft()->getEdition() == Craft::Client && ! $this->_currentUser->admin) {
+            return UrlHelper::getCpUrl('clientaccount');
+        }
+        else if (craft()->getEdition() == Craft::Pro) {
+            return UrlHelper::getCpUrl('users/'.$user['id']);
+        }
+        else {
+            return false;
+        }
     }
 }
