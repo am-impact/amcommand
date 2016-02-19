@@ -77,22 +77,34 @@ class AmCommand_EntriesService extends BaseApplicationComponent
         if (! isset($variables['sectionHandle'])) {
             return false;
         }
+
+        // Gather commands
         $commands = array();
-        $criteria = craft()->elements->getCriteria(ElementType::Entry);
-        $criteria->section = $variables['sectionHandle'];
-        $criteria->limit = null;
-        $criteria->status = null;
-        $criteria->locale = craft()->i18n->getPrimarySiteLocaleId();
-        $entries = $criteria->find();
-        foreach ($entries as $entry) {
-            $commands[] = array(
-                'name' => $entry->title,
-                'info' => Craft::t('URI') . ': ' . $entry->uri,
-                'url'  => $entry->getCpEditUrl()
-            );
-        }
-        if (! count($commands)) {
+
+        // Find entries
+        $criteria = array(
+            'section' => $variables['sectionHandle'],
+            'locale'  => craft()->language,
+        );
+        $entries = craft()->amCommand_elements->getElements(ElementType::Entry, $criteria);
+        if (! $entries) {
             craft()->amCommand->setReturnMessage(Craft::t('No entries in this section exist yet.'));
+        }
+        else {
+            foreach ($entries as $entry) {
+                // Get CP edit URL
+                $url = UrlHelper::getCpUrl('entries/'.$variables['sectionHandle'].'/'.$entry['id'].($entry['slug'] ? '-'.$entry['slug'] : ''));
+                if (craft()->isLocalized()) {
+                    $url .= '/'.craft()->language;
+                }
+
+                // Add command
+                $commands[] = array(
+                    'name' => $entry['title'],
+                    'info' => Craft::t('URI') . ': ' . $entry['uri'],
+                    'url'  => $url
+                );
+            }
         }
         return $commands;
     }
@@ -116,13 +128,12 @@ class AmCommand_EntriesService extends BaseApplicationComponent
         $availableSections = craft()->sections->getEditableSections();
         foreach ($availableSections as $section) {
             if ($section->type != SectionType::Single) {
-                // Get the total entries number
-                $criteria = craft()->elements->getCriteria(ElementType::Entry);
-                $criteria->sectionId = $section->id;
-                $criteria->limit = null;
-                $criteria->status = null;
-                $criteria->locale = craft()->i18n->getPrimarySiteLocaleId();
-                $totalEntries = $criteria->total();
+                // Get total entries
+                $criteria = array(
+                    'sectionId' => $section->id,
+                    'locale'    => craft()->language,
+                );
+                $totalEntries = craft()->amCommand_elements->getTotalElements(ElementType::Entry, $criteria);
 
                 // Only add the command if the section has any entries
                 if ($totalEntries > 0) {
@@ -158,16 +169,26 @@ class AmCommand_EntriesService extends BaseApplicationComponent
         if (! isset($variables['sectionId']) || ! isset($variables['deleteAll'])) {
             return false;
         }
+        // Delete them all?
         $deleteAll = $variables['deleteAll'] == 'true';
-        $criteria = craft()->elements->getCriteria(ElementType::Entry);
-        $criteria->sectionId = $variables['sectionId'];
-        $criteria->limit = null;
-        $criteria->status = null;
-        $criteria->locale = craft()->i18n->getPrimarySiteLocaleId();
-        $entries = $criteria->find();
+
+        // Find entries
+        $criteria = array(
+            'sectionId' => $variables['sectionId'],
+            'locale'  => craft()->language,
+        );
+        $entries = craft()->amCommand_elements->getElements(ElementType::Entry, $criteria);
+
+        // Delete all entries or one by one?
         if ($deleteAll) {
+            // Gather entry IDs
+            $entryIds = array();
+            foreach ($entries as $entry) {
+                $entryIds[] = $entry['id'];
+            }
+
             // Delete all entries
-            $result =  craft()->entries->deleteEntry($entries);
+            $result = craft()->elements->deleteElementById($entryIds);
             if ($result) {
                 craft()->amCommand->setReturnMessage(Craft::t('Entries deleted.'));
             } else {
@@ -179,13 +200,13 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             $commands = array();
             foreach ($entries as $entry) {
                 $commands[] = array(
-                    'name'    => $entry->title,
-                    'info'    => Craft::t('URI') . ': ' . $entry->uri,
+                    'name'    => $entry['title'],
+                    'info'    => Craft::t('URI') . ': ' . $entry['uri'],
                     'warn'    => true,
                     'call'    => 'deleteEntry',
                     'service' => 'amCommand_entries',
                     'vars'    => array(
-                        'entryId' => $entry->id
+                        'entryId' => $entry['id']
                     )
                 );
             }
