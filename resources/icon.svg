@@ -1,18 +1,17 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg width="116px" height="116px" viewBox="0 0 116 116" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
-    <!-- Generator: Sketch 3.3.3 (12081) - http://www.bohemiancoding.com/sketch -->
-    <title>Untitled</title>
-    <desc>Created with Sketch.</desc>
-    <defs>
-        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
-            <stop stop-color="#E1F803" offset="0%"></stop>
-            <stop stop-color="#5BC61D" offset="100%"></stop>
-        </linearGradient>
-    </defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
-        <circle id="Oval-1" fill="url(#linearGradient-1)" sketch:type="MSShapeGroup" cx="58" cy="58" r="58"></circle>
-        <g id="icon-mask" sketch:type="MSLayerGroup" transform="translate(41.000000, 26.000000)" fill="#FFFFFF">
-            <path d="M34.5697917,0 L10.395,0 L0.7284375,34.8604494 L10.4146875,34.8604494 L2.17875,64.5676404 L5.08010417,64.5676404 L33.1172917,29.7057303 L18.9138542,29.7057303 L34.5697917,0 Z" id="Shape" sketch:type="MSShapeGroup"></path>
-        </g>
-    </g>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 19.2.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#42AAF3;}
+	.st1{fill:#F28A1F;}
+</style>
+<g id="Layer_1_1_">
+	<path class="st0" d="M17.5,12l-4.2-2.5l-2.6,5l-2.2,5.2c-0.2,0.4,0,0.9,0.4,1.2c0.2,0,0.4,0.1,0.6,0.1s0.5-0.1,0.7-0.3l7.5-7.1
+		c0.2-0.2,0.3-0.5,0.3-0.8S17.8,12.2,17.5,12z"/>
+</g>
+<g id="Layer_1_copy">
+	<path class="st1" d="M13.3,9.6l2.1-5.1c0.1-0.1,0.1-0.3,0.1-0.4c0-0.6-0.4-1-1-1c-0.2,0-0.5,0.1-0.6,0.2c0,0-0.1,0-0.1,0.1
+		l-7.5,7.1C6.1,10.6,6,10.9,6,11.2s0.2,0.6,0.5,0.8l4.2,2.5L13.3,9.6z"/>
+</g>
 </svg>

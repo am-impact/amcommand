@@ -14,9 +14,14 @@ class AmCommandPlugin extends BasePlugin
          return 'Command';
     }
 
+    public function getReleaseFeedUrl()
+    {
+        return 'https://raw.githubusercontent.com/am-impact/amcommand/master/releases.json';
+    }
+
     public function getVersion()
     {
-        return '1.1.4';
+        return '1.1.5';
     }
 
     public function getSchemaVersion()
