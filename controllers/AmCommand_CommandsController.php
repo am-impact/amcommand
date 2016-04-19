@@ -19,7 +19,13 @@ class AmCommand_CommandsController extends BaseController
         $message  = craft()->amCommand->getReturnMessage();
         $redirect = craft()->amCommand->getReturnUrl();
         $action   = craft()->amCommand->getReturnAction();
+        $commands = craft()->amCommand->getReturnCommands();
         $delete   = craft()->amCommand->getDeleteStatus();
+
+        // Overwrite result with overwritten commands?
+        if ($commands) {
+            $result = $commands;
+        }
 
         // Return the result
         if ($result === false) {

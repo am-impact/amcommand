@@ -8,6 +8,7 @@ class AmCommandService extends BaseApplicationComponent
     private $_returnUrl;
     private $_returnUrlWindow;
     private $_returnAction;
+    private $_returnCommands;
     private $_deleteCurrentCommand = false;
 
     /**
@@ -150,6 +151,28 @@ class AmCommandService extends BaseApplicationComponent
     public function getReturnAction()
     {
         return isset($this->_returnAction) ? $this->_returnAction : false;
+    }
+
+    /**
+     * Set command that'll be returned after a command was executed.
+     *
+     * Note: You can use this to overwrite the normal command's result.
+     *
+     * @param array $commands
+     */
+    public function setReturnCommands($commands)
+    {
+        $this->_returnCommands = $commands;
+    }
+
+    /**
+     * Get the return commands.
+     *
+     * @return bool|array
+     */
+    public function getReturnCommands()
+    {
+        return isset($this->_returnCommands) ? $this->_sortCommands($this->_returnCommands) : false;
     }
 
     /**
