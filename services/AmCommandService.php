@@ -4,6 +4,7 @@ namespace Craft;
 class AmCommandService extends BaseApplicationComponent
 {
     private $_settings;
+    private $_returnTitle;
     private $_returnMessage;
     private $_returnUrl;
     private $_returnUrlWindow;
@@ -75,6 +76,26 @@ class AmCommandService extends BaseApplicationComponent
         } else {
             return $commandResult;
         }
+    }
+
+    /**
+     * Set title that'll be returned after a command was executed.
+     *
+     * @param string $title
+     */
+    public function setReturnTitle($title)
+    {
+        $this->_returnTitle = $title;
+    }
+
+    /**
+     * Get the return title.
+     *
+     * @return bool|string
+     */
+    public function getReturnTitle()
+    {
+        return isset($this->_returnTitle) ? $this->_returnTitle : false;
     }
 
     /**

@@ -24,7 +24,8 @@ Craft.AmCommand = Garnish.Base.extend(
         currentSet: 0,
         commandNames: [],
         commandsArray: [],
-        searchKeywords: []
+        searchKeywords: [],
+        actions: []
     },
     isOpen:              false,
     isAction:            false,
@@ -287,19 +288,36 @@ Craft.AmCommand = Garnish.Base.extend(
      * Remember current commands.
      */
     rememberCommands: function() {
-        var self = this;
+        var self = this,
+            currentAction = {
+                isAction: self.isAction,
+                isActionAsync: self.isActionAsync,
+                isActionRealtime: self.isActionRealtime,
+                actionData: self.actionData
+            };
 
         self.rememberPalette.currentSet++;
         self.rememberPalette.commandNames[ self.rememberPalette.currentSet ] = self.loadingCommand;
         self.rememberPalette.commandsArray[ self.rememberPalette.currentSet ] = self.commandsArray;
         self.rememberPalette.searchKeywords[ self.rememberPalette.currentSet ] = self.$searchField.val();
+        self.rememberPalette.actions[ self.rememberPalette.currentSet ] = currentAction;
+
+        // Reset action if set
+        if (self.isAction && ! self.isActionRealtime) {
+            self.isAction = false;
+            self.isActionAsync = true;
+            self.actionData = [];
+            self.$buttonExecute.addClass('hidden');
+            self.$searchContainer.removeClass('amcommand__search--hasButton');
+        }
     },
 
     /**
      * Restore the previous set of commands.
      */
     restoreCommands: function() {
-        var self = this;
+        var self = this,
+            restoreAction = self.rememberPalette.actions[ self.rememberPalette.currentSet ];
 
         // Reset action if set
         if (self.isAction) {
@@ -324,6 +342,18 @@ Craft.AmCommand = Garnish.Base.extend(
             self.$tabsContainer.text(self.rememberPalette.commandNames[ self.rememberPalette.currentSet ]);
         } else {
             self.$tabsContainer.addClass('hidden');
+        }
+        // Restore action
+        if (restoreAction.isAction) {
+            self.isAction = true;
+            self.isActionAsync = restoreAction.isActionAsync;
+            self.isActionRealtime = restoreAction.isActionRealtime;
+            self.actionData = restoreAction.actionData;
+            // Only display the execute button next to search field when it's not realtime
+            if (! self.isActionRealtime) {
+                self.$buttonExecute.removeClass('hidden');
+                self.$searchContainer.addClass('amcommand__search--hasButton');
+            }
         }
     },
 
@@ -442,13 +472,9 @@ Craft.AmCommand = Garnish.Base.extend(
                 self.loading = false;
                 self.$loader.addClass('hidden');
                 if (response.success) {
-                    // Reset action if set
-                    if (self.isAction && ! self.isActionRealtime) {
-                        self.isAction = false;
-                        self.isActionAsync = true;
-                        self.actionData = [];
-                        self.$buttonExecute.addClass('hidden');
-                        self.$searchContainer.removeClass('amcommand__search--hasButton');
+                    // Was there a custom title set?
+                    if (response.title) {
+                        self.loadingCommand = response.title;
                     }
 
                     // What result do we have? An action, new command set or just a result message?
@@ -457,6 +483,8 @@ Craft.AmCommand = Garnish.Base.extend(
                         self.search(undefined, true, true);
                     }
                     else if (response.isAction) {
+                        // Executed function
+                        self.loadingCommand = response.isAction.tabs;
                         // Remember current commands and action information
                         self.rememberCommands();
                         self.isAction = true;

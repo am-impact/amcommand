@@ -16,6 +16,7 @@ class AmCommand_CommandsController extends BaseController
         $service  = craft()->request->getPost('service', false);
         $vars     = craft()->request->getPost('vars', false);
         $result   = craft()->amCommand->triggerCommand($command, $service, $vars);
+        $title    = craft()->amCommand->getReturnTitle();
         $message  = craft()->amCommand->getReturnMessage();
         $redirect = craft()->amCommand->getReturnUrl();
         $action   = craft()->amCommand->getReturnAction();
@@ -36,6 +37,7 @@ class AmCommand_CommandsController extends BaseController
         } else {
             $this->returnJson(array(
                 'success'       => true,
+                'title'         => $title,
                 'message'       => $message,
                 'result'        => $result,
                 'redirect'      => $redirect,

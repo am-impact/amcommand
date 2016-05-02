@@ -21,7 +21,7 @@ class AmCommandPlugin extends BasePlugin
 
     public function getVersion()
     {
-        return '1.1.6';
+        return '1.1.7';
     }
 
     public function getSchemaVersion()
@@ -118,7 +118,7 @@ class AmCommandPlugin extends BasePlugin
             // Load javascript
             $js = sprintf('new Craft.AmCommand(%s);', $commands);
             craft()->templates->includeJs($js);
-            craft()->templates->includeJsResource('amcommand/js/AmCommand.js');
+            craft()->templates->includeJsResource('amcommand/js/AmCommand.min.js');
             craft()->templates->includeJsResource('amcommand/js/fuzzy-min.js');
             craft()->templates->includeCssResource('amcommand/css/AmCommand.css');
             craft()->templates->includeTranslations('Command executed', 'Are you sure you want to execute this command?', 'There are no more commands available.');
