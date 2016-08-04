@@ -1,5 +1,13 @@
 [
     {
+        "version": "1.1.8",
+        "downloadUrl": "https://github.com/am-impact/amcommand/archive/master.zip",
+        "date": "2016-08-04T10:00:00+01:00",
+        "notes": [
+            "[Added] New command under tools to restart failed tasks."
+        ]
+    },
+    {
         "version": "1.1.7",
         "downloadUrl": "https://github.com/am-impact/amcommand/archive/master.zip",
         "date": "2016-05-02T10:00:00+01:00",

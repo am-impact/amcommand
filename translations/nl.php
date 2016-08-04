@@ -28,6 +28,7 @@ return array(
     'Login as user' => 'Inloggen als gebruiker',
     'New' => 'Nieuw',
     'No entries in this section exist yet.' => 'Er bestaat nog geen inhoud in deze sectie.',
+    'Restart failed tasks' => 'Herstart gefaalde taken',
     'Search criteria isn’t set.' => 'Zoekcriteria is niet ingesteld.',
     'Search for {option}' => 'Zoeken naar {option}',
     'Search on {option}' => 'Zoeken op {option}',

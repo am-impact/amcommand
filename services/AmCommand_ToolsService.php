@@ -37,8 +37,13 @@ class AmCommand_ToolsService extends BaseApplicationComponent
                 'vars'    => array(
                     'tool' => 'AssetIndex'
                 )
+            ),
+            array(
+                'name'    => Craft::t('Restart failed tasks'),
+                'warn'    => true,
+                'call'    => 'restartFailedTasks',
+                'service' => 'amCommand_tools'
             )
-
         );
         return $commands;
     }
@@ -86,6 +91,25 @@ class AmCommand_ToolsService extends BaseApplicationComponent
                 }
             }
         }
+        return true;
+    }
+
+    /**
+     * Restart failed tasks.
+     *
+     * @return bool
+     */
+    public function restartFailedTasks()
+    {
+        $tasks = craft()->tasks->getAllTasks();
+        if ($tasks) {
+            foreach ($tasks as $task) {
+                if ($task->status == TaskStatus::Error) {
+                    craft()->tasks->rerunTaskById($task->id);
+                }
+            }
+        }
+
         return true;
     }
 }
