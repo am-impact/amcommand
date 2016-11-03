@@ -18,6 +18,7 @@ return array(
     'Delete an entry in one of the available sections.' => 'Verwijder een bericht in één van de beschikbare secties.',
     'Enabled commands' => 'Ingeschakelde commando\'s',
     'Delete a task' => 'Verwijder een taak',
+    'Delete all failed tasks' => 'Verwijder alle gefaalde taken',
     'Delete all tasks' => 'Verwijder alle taken',
     'Delete all tasks by type' => 'Verwijder alle taken met bepaald type',
     'Delete pending tasks' => 'Verwijder wachtende taken',

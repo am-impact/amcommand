@@ -24,6 +24,12 @@ class AmCommand_TasksService extends BaseApplicationComponent
                 'service' => 'amCommand_tasks'
             ),
             array(
+                'name'    => Craft::t('Delete all failed tasks'),
+                'warn'    => true,
+                'call'    => 'deleteAllFailedTasks',
+                'service' => 'amCommand_tasks'
+            ),
+            array(
                 'name'    => Craft::t('Delete all tasks by type'),
                 'more'    => true,
                 'call'    => 'listTaskTypes',
@@ -155,6 +161,28 @@ class AmCommand_TasksService extends BaseApplicationComponent
     }
 
     /**
+     * Delete all failed tasks.
+     *
+     * @return bool
+     */
+    public function deleteAllFailedTasks()
+    {
+        $tasks = craft()->db->createCommand()
+            ->select('*')
+            ->from('tasks')
+            ->where(array('and', 'level = 0', 'status = :status'), array(':status' => TaskStatus::Error))
+            ->queryAll();
+
+        if ($tasks) {
+            foreach ($tasks as $task) {
+                craft()->tasks->deleteTaskById($task['id']);
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Delete all tasks by type.
      *
      * @param array $variables
@@ -167,10 +195,15 @@ class AmCommand_TasksService extends BaseApplicationComponent
             return false;
         }
 
-        $tasks = craft()->tasks->getPendingTasks($variables['taskType']);
+        $tasks = craft()->db->createCommand()
+            ->select('*')
+            ->from('tasks')
+            ->where('type = :type', array(':type' => $variables['taskType']))
+            ->queryAll();
+
         if ($tasks) {
             foreach ($tasks as $task) {
-                craft()->tasks->deleteTaskById($task->id);
+                craft()->tasks->deleteTaskById($task['id']);
             }
         }
 
