@@ -457,6 +457,15 @@ class AmCommandService extends BaseApplicationComponent
         if (! craft()->userSession->isAdmin()) {
             return $currentCommands;
         }
+        if ($this->_isEnabled('tasks')) {
+            $currentCommands[] = array(
+                'name'    => Craft::t('Tasks'),
+                'info'    => Craft::t('Manage Craft tasks.'),
+                'more'    => true,
+                'call'    => 'taskCommands',
+                'service' => 'amCommand_tasks'
+            );
+        }
         if ($this->_isEnabled('tools')) {
             $currentCommands[] = array(
                 'name'    => Craft::t('Tools'),

@@ -21,7 +21,7 @@ class AmCommandPlugin extends BasePlugin
 
     public function getVersion()
     {
-        return '1.1.8';
+        return '1.2.0';
     }
 
     public function getSchemaVersion()
@@ -51,7 +51,7 @@ class AmCommandPlugin extends BasePlugin
     {
         $commands = array(
             'newEntry' => array(
-                'name' => Craft::t('New Entry'),
+                'name' => Craft::t('New entry'),
                 'info' => Craft::t('Create a new entry in one of the available sections.')
             ),
             'editEntries' => array(
@@ -84,6 +84,10 @@ class AmCommandPlugin extends BasePlugin
             ),
             'settings' => array(
                 'name' => Craft::t('Settings'),
+                'info' => Craft::t('This action may only be performed by admins.')
+            ),
+            'tasks' => array(
+                'name' => Craft::t('Tasks'),
                 'info' => Craft::t('This action may only be performed by admins.')
             ),
             'tools' => array(
@@ -142,7 +146,8 @@ class AmCommandPlugin extends BasePlugin
             'userCommands'     => array(AttributeType::Bool, 'default' => true),
             'searchCommands'   => array(AttributeType::Bool, 'default' => true),
             'settings'         => array(AttributeType::Bool, 'default' => true),
-            'tools'            => array(AttributeType::Bool, 'default' => true)
+            'tasks'            => array(AttributeType::Bool, 'default' => true),
+            'tools'            => array(AttributeType::Bool, 'default' => true),
         );
     }
 }
