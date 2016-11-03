@@ -98,6 +98,7 @@ class AmCommand_TasksService extends BaseApplicationComponent
         else {
             foreach ($tasks as $task) {
                 if (! isset($taskTypes[ $task->type ])) {
+                    $taskTypes[ $task->type ] = true;
                     $commands[] = array(
                         'name'    => $task->type,
                         'warn'    => true,
