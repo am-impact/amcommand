@@ -1,65 +1,37 @@
-# a&m command
+# Command plugin for Craft CMS 3.x
 
-_Command palette in Craft; Because you can_
+Command palette in Craft; Because you can
 
-## Functionality
+![Screenshot](resources/img/plugin-logo.png)
 
-When you install this plugin, you'll have the ability to show a command palette when you navigate through the backend in Craft.
+## Installation
 
-You can open the command palette by using the keyboard combination: (command key for Apple users) CTRL + SHIFT + P, or you can use the lightning button that'll be added to the header actions.
+To install Command, follow these steps:
 
-![Header actions](https://raw.githubusercontent.com/am-impact/am-impact.github.io/master/img/readme/amcommand/header-actions.jpg "Header Actions")
+1. Download & unzip the file and place the `command` directory into your `craft/plugins` directory
+2.  -OR- do a `git clone https://github.com/amcommand/command.git` directly into your `craft/plugins` folder.  You can then update it with `git pull`
+3.  -OR- install with Composer via `composer require amcommand/command`
+4. Install plugin in the Craft Control Panel under Settings > Plugins
+5. The plugin folder should be named `command` for Craft to see it.  GitHub recently started appending `-master` (the branch name) to the name of the folder for zip file downloads.
 
-The command palette will show admin functions if you are logged in as an admin, and all available sections (non Single) that the user has access to.
+Command works on Craft 3.x.
 
-![Command palette](https://raw.githubusercontent.com/am-impact/am-impact.github.io/master/img/readme/amcommand/command.jpg "Command Palette")
+## Command Overview
 
-It's equipped with fuzzy search!
+-Insert text here-
 
-![Fuzzy search](https://raw.githubusercontent.com/am-impact/am-impact.github.io/master/img/readme/amcommand/fuzzy-search.jpg "Fuzzy Search")
+## Configuring Command
 
-Use the keyboard arrows (up and down) to navigate to your desired command.
+-Insert text here-
 
-![Focus](https://raw.githubusercontent.com/am-impact/am-impact.github.io/master/img/readme/amcommand/focus.jpg "Focus")
+## Using Command
 
-When you hit the return key or click on a command, the command palette will navigate to the location and show what it's loading.
+-Insert text here-
 
-![Loading](https://raw.githubusercontent.com/am-impact/am-impact.github.io/master/img/readme/amcommand/loading.jpg "Loading")
+## Command Roadmap
 
-You can close the command by either clicking anywhere on the page (besides the command palette) or by pressing the ESC key.
+Some things to do, and ideas for potential features:
 
-## Adding your own commands
+* Release it
 
-If you'd like to add commands for a plugin you're developing, you can use the __addCommands__ hook!
-
-### Example
-
-Add this to your main plugin file:
-```
-public function addCommands() {
-    $commands = array(
-        array(
-            'name' => 'Search on Google',
-            'type' => 'Custom',
-            'url'  => 'http://www.google.nl'
-        ),
-        array(
-            'name' => 'My own plugin function in a service',
-            'type' => 'Custom',
-            'call' => 'yourPluginFunctionName',
-            'service' => 'yourPluginServiceName'
-        )
-    );
-    return $commands;
-}
-```
-
-That's it! a&m Command Palette will add these two commands.
-
-If you look at the second example, you see a call and service key. These can be used to load a new set of commands.
-
-In your plugin's service __yourPluginServiceName__ (e.g.: amCommand or amCommand_command), you'll create a new function called __yourPluginFunctionName__. In here you could do the same thing as you see in the example, and just return the new set of commands.
-
-## Contact
-
-If you have any questions or suggestions, don't hesitate to contact us. We would like to add more commands to the palette, so if you have any ideas then please let us know!
+Brought to you by [a&m impact](http://www.am-impact.nl)

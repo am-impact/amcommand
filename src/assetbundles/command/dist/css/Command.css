@@ -1,4 +1,16 @@
-.amcommand {
+/**
+ * Command plugin for Craft CMS
+ *
+ * Command CSS
+ *
+ * @author    a&m impact
+ * @copyright Copyright (c) 2017 a&m impact
+ * @link      http://www.am-impact.nl
+ * @package   Command
+ * @since     2.0.0
+ */
+
+.command {
     display: none;
     background: #ffffff;
     border-radius: 5px;
@@ -14,12 +26,12 @@
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
 }
 
-.amcommand__execute {
+.command__execute {
     float: right;
     margin: 6px 15px 0 0;
 }
 
-.amcommand__tabs {
+.command__tabs {
     padding: 8px 15px;
     border-radius: 5px 5px 0 0;
     color: #29323d;
@@ -31,7 +43,7 @@
     background-image: linear-gradient(#f7f7f8, #f4f5f6);
 }
 
-.amcommand__container {
+.command__container {
     padding: 15px;
 }
 
@@ -39,20 +51,20 @@
 /**
  * Input
  */
-.amcommand__search input[type=text] {
+.command__search input[type=text] {
     width: 100%;
 }
 
-.amcommand__search--hasButton {
+.command__search--hasButton {
     overflow: hidden;
 }
 
-.amcommand__search--hasButton input[type=text] {
+.command__search--hasButton input[type=text] {
     float: left;
     width: 88%;
 }
 
-.amcommand__search--hasButton input[type=button] {
+.command__search--hasButton input[type=button] {
     float: right;
     width: 10%;
     outline: none;
@@ -62,7 +74,7 @@
 /**
  * Loaders
  */
-.amcommand__loader {
+.command__loader {
     left: 175px;
     position: relative;
     margin-top: 5px;
@@ -72,36 +84,36 @@
 /**
  * Commands
  */
-.amcommand__commands > ul {
+.command__commands > ul {
     max-height: 400px;
     margin-top: 15px;
     overflow: auto;
 }
-.amcommand__commands li {
+.command__commands li {
     border-top: 1px dotted rgba(115, 127, 140, 0.15);
     padding: 5px;
 }
 
-.amcommand__commands li:hover {
+.command__commands li:hover {
     background: #f5f6f6;
     cursor: pointer;
 }
 
-.amcommand__commands li.focus {
+.command__commands li.focus {
     background: #eff0f1;
 }
 
-.amcommand__commands li.focus .go:after {
+.command__commands li.focus .go:after {
     color: #0d78f2;
 }
 
-.amcommand__commands--name {
+.command__commands--name {
     color: #0d78f2;
     display: block;
     font-size: 100%;
 }
 
-.amcommand__commands--info {
+.command__commands--info {
     color: #b9bfc6;
     display: block;
     font-style: italic;
@@ -113,7 +125,7 @@
  * Notices
  */
 
-.amcommand__notice {
+.command__notice {
     font-weight: bold;
     padding-right: 10px;
 }

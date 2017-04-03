@@ -1,59 +1,74 @@
 <?php
-namespace Craft;
+/**
+ * Command plugin for Craft CMS 3.x
+ *
+ * Command palette in Craft; Because you can
+ *
+ * @link      http://www.am-impact.nl
+ * @copyright Copyright (c) 2017 a&m impact
+ */
 
-class AmCommand_TasksService extends BaseApplicationComponent
+namespace amimpact\command\services;
+
+use amimpact\command\Command;
+
+use Craft;
+use craft\base\Component;
+use craft\base\Task;
+
+class Tasks extends Component
 {
     /**
      * List task commands.
      *
      * @return array
      */
-    public function taskCommands()
+    public function getTaskCommands()
     {
-        $commands = array(
-            array(
-                'name'    => Craft::t('Delete a task'),
+        $commands = [
+            [
+                'name'    => Craft::t('command', 'Delete a task'),
                 'more'    => true,
                 'call'    => 'listTasks',
-                'service' => 'amCommand_tasks'
-            ),
-            array(
-                'name'    => Craft::t('Delete all tasks'),
+                'service' => 'tasks'
+            ],
+            [
+                'name'    => Craft::t('command', 'Delete all tasks'),
                 'warn'    => true,
                 'call'    => 'deleteAllTasks',
-                'service' => 'amCommand_tasks'
-            ),
-            array(
-                'name'    => Craft::t('Delete all failed tasks'),
+                'service' => 'tasks'
+            ],
+            [
+                'name'    => Craft::t('command', 'Delete all failed tasks'),
                 'warn'    => true,
                 'call'    => 'deleteAllFailedTasks',
-                'service' => 'amCommand_tasks'
-            ),
-            array(
-                'name'    => Craft::t('Delete all tasks by type'),
+                'service' => 'tasks'
+            ],
+            [
+                'name'    => Craft::t('command', 'Delete all tasks by type'),
                 'more'    => true,
                 'call'    => 'listTaskTypes',
-                'service' => 'amCommand_tasks'
-            ),
-            array(
-                'name'    => Craft::t('Delete pending tasks'),
+                'service' => 'tasks'
+            ],
+            [
+                'name'    => Craft::t('command', 'Delete pending tasks'),
                 'warn'    => true,
                 'call'    => 'deletePendingTasks',
-                'service' => 'amCommand_tasks'
-            ),
-            array(
-                'name'    => Craft::t('Delete running task'),
+                'service' => 'tasks'
+            ],
+            [
+                'name'    => Craft::t('command', 'Delete running task'),
                 'warn'    => true,
                 'call'    => 'deleteRunningTask',
-                'service' => 'amCommand_tasks'
-            ),
-            array(
-                'name'    => Craft::t('Restart failed tasks'),
+                'service' => 'tasks'
+            ],
+            [
+                'name'    => Craft::t('command', 'Restart failed tasks'),
                 'warn'    => true,
                 'call'    => 'restartFailedTasks',
-                'service' => 'amCommand_tasks'
-            )
-        );
+                'service' => 'tasks'
+            ]
+        ];
         return $commands;
     }
 
@@ -64,23 +79,23 @@ class AmCommand_TasksService extends BaseApplicationComponent
      */
     public function listTasks()
     {
-        $commands = array();
+        $commands = [];
 
-        $tasks = craft()->tasks->getAllTasks();
+        $tasks = Craft::$app->tasks->getAllTasks();
         if (! $tasks) {
-            craft()->amCommand->setReturnMessage(Craft::t('There are no tasks at the moment.'));
+            Command::$plugin->general->setReturnMessage(Craft::t('command', 'There are no tasks at the moment.'));
         }
         else {
             foreach ($tasks as $task) {
-                $commands[] = array(
+                $commands[] = [
                     'name'    => $task->getDescription(),
                     'warn'    => true,
                     'call'    => 'deleteTask',
-                    'service' => 'amCommand_tasks',
-                    'vars'    => array(
+                    'service' => 'tasks',
+                    'vars'    => [
                         'taskId' => $task->id
-                    )
-                );
+                    ]
+                ];
             }
         }
 
@@ -94,26 +109,26 @@ class AmCommand_TasksService extends BaseApplicationComponent
      */
     public function listTaskTypes()
     {
-        $commands = array();
-        $taskTypes = array();
+        $commands = [];
+        $taskTypes = [];
 
-        $tasks = craft()->tasks->getAllTasks();
+        $tasks = Craft::$app->tasks->getAllTasks();
         if (! $tasks) {
-            craft()->amCommand->setReturnMessage(Craft::t('There are no tasks at the moment.'));
+            Command::$plugin->general->setReturnMessage(Craft::t('command', 'There are no tasks at the moment.'));
         }
         else {
             foreach ($tasks as $task) {
                 if (! isset($taskTypes[ $task->type ])) {
                     $taskTypes[ $task->type ] = true;
-                    $commands[] = array(
+                    $commands[] = [
                         'name'    => $task->type,
                         'warn'    => true,
                         'call'    => 'deleteAllTasksByType',
-                        'service' => 'amCommand_tasks',
-                        'vars'    => array(
+                        'service' => 'tasks',
+                        'vars'    => [
                             'taskType' => $task->type
-                        )
-                    );
+                        ]
+                    ];
                 }
             }
         }
@@ -133,12 +148,12 @@ class AmCommand_TasksService extends BaseApplicationComponent
         if (! isset($variables['taskId'])) {
             return false;
         }
-        $result = craft()->tasks->deleteTaskById($variables['taskId']);
+        $result = Craft::$app->tasks->deleteTaskById($variables['taskId']);
         if ($result === true) {
-            craft()->amCommand->deleteCurrentCommand();
-            craft()->amCommand->setReturnMessage(Craft::t('Task deleted.'));
+            Command::$plugin->general->deleteCurrentCommand();
+            Command::$plugin->general->setReturnMessage(Craft::t('command', 'Task deleted.'));
         } else {
-            craft()->amCommand->setReturnMessage(Craft::t('Couldn’t delete task.'));
+            Command::$plugin->general->setReturnMessage(Craft::t('command', 'Couldn’t delete task.'));
         }
         return $result ? true : false;
     }
@@ -150,10 +165,10 @@ class AmCommand_TasksService extends BaseApplicationComponent
      */
     public function deleteAllTasks()
     {
-        $tasks = craft()->tasks->getAllTasks();
+        $tasks = Craft::$app->tasks->getAllTasks();
         if ($tasks) {
             foreach ($tasks as $task) {
-                craft()->tasks->deleteTaskById($task->id);
+                Craft::$app->tasks->deleteTaskById($task->id);
             }
         }
 
@@ -170,12 +185,12 @@ class AmCommand_TasksService extends BaseApplicationComponent
         $tasks = craft()->db->createCommand()
             ->select('*')
             ->from('tasks')
-            ->where(array('and', 'level = 0', 'status = :status'), array(':status' => TaskStatus::Error))
+            ->where(['and', 'level = 0', 'status = :status'], [':status' => Task::STATUS_ERROR])
             ->queryAll();
 
         if ($tasks) {
             foreach ($tasks as $task) {
-                craft()->tasks->deleteTaskById($task['id']);
+                Craft::$app->tasks->deleteTaskById($task['id']);
             }
         }
 
@@ -198,12 +213,12 @@ class AmCommand_TasksService extends BaseApplicationComponent
         $tasks = craft()->db->createCommand()
             ->select('*')
             ->from('tasks')
-            ->where('type = :type', array(':type' => $variables['taskType']))
+            ->where('type = :type', [':type' => $variables['taskType']])
             ->queryAll();
 
         if ($tasks) {
             foreach ($tasks as $task) {
-                craft()->tasks->deleteTaskById($task['id']);
+                Craft::$app->tasks->deleteTaskById($task['id']);
             }
         }
 
@@ -217,10 +232,10 @@ class AmCommand_TasksService extends BaseApplicationComponent
      */
     public function deletePendingTasks()
     {
-        $tasks = craft()->tasks->getPendingTasks();
+        $tasks = Craft::$app->tasks->getPendingTasks();
         if ($tasks) {
             foreach ($tasks as $task) {
-                craft()->tasks->deleteTaskById($task->id);
+                Craft::$app->tasks->deleteTaskById($task->id);
             }
         }
 
@@ -234,12 +249,12 @@ class AmCommand_TasksService extends BaseApplicationComponent
      */
     public function deleteRunningTask()
     {
-        $task = craft()->tasks->getRunningTask();
+        $task = Craft::$app->tasks->getRunningTask();
         if (! $task) {
-            craft()->amCommand->setReturnMessage(Craft::t('There is no running task at the moment.'));
+            Command::$plugin->general->setReturnMessage(Craft::t('command', 'There is no running task at the moment.'));
         }
         else {
-            if (craft()->tasks->deleteTaskById($task->id) === true) {
+            if (Craft::$app->tasks->deleteTaskById($task->id) === true) {
                 return true;
             }
         }
@@ -254,11 +269,11 @@ class AmCommand_TasksService extends BaseApplicationComponent
      */
     public function restartFailedTasks()
     {
-        $tasks = craft()->tasks->getAllTasks();
+        $tasks = Craft::$app->tasks->getAllTasks();
         if ($tasks) {
             foreach ($tasks as $task) {
-                if ($task->status == TaskStatus::Error) {
-                    craft()->tasks->rerunTaskById($task->id);
+                if ($task->status == Task::STATUS_ERROR) {
+                    Craft::$app->tasks->rerunTaskById($task->id);
                 }
             }
         }

@@ -1,14 +1,52 @@
 {
-    "name": "am-impact/amcommand",
+    "name": "amimpact/command",
     "description": "Command palette in Craft; Because you can",
+    "type": "craft-plugin",
+    "version": "2.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "plugin",
+        "command"
+    ],
+    "license": "MIT",
     "authors": [
         {
-            "name": "Hubert Prein",
-            "email": "h.prein@am-impact.nl"
+            "name": "a&m impact",
+            "homepage": "http://www.am-impact.nl"
         }
     ],
-    "type": "craft-plugin",
     "require": {
-        "composer/installers": "~1.0"
+        "craftcms/cms": "~3.0.0-beta.1"
+    },
+    "autoload": {
+        "psr-4": {
+          "amimpact\\command\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Command",
+        "handle": "command",
+        "version": "2.0.0",
+        "schemaVersion": "2.0.0",
+        "hasSettings": true,
+        "hasCpSection": true,
+        "developer": "a&m impact",
+        "developerUrl": "http://www.am-impact.nl",
+        "description": "Command palette in Craft; Because you can",
+        "documentationUrl": "https://github.com/amcommand/command/blob/master/README.md",
+        "changelogUrl": "https://raw.githubusercontent.com/amcommand/command/master/CHANGELOG.md",
+        "components": {
+            "entries": "amimpact\\command\\services\\Entries",
+            "general": "amimpact\\command\\services\\General",
+            "globals": "amimpact\\command\\services\\Globals",
+            "search": "amimpact\\command\\services\\Search",
+            "settings": "amimpact\\command\\services\\Settings",
+            "tasks": "amimpact\\command\\services\\Tasks",
+            "utilities": "amimpact\\command\\services\\Utilities",
+            "users": "amimpact\\command\\services\\Users"
+        },
+        "class": "amimpact\\command\\Command"
     }
 }

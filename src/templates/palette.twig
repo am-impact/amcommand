@@ -1,0 +1,17 @@
+<div class="command">
+    <div class="command__tabs hidden"></div>
+    <div class="command__container">
+        <div class="command__search">
+            <input class="text" type="text" name="search" value="" autocomplete="off">
+            <input type="button" class="btn submit hidden" value="&rsaquo;">
+        </div>
+        <div class="command__loader spinner hidden"></div>
+        <div class="command__commands">
+            <ul></ul>
+        </div>
+    </div>
+</div>
+
+{% js %}
+    new Craft.Command({{ commands|raw }});
+{% endjs %}

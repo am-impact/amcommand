@@ -1,5 +1,14 @@
 <?php
-return array(
+/**
+ * Command plugin for Craft CMS 3.x
+ *
+ * Command palette in Craft; Because you can
+ *
+ * @link      http://www.am-impact.nl
+ * @copyright Copyright (c) 2017 a&m impact
+ */
+
+return [
     'Add something new in the settings...' => 'Maak iets nieuws aan in de instellingen...',
     'Are you sure you want to execute this command?' => 'Weet u zeker dat u dit commando uit wilt voeren?',
     'Besides your account, no other account could be found.' => 'Afgezien van uw account, kon er geen ander account gevonden worden.',
@@ -48,7 +57,7 @@ return array(
     'There is no running task at the moment.' => 'Er is op dit moment geen lopende taak.',
     'Title isn’t set.' => 'De titel is niet ingevuld.',
     'Title of new entry:' => 'Titel van het nieuwe bericht:',
-    'Use one of the most used tools.' => 'Gebruik één van de meest gebruikte tools.',
+    'Use one of the most used utilities.' => 'Gebruik één van de meest gebruikte utilities.',
     'You can disable commands you do not wish to use, by unchecking the checkboxes below.' => 'U kunt commando\'s uitschakelen die u niet wenst te gebruiken, door de boxen hieronder uit te vinken.',
     'You’re able to search within a site that offers help.' => 'Je hebt de mogelijkheid om te zoeken binnen een site die hulp bied.'
-);
+];

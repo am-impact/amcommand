@@ -1,7 +1,24 @@
 <?php
-namespace Craft;
+/**
+ * Command plugin for Craft CMS 3.x
+ *
+ * Command palette in Craft; Because you can
+ *
+ * @link      http://www.am-impact.nl
+ * @copyright Copyright (c) 2017 a&m impact
+ */
 
-class AmCommand_SearchService extends BaseApplicationComponent
+namespace amimpact\command\services;
+
+use amimpact\command\Command;
+
+use Craft;
+use craft\base\Component;
+use craft\elements\Category;
+use craft\elements\Entry;
+use craft\elements\User;
+
+class Search extends Component
 {
     /**
      * Get the search option action for Craft.
@@ -10,8 +27,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
      */
     public function searchOptionCraft()
     {
-        $this->_setAction('Craft');
-        return true;
+        return $this->_setAction('Craft');
     }
 
     /**
@@ -21,8 +37,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
      */
     public function searchOptionStackExchange()
     {
-        $this->_setAction('StackExchange');
-        return true;
+        return $this->_setAction('StackExchange');
     }
 
     /**
@@ -32,8 +47,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
      */
     public function searchOptionCategories()
     {
-        $this->_setRealtimeAction('Categories');
-        return true;
+        return $this->_setRealtimeAction('Categories');
     }
 
     /**
@@ -43,8 +57,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
      */
     public function searchOptionEntries()
     {
-        $this->_setRealtimeAction('Entries');
-        return true;
+        return $this->_setRealtimeAction('Entries');
     }
 
     /**
@@ -54,8 +67,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
      */
     public function searchOptionUsers()
     {
-        $this->_setRealtimeAction('Users');
-        return true;
+        return $this->_setRealtimeAction('Users');
     }
 
     /**
@@ -67,34 +79,40 @@ class AmCommand_SearchService extends BaseApplicationComponent
      */
     public function searchOn($variables)
     {
+        // Do we have the required information?
         if (! isset($variables['searchText'])) {
             return false;
         }
+
+        // Do we have our search criteria?
         $searchCriteria = $variables['searchText'];
         if (empty($searchCriteria) || trim($searchCriteria) == '') {
-            craft()->amCommand->setReturnMessage(Craft::t('Search criteria isn’t set.'));
+            Command::$plugin->general->setReturnMessage(Craft::t('command', 'Search criteria isn’t set.'));
             return false;
         }
+
+        // What are we searching for?
         switch ($variables['option']) {
             case 'Craft':
-                craft()->amCommand->setReturnUrl('https://craftcms.com/search?q=' . $searchCriteria, true);
+                Command::$plugin->general->setReturnUrl('https://craftcms.com/search?q=' . $searchCriteria, true);
                 break;
             case 'StackExchange':
-                craft()->amCommand->setReturnUrl('http://craftcms.stackexchange.com/search?q=' . $searchCriteria, true);
+                Command::$plugin->general->setReturnUrl('http://craftcms.stackexchange.com/search?q=' . $searchCriteria, true);
                 break;
             case 'Categories':
-                return $this->_searchForElement(ElementType::Category, $searchCriteria);
+                return $this->_searchForElement(Category::class, $searchCriteria);
                 break;
             case 'Entries':
-                return $this->_searchForElement(ElementType::Entry, $searchCriteria);
+                return $this->_searchForElement(Entry::class, $searchCriteria);
                 break;
             case 'Users':
-                return $this->_searchForElement(ElementType::User, $searchCriteria);
+                return $this->_searchForElement(User::class, $searchCriteria);
                 break;
             default:
                 return false;
                 break;
         }
+
         return true;
     }
 
@@ -102,23 +120,32 @@ class AmCommand_SearchService extends BaseApplicationComponent
      * Set the return action.
      *
      * @param string $searchOption
+     *
+     * @return bool
      */
     private function _setAction($searchOption)
     {
-        $variables = array(
+        $variables = [
             'option' => $searchOption
-        );
+        ];
 
-        craft()->amCommand->setReturnAction(Craft::t('Search on {option}', array('option' => Craft::t($searchOption))), '', 'searchOn', 'amCommand_search', $variables, false);
+        return Command::$plugin->general->setReturnAction(Craft::t('command', 'Search on {option}', ['option' => Craft::t('app', $searchOption)]), '', 'searchOn', 'search', $variables, false);
     }
 
+    /**
+     * Set the return realtime action.
+     *
+     * @param string $searchOption
+     *
+     * @return bool
+     */
     private function _setRealtimeAction($searchOption)
     {
-        $variables = array(
+        $variables = [
             'option' => $searchOption
-        );
+        ];
 
-        craft()->amCommand->setReturnAction(Craft::t('Search for {option}', array('option' => Craft::t($searchOption))), '', 'searchOn', 'amCommand_search', $variables, true, true);
+        return Command::$plugin->general->setReturnAction(Craft::t('command', 'Search for {option}', ['option' => Craft::t('app', $searchOption)]), '', 'searchOn', 'search', $variables, true, true);
     }
 
     /**
@@ -131,18 +158,19 @@ class AmCommand_SearchService extends BaseApplicationComponent
      */
     private function _searchForElement($elementType, $searchCriteria)
     {
-        $criteria = craft()->elements->getCriteria($elementType, $searchCriteria);
-        $criteria->search = '*' . $searchCriteria . '*';
-        $criteria->status = null;
-        $criteria->locale = craft()->i18n->getPrimarySiteLocaleId();
-        $criteria->order = 'score';
-        $elements = $criteria->find();
+        // Get elements
+        $elements = $elementType::find()
+            ->search('*' . $searchCriteria . '*')
+            ->status(null)
+            ->orderBy('score')
+            ->limit(null);
 
-        $commands = array();
+        // Gather commands based on the element type
+        $commands = [];
         foreach ($elements as $element) {
             switch ($elementType) {
-                case ElementType::User:
-                    $userInfo = array();
+                case User::class:
+                    $userInfo = [];
                     if ($element->firstName) {
                         $userInfo[] = $element->firstName;
                     }
@@ -151,19 +179,19 @@ class AmCommand_SearchService extends BaseApplicationComponent
                     }
                     $userInfo[] = $element->email;
 
-                    $commands[] = array(
+                    $commands[] = [
                         'name' => $element->username,
                         'info' => implode(' - ', $userInfo),
                         'url'  => $element->getCpEditUrl()
-                    );
+                    ];
                     break;
 
                 default:
-                    $commands[] = array(
+                    $commands[] = [
                         'name' => $element->title,
-                        'info' => Craft::t('URI') . ': ' . $element->uri,
+                        'info' => Craft::t('app', 'URI') . ': ' . $element->uri,
                         'url'  => $element->getCpEditUrl()
-                    );
+                    ];
                     break;
             }
         }

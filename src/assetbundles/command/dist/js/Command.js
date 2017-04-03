@@ -1,16 +1,28 @@
+/**
+ * Command plugin for Craft CMS
+ *
+ * Command JS
+ *
+ * @author    a&m impact
+ * @copyright Copyright (c) 2017 a&m impact
+ * @link      http://www.am-impact.nl
+ * @package   Command
+ * @since     2.0.0
+ */
+
 (function($) {
 
-Craft.AmCommand = Garnish.Base.extend(
+Craft.Command = Garnish.Base.extend(
 {
-    $searchField:        $('.amcommand__search input[type=text]'),
-    $container:          $('.amcommand'),
-    $tabsContainer:      $('.amcommand__tabs'),
-    $searchContainer:    $('.amcommand__search'),
-    $commandsContainer:  $('.amcommand__commands ul'),
-    $loader:             $('.amcommand__loader'),
-    $commands:           $('.amcommand__commands li'),
-    $button:             $('#nav-amcommand'),
-    $buttonExecute:      $('.amcommand__search input[type=button]'),
+    $searchField:        $('.command__search input[type=text]'),
+    $container:          $('.command'),
+    $tabsContainer:      $('.command__tabs'),
+    $searchContainer:    $('.command__search'),
+    $commandsContainer:  $('.command__commands ul'),
+    $loader:             $('.command__loader'),
+    $commands:           $('.command__commands li'),
+    $button:             $('#nav-command'),
+    $buttonExecute:      $('.command__search input[type=button]'),
     ignoreSearchKeys:    [Garnish.UP_KEY, Garnish.DOWN_KEY, Garnish.LEFT_KEY, Garnish.RIGHT_KEY, Garnish.RETURN_KEY, Garnish.ESC_KEY],
     fuzzyOptions:        {
         pre: "<strong>",
@@ -63,7 +75,7 @@ Craft.AmCommand = Garnish.Base.extend(
 
         self.addListener(self.$button, 'click', function(ev) {
             ev.preventDefault();
-            self.openPalette();
+            self.openPalette(ev);
         });
 
         self.addListener(self.$searchField, 'keyup', 'search');
@@ -129,7 +141,7 @@ Craft.AmCommand = Garnish.Base.extend(
             self.$container.fadeOut(1, function() {
                 // Hide execute button
                 self.$buttonExecute.addClass('hidden');
-                self.$searchContainer.removeClass('amcommand__search--hasButton');
+                self.$searchContainer.removeClass('command__search--hasButton');
                 // Reset search keywords and executed command
                 self.$searchField.val('');
                 self.$tabsContainer.addClass('hidden');
@@ -159,7 +171,7 @@ Craft.AmCommand = Garnish.Base.extend(
         var self = this;
 
         // Reset clicking event
-        self.$commands = $('.amcommand__commands li');
+        self.$commands = $('.command__commands li');
         self.addListener(self.$commands, 'click', 'triggerCommand');
 
         // Focus first
@@ -190,8 +202,8 @@ Craft.AmCommand = Garnish.Base.extend(
 
                 // Find matches
                 var results = filtered.map(function(el) {
-                    var name = '<span class="amcommand__commands--name' + ('more' in el.original && el.original.more ? ' go' : '') + '">' + el.string + '</span>';
-                    var info = ('info' in el.original) ? '<span class="amcommand__commands--info">' + el.original.info + '</span>' : '';
+                    var name = '<span class="command__commands--name' + ('more' in el.original && el.original.more ? ' go' : '') + '">' + el.string + '</span>';
+                    var info = ('info' in el.original) ? '<span class="command__commands--info">' + el.original.info + '</span>' : '';
                     return '<li data-id="' + el.index + '">' + name + info + '</li>';
                 });
                 self.$commandsContainer.html(results.join(''));
@@ -277,7 +289,7 @@ Craft.AmCommand = Garnish.Base.extend(
             if (customMessage !== false) {
                 Craft.cp.displayNotice(customMessage);
             } else {
-                Craft.cp.displayNotice('<span class="amcommand__notice">' + Craft.t('Command executed') + ' &raquo;</span>' + executedCommand);
+                Craft.cp.displayNotice('<span class="command__notice">' + Craft.t('command', 'Command executed') + ' &raquo;</span>' + executedCommand);
             }
         } else {
             Craft.cp.displayError(customMessage);
@@ -308,7 +320,7 @@ Craft.AmCommand = Garnish.Base.extend(
             self.isActionAsync = true;
             self.actionData = [];
             self.$buttonExecute.addClass('hidden');
-            self.$searchContainer.removeClass('amcommand__search--hasButton');
+            self.$searchContainer.removeClass('command__search--hasButton');
         }
     },
 
@@ -326,7 +338,7 @@ Craft.AmCommand = Garnish.Base.extend(
             self.isActionRealtime = false;
             self.actionData = [];
             self.$buttonExecute.addClass('hidden');
-            self.$searchContainer.removeClass('amcommand__search--hasButton');
+            self.$searchContainer.removeClass('command__search--hasButton');
         }
         // Restore commands
         self.commandsArray = self.rememberPalette.commandsArray[ self.rememberPalette.currentSet ];
@@ -352,7 +364,7 @@ Craft.AmCommand = Garnish.Base.extend(
             // Only display the execute button next to search field when it's not realtime
             if (! self.isActionRealtime) {
                 self.$buttonExecute.removeClass('hidden');
-                self.$searchContainer.addClass('amcommand__search--hasButton');
+                self.$searchContainer.addClass('command__search--hasButton');
             }
         }
     },
@@ -375,7 +387,7 @@ Craft.AmCommand = Garnish.Base.extend(
         variables['searchText'] = self.$searchField.val();
         // Trigger action
         self.loading = true;
-        self.triggerCallback(self.actionData.call, self.actionData.service, variables);
+        self.triggerCallback(self.actionData.call, self.actionData.plugin, self.actionData.service, variables);
     },
 
     /**
@@ -393,7 +405,7 @@ Craft.AmCommand = Garnish.Base.extend(
                 variables['searchText'] = self.$searchField.val();
                 // Trigger action
                 self.loading = true;
-                self.triggerCallback(self.actionData.call, self.actionData.service, variables);
+                self.triggerCallback(self.actionData.call, self.actionData.plugin, self.actionData.service, variables);
             } else {
                 if (ev.type == 'click') {
                     if (ev.ctrlKey || ev.metaKey) {
@@ -415,6 +427,7 @@ Craft.AmCommand = Garnish.Base.extend(
                             warn            = ('warn' in commandData) ? commandData.warn : false,
                             url             = ('url' in commandData) ? commandData.url : false,
                             callback        = ('call' in commandData) ? commandData.call : false,
+                            callbackPlugin  = ('plugin' in commandData) ? commandData.plugin : false,
                             callbackService = ('service' in commandData) ? commandData.service : false,
                             callbackVars    = ('vars' in commandData) ? commandData.vars : false;
 
@@ -422,7 +435,7 @@ Craft.AmCommand = Garnish.Base.extend(
                         self.loadingCommand = commandData.name;
                         // Do we have to show a warning?
                         if (warn) {
-                            var confirmation = confirm(Craft.t('Are you sure you want to execute this command?'));
+                            var confirmation = confirm(Craft.t('command', 'Are you sure you want to execute this command?'));
                             if (! confirmation) {
                                 confirmed = false;
                             }
@@ -431,7 +444,7 @@ Craft.AmCommand = Garnish.Base.extend(
                         if (confirmed) {
                             self.loading = true;
                             if (callback) {
-                                self.triggerCallback(callback, callbackService, callbackVars);
+                                self.triggerCallback(callback, callbackPlugin, callbackService, callbackVars);
                             }
                             else if (url) {
                                 // Open the URL in a new window if the CTRL or Command key was pressed
@@ -455,10 +468,11 @@ Craft.AmCommand = Garnish.Base.extend(
      * Trigger a command callback function rather than navigating to it.
      *
      * @param string name    Callback function.
-     * @param string service Which service should be triggered.
+     * @param string plugin  Which plugin should be used.
+     * @param string service Which service should be used.
      * @param string vars    JSON string with optional variables.
      */
-    triggerCallback: function(name, service, vars) {
+    triggerCallback: function(name, plugin, service, vars) {
         var self = this,
             displayDefaultMessage = false,
             $current = self.$commands.filter('.focus');
@@ -467,7 +481,7 @@ Craft.AmCommand = Garnish.Base.extend(
         self.$commands.hide();
         self.$loader.removeClass('hidden');
 
-        Craft.postActionRequest('amCommand/commands/triggerCommand', {command: name, service: service, vars: vars}, $.proxy(function(response, textStatus) {
+        Craft.postActionRequest('command/commands/trigger-command', {command: name, plugin: plugin, service: service, vars: vars}, $.proxy(function(response, textStatus) {
             if (textStatus == 'success') {
                 self.loading = false;
                 self.$loader.addClass('hidden');
@@ -497,7 +511,7 @@ Craft.AmCommand = Garnish.Base.extend(
                         // Only display the execute button next to search field when it's not realtime
                         if (! response.isAction.realtime) {
                             self.$buttonExecute.removeClass('hidden');
-                            self.$searchContainer.addClass('amcommand__search--hasButton');
+                            self.$searchContainer.addClass('command__search--hasButton');
                         }
                         // Reset palette
                         self.commandsArray = [];
@@ -536,7 +550,7 @@ Craft.AmCommand = Garnish.Base.extend(
                         self.$commands.show();
                         // Close the command palette if all commands are hidden
                         if (self.commandsArray.length <= 0) {
-                            self.displayMessage(false, Craft.t('There are no more commands available.'), false);
+                            self.displayMessage(false, Craft.t('command', 'There are no more commands available.'), false);
                             self.closePalette();
                         }
                     } else {
@@ -549,7 +563,7 @@ Craft.AmCommand = Garnish.Base.extend(
                         self.displayMessage((response.result != ''), response.message, false);
                     }
                     else if (displayDefaultMessage) {
-                        self.displayMessage(true, false, $current.children('.amcommand__commands--name').text());
+                        self.displayMessage(true, false, $current.children('.command__commands--name').text());
                     }
                     // Redirect?
                     if (response.redirect) {
