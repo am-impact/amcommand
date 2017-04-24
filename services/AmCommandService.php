@@ -480,21 +480,39 @@ class AmCommandService extends BaseApplicationComponent
                 'name'    => Craft::t('Settings') . ': ' . Craft::t('New') . '...',
                 'info'    => Craft::t('Add something new in the settings...'),
                 'more'    => true,
-                'call'    => 'newSettings',
+                'call'    => 'createNewSetting',
                 'service' => 'amCommand_settings'
             );
             $currentCommands[] = array(
                 'name' => Craft::t('Settings') . ': ' . Craft::t('Fields'),
                 'url'  => UrlHelper::getUrl('settings/fields')
             );
+            $currentCommands[] = [
+                'name'    => Craft::t('Settings') . ': ' . Craft::t('Fields') . ' - ' . Craft::t('Edit'),
+                'more'    => true,
+                'call'    => 'editFields',
+                'service' => 'amCommand_settings'
+            ];
+            $currentCommands[] = [
+                'name'    => Craft::t('Settings') . ': ' . Craft::t('Fields') . ' - ' . Craft::t('Duplicate'),
+                'more'    => true,
+                'call'    => 'duplicateFields',
+                'service' => 'amCommand_settings'
+            ];
             $currentCommands[] = array(
                 'name' => Craft::t('Settings') . ': ' . Craft::t('Sections'),
                 'url'  => UrlHelper::getUrl('settings/sections')
             );
+            $currentCommands[] = [
+                'name'    => Craft::t('Settings') . ': ' . Craft::t('Sections') . ' - ' . Craft::t('Edit'),
+                'more'    => true,
+                'call'    => 'editSections',
+                'service' => 'amCommand_settings'
+            ];
             $currentCommands[] = array(
                 'name'    => Craft::t('Settings') . ': ' . Craft::t('Sections') . ' - ' . Craft::t('Edit entry type'),
                 'more'    => true,
-                'call'    => 'sectionEntryTypes',
+                'call'    => 'editSectionEntryTypes',
                 'service' => 'amCommand_settings'
             );
             $currentCommands[] = array(
@@ -504,7 +522,7 @@ class AmCommandService extends BaseApplicationComponent
             $currentCommands[] = array(
                 'name'    => Craft::t('Settings') . ': ' . Craft::t('Globals') . ' - ' . Craft::t('Global Sets'),
                 'more'    => true,
-                'call'    => 'globalSets',
+                'call'    => 'editGlobalSets',
                 'service' => 'amCommand_settings'
             );
             $currentCommands[] = array(
