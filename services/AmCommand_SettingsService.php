@@ -412,6 +412,19 @@ class AmCommand_SettingsService extends BaseApplicationComponent
             return false;
         }
 
+        // Make sure the templates directory exists
+        $templatesPath = craft()->path->getSiteTemplatesPath() . $overviewSection->template . '/';
+        IOHelper::ensureFolderExists($templatesPath);
+
+        // Create templates
+        $sampleFile = craft()->path->getPluginsPath() . 'amcommand/templates/_commands/overviewDetailSectionGenerator.twig';
+        if (! IOHelper::fileExists($templatesPath . 'index.twig')) {
+            IOHelper::copyFile($sampleFile, $templatesPath . 'index.twig');
+        }
+        if (! IOHelper::fileExists($templatesPath . '_entry.twig')) {
+            IOHelper::copyFile($sampleFile, $templatesPath . '_entry.twig');
+        }
+
         return true;
     }
 }
