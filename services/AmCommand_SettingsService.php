@@ -26,6 +26,11 @@ class AmCommand_SettingsService extends BaseApplicationComponent
                 'url'  => UrlHelper::getUrl('settings/sections/new')
             ),
             array(
+                'name'    => Craft::t('Create a new overview and detail section'),
+                'call'    => 'overviewDetailSectionGenerator',
+                'service' => 'amCommand_settings'
+            ),
+            array(
                 'name' => Craft::t('Create a new global set'),
                 'url'  => UrlHelper::getUrl('settings/globals/new')
             ),
@@ -251,6 +256,160 @@ class AmCommand_SettingsService extends BaseApplicationComponent
                 }
 
                 break;
+        }
+
+        return true;
+    }
+
+    /**
+     * Start overview and detail section generator.
+     *
+     * @param array $variables
+     *
+     * @return bool
+     */
+    public function overviewDetailSectionGenerator($variables = array())
+    {
+        if (! isset($variables['step'])) {
+            // Set action variables
+            $title = Craft::t('Name of the overview section?');
+            $searchText = '';
+            $callback = 'overviewDetailSectionGenerator';
+            $service = 'amCommand_settings';
+            $variables = array(
+                'step' => 1,
+            );
+
+            // Set a&m command action
+            craft()->amCommand->setReturnAction($title, $searchText, $callback, $service, $variables);
+
+            return true;
+        }
+
+        switch ($variables['step']) {
+            case 1:
+                // Get overview name
+                if (! isset($variables['searchText'])) {
+                    return false;
+                }
+                elseif (empty($variables['searchText'])) {
+                    craft()->amCommand->setReturnMessage(Craft::t('Name isn’t set.'));
+                    return false;
+                }
+
+                // Set action variables
+                $title = Craft::t('Name of the detail section?');
+                $searchText = '';
+                $callback = 'overviewDetailSectionGenerator';
+                $service = 'amCommand_settings';
+                $variables = array_merge($variables, array(
+                    'step'         => 2,
+                    'overviewName' => $variables['searchText']
+                ));
+
+                // Set a&m command action
+                craft()->amCommand->setReturnAction($title, $searchText, $callback, $service, $variables);
+                break;
+
+            case 2:
+                // Get detail name
+                if (! isset($variables['searchText'])) {
+                    return false;
+                }
+                elseif (empty($variables['searchText'])) {
+                    craft()->amCommand->setReturnMessage(Craft::t('Name isn’t set.'));
+                    return false;
+                }
+
+                // Set commands
+                $commands = array(
+                    array(
+                        'name'    => Craft::t('Channel'),
+                        'call'    => 'overviewDetailSectionGenerator',
+                        'service' => 'amCommand_settings',
+                        'vars'    => array_merge($variables, array(
+                            'step'       => 3,
+                            'detailType' => SectionType::Channel,
+                            'detailName' => $variables['searchText']
+                        ))
+                    ),
+                    array(
+                        'name'    => Craft::t('Structure'),
+                        'call'    => 'overviewDetailSectionGenerator',
+                        'service' => 'amCommand_settings',
+                        'vars'    => array_merge($variables, array(
+                            'step'       => 3,
+                            'detailType' => SectionType::Structure,
+                            'detailName' => $variables['searchText']
+                        ))
+                    )
+                );
+                craft()->amCommand->setReturnCommands($commands);
+                craft()->amCommand->setReturnTitle(Craft::t('Type of the detail section?'));
+                break;
+
+            case 3:
+                if ($this->_createSections($variables)) {
+                    craft()->amCommand->setReturnMessage(Craft::t('Sections created.'));
+                }
+                break;
+        }
+
+        return true;
+    }
+
+    /**
+     * Create the sections.
+     *
+     * @param array $variables
+     *
+     * @return bool
+     */
+    private function _createSections($variables)
+    {
+        // Double check required information
+        if (! isset($variables['overviewName']) || ! isset($variables['detailName']) || ! isset($variables['detailType'])) {
+            return false;
+        }
+        $overviewName = $variables['overviewName'];
+        $detailName = $variables['detailName'];
+
+        // Get primary locale
+        $primaryLocaleId = craft()->i18n->getPrimarySiteLocaleId();
+
+        // Overview section
+        $overviewSection = new SectionModel();
+        $overviewSection->name = $overviewName;
+        $overviewSection->handle = StringHelper::toCamelCase($overviewName);
+        $overviewSection->type = SectionType::Single;
+        $overviewSection->hasUrls = false;
+        $overviewSection->template = StringHelper::toKebabCase($overviewName);
+        $overviewSection->setLocales(array(
+            $primaryLocaleId => new SectionLocaleModel(array(
+                'locale'    => $primaryLocaleId,
+                'urlFormat' => StringHelper::toKebabCase($overviewName),
+            ))
+        ));
+        if (! craft()->sections->saveSection($overviewSection)) {
+            return false;
+        }
+
+        // Detail section
+        $detailSection = new SectionModel();
+        $detailSection->type = $variables['detailType'];
+        $detailSection->name = $detailName;
+        $detailSection->handle = StringHelper::toCamelCase($detailName);
+        $detailSection->hasUrls = true;
+        $detailSection->template = StringHelper::toKebabCase($overviewName) . '/_entry';
+        $detailSection->setLocales(array(
+            $primaryLocaleId => new SectionLocaleModel(array(
+                'locale'          => $primaryLocaleId,
+                'urlFormat'       => StringHelper::toKebabCase($overviewName) . '/{slug}',
+                'nestedUrlFormat' => ($variables['detailType'] == SectionType::Structure ? '{parent.uri}/{slug}' : null),
+            ))
+        ));
+        if (! craft()->sections->saveSection($detailSection)) {
+            return false;
         }
 
         return true;
