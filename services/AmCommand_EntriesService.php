@@ -144,8 +144,9 @@ class AmCommand_EntriesService extends BaseApplicationComponent
                         'call'    => 'deleteEntriesFromSection',
                         'service' => 'amCommand_entries',
                         'vars'    => array(
-                            'sectionId' => $section->id,
-                            'deleteAll' => $deleteAll
+                            'sectionId'     => $section->id,
+                            'sectionHandle' => $section->handle,
+                            'deleteAll'     => $deleteAll
                         )
                     );
                 }
@@ -166,7 +167,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
      */
     public function deleteEntriesFromSection($variables)
     {
-        if (! isset($variables['sectionId']) || ! isset($variables['deleteAll'])) {
+        if (! isset($variables['sectionId']) || ! isset($variables['sectionHandle']) || ! isset($variables['deleteAll'])) {
             return false;
         }
         // Delete them all?
@@ -190,6 +191,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             // Delete all entries
             $result = craft()->elements->deleteElementById($entryIds);
             if ($result) {
+                craft()->amCommand->setReturnUrl(UrlHelper::getCpUrl('entries/' . $variables['sectionHandle']));
                 craft()->amCommand->setReturnMessage(Craft::t('Entries deleted.'));
             } else {
                 craft()->amCommand->setReturnMessage(Craft::t('Couldn’t delete entries.'));
