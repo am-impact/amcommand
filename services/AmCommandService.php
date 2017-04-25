@@ -11,6 +11,7 @@ class AmCommandService extends BaseApplicationComponent
     private $_returnAction;
     private $_returnCommands;
     private $_deleteCurrentCommand = false;
+    private $_reverseSorting = false;
 
     /**
      * Get all available commands.
@@ -215,6 +216,16 @@ class AmCommandService extends BaseApplicationComponent
     }
 
     /**
+     * Whether the palette should reverse the commands's sorting.
+     *
+     * @param bool $value
+     */
+    public function setReverseSorting($value)
+    {
+        $this->_reverseSorting = $value;
+    }
+
+    /**
      * Check whether a command is enabled.
      *
      * @param string $command
@@ -236,7 +247,7 @@ class AmCommandService extends BaseApplicationComponent
     private function _sortCommands($commands)
     {
         usort($commands, function($a, $b) {
-            return strcmp($a['name'], $b['name']);
+            return $this->_reverseSorting ? strnatcmp($b['name'], $a['name']) : strnatcmp($a['name'], $b['name']);
         });
         return $commands;
     }
