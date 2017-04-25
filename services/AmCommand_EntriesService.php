@@ -249,13 +249,27 @@ class AmCommand_EntriesService extends BaseApplicationComponent
      */
     public function duplicateEntry($variables)
     {
+        // Do we have an entry?
         if (! isset($variables['entryId'])) {
             return false;
         }
-        $currentEntry = craft()->entries->getEntryById($variables['entryId']);
+
+        // What locale are we getting?
+        $locale = null;
+        if (isset($variables['locale'])) {
+            $localeParts = explode('-', $variables['locale']);
+            if (count($localeParts) == 1) {
+                $locale = $localeParts[0];
+            }
+        }
+
+        // Get the entry
+        $currentEntry = craft()->entries->getEntryById($variables['entryId'], $locale);
         if (is_null($currentEntry)) {
             return false;
         }
+
+        // Ask new entry's title
         $variables['locale'] = $currentEntry->locale;
         craft()->amCommand->setReturnAction(Craft::t('Title of new entry:'), $currentEntry->getContent()->title, 'duplicateAnEntry', 'amCommand_entries', $variables);
         return true;
@@ -332,10 +346,12 @@ class AmCommand_EntriesService extends BaseApplicationComponent
                 $duplicatePrimaryLocaleEntry = $newEntry;
             }
         }
+
         // Update other locales URIs since somehow the uri is the same as the primary locale
         if ($duplicatePrimaryLocaleEntry !== false) {
             craft()->elements->updateElementSlugAndUriInOtherLocales($duplicatePrimaryLocaleEntry);
         }
+
         // Return duplication result
         if ($result) {
             if ($duplicatePrimaryLocaleEntry !== false) {

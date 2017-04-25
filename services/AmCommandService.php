@@ -266,7 +266,8 @@ class AmCommandService extends BaseApplicationComponent
                             'call'    => 'duplicateEntry',
                             'service' => 'amCommand_entries',
                             'vars'    => array(
-                                'entryId' => $entryId
+                                'entryId' => $entryId,
+                                'locale'  => craft()->request->getSegment(-1),
                             )
                         );
                     }
