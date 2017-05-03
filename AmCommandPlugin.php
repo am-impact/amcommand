@@ -70,6 +70,10 @@ class AmCommandPlugin extends BasePlugin
                 'name' => Craft::t('Duplicate entry'),
                 'info' => Craft::t('Duplicate the current entry.')
             ),
+            'compareEntryVersion' => array(
+                'name' => Craft::t('Compare entry version'),
+                'info' => Craft::t('Compare the current entry with older versions.')
+            ),
             'editGlobals' => array(
                 'name' => Craft::t('Globals'),
                 'info' => Craft::t('Edit')
@@ -137,17 +141,18 @@ class AmCommandPlugin extends BasePlugin
     protected function defineSettings()
     {
         return array(
-            'duplicateEntry'   => array(AttributeType::Bool, 'default' => true),
-            'newEntry'         => array(AttributeType::Bool, 'default' => true),
-            'editEntries'      => array(AttributeType::Bool, 'default' => true),
-            'deleteEntries'    => array(AttributeType::Bool, 'default' => true),
-            'deleteAllEntries' => array(AttributeType::Bool, 'default' => true),
-            'editGlobals'      => array(AttributeType::Bool, 'default' => true),
-            'userCommands'     => array(AttributeType::Bool, 'default' => true),
-            'searchCommands'   => array(AttributeType::Bool, 'default' => true),
-            'settings'         => array(AttributeType::Bool, 'default' => true),
-            'tasks'            => array(AttributeType::Bool, 'default' => true),
-            'tools'            => array(AttributeType::Bool, 'default' => true),
+            'newEntry'            => array(AttributeType::Bool, 'default' => true),
+            'editEntries'         => array(AttributeType::Bool, 'default' => true),
+            'deleteEntries'       => array(AttributeType::Bool, 'default' => true),
+            'deleteAllEntries'    => array(AttributeType::Bool, 'default' => true),
+            'duplicateEntry'      => array(AttributeType::Bool, 'default' => true),
+            'compareEntryVersion' => array(AttributeType::Bool, 'default' => true),
+            'editGlobals'         => array(AttributeType::Bool, 'default' => true),
+            'userCommands'        => array(AttributeType::Bool, 'default' => true),
+            'searchCommands'      => array(AttributeType::Bool, 'default' => true),
+            'settings'            => array(AttributeType::Bool, 'default' => true),
+            'tasks'               => array(AttributeType::Bool, 'default' => true),
+            'tools'               => array(AttributeType::Bool, 'default' => true),
         );
     }
 }

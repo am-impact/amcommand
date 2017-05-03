@@ -283,19 +283,34 @@ class AmCommandService extends BaseApplicationComponent
     private function _getContentCommands($currentCommands)
     {
         // Duplicate entry command
-        if ($this->_isEnabled('duplicateEntry')) {
+        if ($this->_isEnabled('duplicateEntry') || $this->_isEnabled('compareEntryVersion')) {
             $entrySegment = craft()->request->getSegment(1) == 'entries';
             $entryId = current(explode('-', craft()->request->getSegment(3)));
             if ($entrySegment && is_numeric($entryId)) {
-                // We don't want to duplicate Single type entries
                 $entry = craft()->entries->getEntryById($entryId);
                 if ($entry) {
                     $entrySection = $entry->getSection();
-                    if ($entrySection->type != SectionType::Single) {
+
+                    if ($this->_isEnabled('duplicateEntry')) {
+                        // We don't want to duplicate Single type entries
+                        if ($entrySection->type != SectionType::Single) {
+                            $currentCommands[] = array(
+                                'name'    => Craft::t('Content') . ': ' . Craft::t('Duplicate entry'),
+                                'info'    => Craft::t('Duplicate the current entry.'),
+                                'call'    => 'duplicateEntry',
+                                'service' => 'amCommand_entries',
+                                'vars'    => array(
+                                    'entryId' => $entryId,
+                                    'locale'  => craft()->request->getSegment(-1),
+                                )
+                            );
+                        }
+                    }
+                    if ($this->_isEnabled('compareEntryVersion')) {
                         $currentCommands[] = array(
-                            'name'    => Craft::t('Content') . ': ' . Craft::t('Duplicate entry'),
-                            'info'    => Craft::t('Duplicate the current entry.'),
-                            'call'    => 'duplicateEntry',
+                            'name'    => Craft::t('Content') . ': ' . Craft::t('Compare entry version'),
+                            'info'    => Craft::t('Compare the current entry with older versions.'),
+                            'call'    => 'compareEntryVersion',
                             'service' => 'amCommand_entries',
                             'vars'    => array(
                                 'entryId' => $entryId,

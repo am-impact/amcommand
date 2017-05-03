@@ -1,0 +1,79 @@
+{% import '_includes/forms' as forms %}
+
+{% set ignoreAttributes = ['root', 'lft', 'rgt', 'level', 'searchScore', 'revisionNotes', 'localeEnabled'] %}
+
+{% set initCss %}
+.amcommand__entryCompare td {
+    vertical-align: top;
+}
+.amcommand__entryCompare--attribute {
+    word-break: break-all;
+}
+.amcommand__entryCompare--modified {
+    color: #FFFFFF;
+    background: #27AE61;
+}
+{% endset %}
+{% includeCss initCss %}
+
+{{ forms.lightswitchField({
+    label: 'Show all attributes'|t,
+    id: 'showAllAttributes',
+    name: 'showAllAttributes',
+    toggle: 'showAllAttributes-container'
+}) }}
+<div id="showAllAttributes-container" class="hidden">
+    <h2>{{ 'All attributes'|t }}</h2>
+    <table class="data fullwidth amcommand__entryCompare">
+        <thead>
+            <tr>
+                <th scope="col">{{ 'Attribute'|t }}</th>
+                <th scope="col">{{ 'Version {num}'|t({ 'num': olderVersion.num }) }}</th>
+                <th scope="col">{{ 'Current'|t }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for attribute, value in currentEntryAttributes %}
+                {% set oldValue = attribute(olderVersionAttributes, attribute) ?? '' %}
+                {{ _self.showAttribute(0, ignoreAttributes, attribute, value, oldValue, olderVersionAttributes, false) }}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<h2>{{ 'Changed attributes'|t }}</h2>
+<table class="data fullwidth amcommand__entryCompare">
+    <thead>
+        <tr>
+            <th scope="col">{{ 'Attribute'|t }}</th>
+                <th scope="col">{{ 'Version {num}'|t({ 'num': olderVersion.num }) }}</th>
+                <th scope="col">{{ 'Current'|t }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for attribute, value in currentEntryAttributes %}
+            {% set oldValue = attribute(olderVersionAttributes, attribute) ?? '' %}
+            {{ _self.showAttribute(0, ignoreAttributes, attribute, value, oldValue, olderVersionAttributes, true) }}
+        {% endfor %}
+    </tbody>
+</table>
+
+{% macro showAttribute(level, ignoreAttributes, attribute, value, oldValue, olderVersionAttributes, showDifferencesOnly) %}
+    {% if attribute not in ignoreAttributes and (not showDifferencesOnly or (showDifferencesOnly and oldValue != value)) %}
+        <tr>
+            <td{% if level > 0 %} style="padding-left: {{ 40 * level }}px;"{% endif %}>
+                <strong>{{ attribute }}</strong>
+            </td>
+            {% if value is iterable or oldValue is iterable %}
+                <td class="amcommand__entryCompare--attribute"></td>
+                <td class="amcommand__entryCompare--attribute"></td>
+                {% for subAttribute, subValue in value %}
+                    {% set oldSubValue = attribute(oldValue, subAttribute) ?? '' %}
+                    {{ _self.showAttribute(level + 1, ignoreAttributes, subAttribute, subValue, oldSubValue, olderVersionAttributes, showDifferencesOnly) }}
+                {% endfor %}
+            {% else %}
+                <td class="amcommand__entryCompare--attribute">{{ oldValue }}</td>
+                <td class="amcommand__entryCompare--attribute{% if oldValue != value %} amcommand__entryCompare--modified{% endif %}">{{ value }}</td>
+            {% endif %}
+        </tr>
+    {% endif %}
+{% endmacro %}

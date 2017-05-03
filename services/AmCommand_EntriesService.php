@@ -311,7 +311,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             // Current entry data
             $currentParent     = $currentEntry->getParent();
             $currentTitle      = $currentEntry->getContent()->title;
-            $currentAttributes = $this->_getAttributesForModel($currentEntry);
+            $currentAttributes = $this->_getContentFromModel($currentEntry);
 
             // Override title?
             if ($locale->id == $variables['locale']) {
@@ -367,16 +367,114 @@ class AmCommand_EntriesService extends BaseApplicationComponent
     }
 
     /**
-     * Get attributes for a Model.
+     * Get older versions of an entry.
+     *
+     * @param array $variables
+     *
+     * @return false|array
+     */
+    public function compareEntryVersion($variables)
+    {
+        // Do we have an entry?
+        if (! isset($variables['entryId'])) {
+            return false;
+        }
+
+        // What locale are we getting?
+        $locale = null;
+        if (isset($variables['locale'])) {
+            $localeParts = explode('-', $variables['locale']);
+            if (count($localeParts) == 1) {
+                $locale = $localeParts[0];
+            }
+        }
+
+        // Get the entry
+        $currentEntry = craft()->entries->getEntryById($variables['entryId'], $locale);
+        if (is_null($currentEntry)) {
+            return false;
+        }
+
+        // Does this entry have versions?
+        $versions = craft()->entryRevisions->getVersionsByEntryId($variables['entryId'], $locale);
+        if (! $versions || ! count($versions)) {
+            craft()->amCommand->setReturnMessage(Craft::t('There are no older versions of this entry.'));
+            return false;
+        }
+
+        // Map up the versions
+        $commands = array();
+        foreach ($versions as $version) {
+            $commands[] = array(
+                'name' => Craft::t('Version {num}', array('num' => $version->num)),
+                'info' => Craft::t('From {date} by {user}.', array(
+                    'date' => $version->dateCreated->localeDate(),
+                    'user' => $version->getCreator()->getFullName(),
+                )),
+                'call'    => 'compareVersion',
+                'service' => 'amCommand_entries',
+                'vars'    => array_merge($variables, array(
+                    'locale' => $locale,
+                    'versionId' => $version->versionId
+                ))
+            );
+        }
+
+        // Let the palette knnow we are reversing the sorting
+        craft()->amCommand->setReverseSorting(true);
+
+        return $commands;
+    }
+
+    /**
+     * Compare an entry version.
+     *
+     * @param array $variables
+     *
+     * @return false|string
+     */
+    public function compareVersion($variables)
+    {
+        // Do we have the required information?
+        if (! isset($variables['entryId']) || ! isset($variables['locale']) || ! isset($variables['versionId'])) {
+            return false;
+        }
+
+        // Get the entry
+        $currentEntry = craft()->entries->getEntryById($variables['entryId'], (! empty($variables['locale']) ? $variables['locale'] : null));
+        if (is_null($currentEntry)) {
+            return false;
+        }
+
+        // Get the version
+        $olderVersion = craft()->entryRevisions->getVersionById($variables['versionId']);
+        if (! $olderVersion) {
+            return false;
+        }
+
+        // Let the palette knnow we are returning HTML
+        craft()->amCommand->setReturnHtml(true);
+
+        // Compare them!
+        return craft()->templates->render('amcommand/_commands/compareEntryVersion', array(
+            'currentEntry' => $currentEntry,
+            'olderVersion' => $olderVersion,
+            'currentEntryAttributes' => craft()->amCommand_elements->getElementModelAttributes($currentEntry),
+            'olderVersionAttributes' => craft()->amCommand_elements->getElementModelAttributes($olderVersion)
+        ));
+    }
+
+    /**
+     * Get content from a model.
      *
      * @param EntryModel/MatrixBlockModel $model
      *
      * @return array
      */
-    private function _getAttributesForModel($model)
+    private function _getContentFromModel($model)
     {
         $attributes = array();
-        $content    = $model->getContent()->getAttributes();
+        $content = $model->getContent()->getAttributes();
         $fieldLayout = $model->getFieldLayout();
         foreach ($fieldLayout->getFields() as $fieldLayoutField) {
             $field = $fieldLayoutField->getField();
@@ -392,7 +490,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
                         $newMatrixBlock->locale  = $model->locale;
 
                         // Set content
-                        $blockData = $this->_getAttributesForModel($matrixBlock);
+                        $blockData = $this->_getContentFromModel($matrixBlock);
                         $newMatrixBlock->setContentFromPost($blockData);
 
                         // Add block to Matrix Field
