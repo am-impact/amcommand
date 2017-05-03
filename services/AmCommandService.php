@@ -12,6 +12,7 @@ class AmCommandService extends BaseApplicationComponent
     private $_returnCommands;
     private $_deleteCurrentCommand = false;
     private $_reverseSorting = false;
+    private $_returnHtml = false;
 
     /**
      * Get all available commands.
@@ -223,6 +224,26 @@ class AmCommandService extends BaseApplicationComponent
     public function setReverseSorting($value)
     {
         $this->_reverseSorting = $value;
+    }
+
+    /**
+     * Whether the palette will have HTML returned.
+     *
+     * @param bool $value
+     */
+    public function setReturnHtml($value)
+    {
+        $this->_returnHtml = $value;
+    }
+
+    /**
+     * Get the return html.
+     *
+     * @return bool
+     */
+    public function getReturnHtml()
+    {
+        return is_bool($this->_returnHtml) ? $this->_returnHtml : false;
     }
 
     /**

@@ -43,6 +43,9 @@ class AmCommand_CommandsController extends BaseController
                 'redirect'      => $redirect,
                 'isNewSet'      => !is_bool($result),
                 'isAction'      => $action,
+                'isHtml'        => craft()->amCommand->getReturnHtml(),
+                'headHtml'      => craft()->templates->getHeadHtml(),
+                'footHtml'      => craft()->templates->getFootHtml(),
                 'deleteCommand' => $delete
             ));
         }
