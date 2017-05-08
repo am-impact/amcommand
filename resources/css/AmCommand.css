@@ -1,17 +1,17 @@
 .amcommand {
     display: none;
     background: #ffffff;
-    border-radius: 5px;
+    border-radius: 0;
     margin: 0 auto;
     left: 0;
     right: 0;
     top: 20%;
     position: fixed;
-    width: 400px;
+    width: 600px;
     z-index: 1337;
-    -webkit-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
-    -moz-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
+    -webkit-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
 }
 
 .amcommand__execute {
@@ -20,7 +20,7 @@
 }
 
 .amcommand__tabs {
-    padding: 8px 15px;
+    padding: 12px 15px 10px;
     border-radius: 5px 5px 0 0;
     color: #29323d;
     cursor: default;
@@ -41,6 +41,16 @@
  */
 .amcommand__search input[type=text] {
     width: 100%;
+    border: 0;
+    background: rgba(238, 238, 238, 0.72);
+    padding: 8px 10px 10px;
+    border-radius: 0;
+    font-size: 28px;
+    line-height: 1;
+}
+
+.amcommand__search input[type=text]:focus {
+    box-shadow: none;
 }
 
 .amcommand__search--hasButton {
@@ -79,7 +89,8 @@
 }
 .amcommand__commands li {
     border-top: 1px dotted rgba(115, 127, 140, 0.15);
-    padding: 5px;
+    font-size: 18px;
+    padding: 10px 10px;
 }
 
 .amcommand__commands li:hover {
@@ -88,24 +99,28 @@
 }
 
 .amcommand__commands li.focus {
-    background: #eff0f1;
+    background: rgba(239, 240, 241, 0.43);
 }
 
 .amcommand__commands li.focus .go:after {
-    color: #0d78f2;
+    color: inherit;
 }
 
 .amcommand__commands--name {
-    color: #0d78f2;
+    color: rgba(0, 0, 0, 0.82);
     display: block;
     font-size: 100%;
 }
 
+    .amcommand__commands li.focus .amcommand__commands--name {
+        color: rgba(0, 0, 0, 0.90);
+    }
+
 .amcommand__commands--info {
     color: #b9bfc6;
     display: block;
-    font-style: italic;
     font-size: 80%;
+    margin-top: 5px;
 }
 
 
@@ -125,4 +140,3 @@
 .visuallyhidden {
     display: none;
 }
-
