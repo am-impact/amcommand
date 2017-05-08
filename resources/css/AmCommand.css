@@ -24,6 +24,7 @@
     border-radius: 5px 5px 0 0;
     color: #29323d;
     cursor: default;
+    font-size: 15px;
     background-image: -webkit-linear-gradient(#f7f7f8, #f4f5f6);
     background-image: -moz-linear-gradient(#f7f7f8, #f4f5f6);
     background-image: -ms-linear-gradient(#f7f7f8, #f4f5f6);
@@ -65,7 +66,9 @@
 .amcommand__search--hasButton input[type=button] {
     float: right;
     width: 10%;
+    height: 52px;
     outline: none;
+    font-size: 25px;
 }
 
 
@@ -73,9 +76,9 @@
  * Loaders
  */
 .amcommand__loader {
-    left: 175px;
+    left: 46%;
     position: relative;
-    margin-top: 5px;
+    margin-top: 10px;
 }
 
 

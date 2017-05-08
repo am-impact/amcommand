@@ -22,6 +22,7 @@ Craft.AmCommand = Garnish.Base.extend(
     commandsArray:       [],
     rememberPalette:     {
         currentSet: 0,
+        paletteStyle: [],
         commandNames: [],
         commandsArray: [],
         searchKeywords: [],
@@ -298,6 +299,9 @@ Craft.AmCommand = Garnish.Base.extend(
             };
 
         self.rememberPalette.currentSet++;
+        self.rememberPalette.paletteStyle[ self.rememberPalette.currentSet ] = {
+            width: self.$container.width()
+        };
         self.rememberPalette.commandNames[ self.rememberPalette.currentSet ] = self.loadingCommand;
         self.rememberPalette.commandsArray[ self.rememberPalette.currentSet ] = self.commandsArray;
         self.rememberPalette.searchKeywords[ self.rememberPalette.currentSet ] = self.$searchField.val();
@@ -324,7 +328,7 @@ Craft.AmCommand = Garnish.Base.extend(
         if (self.isHtml) {
             self.isHtml = false;
             self.$searchContainer.removeClass('hidden');
-            self.$container.velocity({ width: '400px' }, 400);
+            self.$container.velocity(self.rememberPalette.paletteStyle[ self.rememberPalette.currentSet ], 400);
         }
         // Reset action if set
         if (self.isAction) {
