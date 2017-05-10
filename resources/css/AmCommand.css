@@ -105,6 +105,9 @@
     background: rgba(239, 240, 241, 0.43);
 }
 
+.amcommand__commands .go:hover:after {
+    color: inherit;
+}
 .amcommand__commands li.focus .go:after {
     color: inherit;
 }
@@ -115,9 +118,9 @@
     font-size: 100%;
 }
 
-    .amcommand__commands li.focus .amcommand__commands--name {
-        color: rgba(0, 0, 0, 0.90);
-    }
+.amcommand__commands li.focus .amcommand__commands--name {
+    color: rgba(0, 0, 0, 0.90);
+}
 
 .amcommand__commands--info {
     color: #b9bfc6;
