@@ -59,9 +59,17 @@ class Entries extends Component
         foreach ($availableSections as $section) {
             $type = ucfirst(Craft::t('app', ucfirst($section->type)));
             if ($section->type != Section::TYPE_SINGLE) {
+                // Get total entries
+                $totalEntries = Entry::find()
+                    ->section($section->handle)
+                    ->limit(null)
+                    ->status(null)
+                    ->count();
+
                 // We have to get the entries for this section first
                 $commands[] = [
                     'name'    => $type . ': ' . $section->name,
+                    'info'    => Craft::t('command', 'Total entries in this section: {total}', array('total' => $totalEntries)),
                     'more'    => true,
                     'call'    => 'editEntry',
                     'service' => 'entries',
@@ -162,7 +170,8 @@ class Entries extends Component
                 // Only add the command if the section has any entries
                 if ($totalEntries > 0) {
                     $commands[] = [
-                        'name'    => $section->name . ' (' . $totalEntries . ')',
+                        'name'    => $section->name,
+                        'info'    => Craft::t('command', 'Total entries in this section: {total}', array('total' => $totalEntries)),
                         'warn'    => $deleteAll,
                         'more'    => !$deleteAll,
                         'call'    => 'deleteEntriesFromSection',
@@ -218,6 +227,7 @@ class Entries extends Component
 
             // Did we delete some?
             if ($success) {
+                Command::$plugin->general->setReturnUrl(UrlHelper::cpUrl('entries/' . $variables['sectionHandle']));
                 Command::$plugin->general->setReturnMessage(Craft::t('command', 'Entries deleted.'));
             }
             else {

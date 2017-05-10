@@ -26,6 +26,8 @@ class General extends Component
     private $_returnAction;
     private $_returnCommands;
     private $_deleteCurrentCommand = false;
+    private $_reverseSorting = false;
+    private $_returnHtml = false;
 
     /**
      * Get all available commands.
@@ -253,6 +255,36 @@ class General extends Component
     }
 
     /**
+     * Whether the palette should reverse the commands's sorting.
+     *
+     * @param bool $value
+     */
+    public function setReverseSorting($value)
+    {
+        $this->_reverseSorting = $value;
+    }
+
+    /**
+     * Whether the palette will have HTML returned.
+     *
+     * @param bool $value
+     */
+    public function setReturnHtml($value)
+    {
+        $this->_returnHtml = $value;
+    }
+
+    /**
+     * Get the return html.
+     *
+     * @return bool
+     */
+    public function getReturnHtml()
+    {
+        return is_bool($this->_returnHtml) ? $this->_returnHtml : false;
+    }
+
+    /**
      * Check whether a command is enabled.
      *
      * @param string $command
@@ -273,8 +305,9 @@ class General extends Component
      */
     private function _sortCommands($commands)
     {
-        usort($commands, function($a, $b) {
-            return strcmp($a['name'], $b['name']);
+        $reverseSorting = $this->_reverseSorting;
+        usort($commands, function($a, $b) use ($reverseSorting) {
+            return $reverseSorting ? strnatcmp($b['name'], $a['name']) : strnatcmp($a['name'], $b['name']);
         });
         return $commands;
     }

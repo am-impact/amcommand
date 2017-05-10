@@ -34,12 +34,14 @@ Craft.Command = Garnish.Base.extend(
     commandsArray:       [],
     rememberPalette:     {
         currentSet: 0,
+        paletteStyle: [],
         commandNames: [],
         commandsArray: [],
         searchKeywords: [],
         actions: []
     },
     isOpen:              false,
+    isHtml:              false,
     isAction:            false,
     isActionAsync:       true,
     isActionRealtime:    false,
@@ -309,6 +311,9 @@ Craft.Command = Garnish.Base.extend(
             };
 
         self.rememberPalette.currentSet++;
+        self.rememberPalette.paletteStyle[ self.rememberPalette.currentSet ] = {
+            width: self.$container.width()
+        };
         self.rememberPalette.commandNames[ self.rememberPalette.currentSet ] = self.loadingCommand;
         self.rememberPalette.commandsArray[ self.rememberPalette.currentSet ] = self.commandsArray;
         self.rememberPalette.searchKeywords[ self.rememberPalette.currentSet ] = self.$searchField.val();
@@ -331,6 +336,12 @@ Craft.Command = Garnish.Base.extend(
         var self = this,
             restoreAction = self.rememberPalette.actions[ self.rememberPalette.currentSet ];
 
+        // Adjust palette?
+        if (self.isHtml) {
+            self.isHtml = false;
+            self.$searchContainer.removeClass('hidden');
+            self.$container.velocity(self.rememberPalette.paletteStyle[ self.rememberPalette.currentSet ], 400);
+        }
         // Reset action if set
         if (self.isAction) {
             self.isAction = false;
@@ -491,8 +502,29 @@ Craft.Command = Garnish.Base.extend(
                         self.loadingCommand = response.title;
                     }
 
-                    // What result do we have? An action, new command set or just a result message?
-                    if (self.isAction && self.isActionRealtime && response.isNewSet) {
+                    // What result do we have? HTML, an action, new command set or just a result message?
+                    if (response.isHtml) {
+                        // It is a command that shows HTML, but did we get any?
+                        if (response.result == '') {
+                            self.$commands.show(); // Show current commands again
+                        } else {
+                            // Remember current commands
+                            self.rememberCommands();
+                            self.isHtml = true;
+                            // Display executed command above search field
+                            self.$tabsContainer.text(self.loadingCommand);
+                            self.$tabsContainer.removeClass('hidden');
+                            // Adjust palette
+                            self.$searchContainer.addClass('hidden');
+                            self.$container.velocity({ width: '80%' }, 400);
+                            // Show HTML
+                            self.$commandsContainer.html(response.result);
+                            Craft.appendHeadHtml(response.headHtml);
+                            Craft.appendFootHtml(response.footHtml);
+                            Craft.initUiElements(self.$commandsContainer);
+                        }
+                    }
+                    else if (self.isAction && self.isActionRealtime && response.isNewSet) {
                         self.commandsArray = response.result;
                         self.search(undefined, true, true);
                     }

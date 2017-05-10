@@ -13,17 +13,17 @@
 .command {
     display: none;
     background: #ffffff;
-    border-radius: 5px;
+    border-radius: 0;
     margin: 0 auto;
     left: 0;
     right: 0;
     top: 20%;
     position: fixed;
-    width: 400px;
+    width: 600px;
     z-index: 1337;
-    -webkit-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
-    -moz-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
+    -webkit-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
 }
 
 .command__execute {
@@ -32,10 +32,11 @@
 }
 
 .command__tabs {
-    padding: 8px 15px;
+    padding: 12px 15px 10px;
     border-radius: 5px 5px 0 0;
     color: #29323d;
     cursor: default;
+    font-size: 15px;
     background-image: -webkit-linear-gradient(#f7f7f8, #f4f5f6);
     background-image: -moz-linear-gradient(#f7f7f8, #f4f5f6);
     background-image: -ms-linear-gradient(#f7f7f8, #f4f5f6);
@@ -53,6 +54,16 @@
  */
 .command__search input[type=text] {
     width: 100%;
+    border: 0;
+    background: rgba(238, 238, 238, 0.72);
+    padding: 8px 10px 10px;
+    border-radius: 0;
+    font-size: 28px;
+    line-height: 1;
+}
+
+.command__search input[type=text]:focus {
+    box-shadow: none;
 }
 
 .command__search--hasButton {
@@ -67,7 +78,9 @@
 .command__search--hasButton input[type=button] {
     float: right;
     width: 10%;
+    height: 52px;
     outline: none;
+    font-size: 25px;
 }
 
 
@@ -75,9 +88,9 @@
  * Loaders
  */
 .command__loader {
-    left: 175px;
+    left: 46%;
     position: relative;
-    margin-top: 5px;
+    margin-top: 10px;
 }
 
 
@@ -91,7 +104,8 @@
 }
 .command__commands li {
     border-top: 1px dotted rgba(115, 127, 140, 0.15);
-    padding: 5px;
+    font-size: 18px;
+    padding: 10px 10px;
 }
 
 .command__commands li:hover {
@@ -100,24 +114,31 @@
 }
 
 .command__commands li.focus {
-    background: #eff0f1;
+    background: rgba(239, 240, 241, 0.43);
 }
 
+.command__commands .go:hover:after {
+    color: inherit;
+}
 .command__commands li.focus .go:after {
-    color: #0d78f2;
+    color: inherit;
 }
 
 .command__commands--name {
-    color: #0d78f2;
+    color: rgba(0, 0, 0, 0.82);
     display: block;
     font-size: 100%;
+}
+
+.command__commands li.focus .command__commands--name {
+    color: rgba(0, 0, 0, 0.90);
 }
 
 .command__commands--info {
     color: #b9bfc6;
     display: block;
-    font-style: italic;
     font-size: 80%;
+    margin-top: 5px;
 }
 
 
@@ -137,4 +158,3 @@
 .visuallyhidden {
     display: none;
 }
-

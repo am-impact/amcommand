@@ -14,6 +14,7 @@ use amimpact\command\Command;
 
 use Craft;
 use craft\web\Controller;
+use craft\web\View;
 
 class CommandsController extends Controller
 {
@@ -58,6 +59,9 @@ class CommandsController extends Controller
                 'redirect'      => $redirect,
                 'isNewSet'      => !is_bool($result),
                 'isAction'      => $action,
+                'isHtml'        => Command::$plugin->general->getReturnHtml(),
+                'headHtml'      => Craft::$app->view->getHeadHtml(),
+                'footHtml'      => Craft::$app->view->getFootHtml(),
                 'deleteCommand' => $delete
             ]);
         }
