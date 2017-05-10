@@ -60,6 +60,7 @@ return array(
     'There is no running task at the moment.' => 'Er is op dit moment geen lopende taak.',
     'Title isn’t set.' => 'De titel is niet ingevuld.',
     'Title of new entry:' => 'Titel van het nieuwe bericht:',
+    'Total entries in this section: {total}' => 'Aantal entries in deze sectie: {total}',
     'Type of the detail section?' => 'Type van de detail sectie?',
     'Use one of the most used tools.' => 'Gebruik één van de meest gebruikte tools.',
     'You can disable commands you do not wish to use, by unchecking the checkboxes below.' => 'U kunt commando\'s uitschakelen die u niet wenst te gebruiken, door de boxen hieronder uit te vinken.',

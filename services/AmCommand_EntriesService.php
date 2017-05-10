@@ -35,9 +35,17 @@ class AmCommand_EntriesService extends BaseApplicationComponent
         foreach ($availableSections as $section) {
             $type = ucfirst(Craft::t(ucfirst($section->type)));
             if ($section->type != SectionType::Single) {
+                // Get total entries
+                $criteria = array(
+                    'sectionId' => $section->id,
+                    'locale'    => craft()->language,
+                );
+                $totalEntries = craft()->amCommand_elements->getTotalElements(ElementType::Entry, $criteria);
+
                 // We have to get the entries for this section first
                 $commands[] = array(
                     'name'    => $type . ': ' . $section->name,
+                    'info'    => Craft::t('Total entries in this section: {total}', array('total' => $totalEntries)),
                     'more'    => true,
                     'call'    => 'editEntry',
                     'service' => 'amCommand_entries',
@@ -138,7 +146,8 @@ class AmCommand_EntriesService extends BaseApplicationComponent
                 // Only add the command if the section has any entries
                 if ($totalEntries > 0) {
                     $commands[] = array(
-                        'name'    => $section->name . ' (' . $totalEntries . ')',
+                        'name'    => $section->name,
+                        'info'    => Craft::t('Total entries in this section: {total}', array('total' => $totalEntries)),
                         'warn'    => $deleteAll,
                         'more'    => !$deleteAll,
                         'call'    => 'deleteEntriesFromSection',
