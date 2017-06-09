@@ -59,7 +59,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
                 $criteria->sectionId = $section->id;
                 $criteria->limit = 1;
                 $criteria->status = null;
-                $criteria->locale = craft()->i18n->getPrimarySiteLocaleId();
+                $criteria->locale = craft()->language;
                 $entry = $criteria->first();
 
                 if ($entry) {
