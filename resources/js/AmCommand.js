@@ -38,6 +38,7 @@ Craft.AmCommand = Garnish.Base.extend(
     loading:             false,
     loadingCommand:      '',
     P_KEY:               80,
+    NUM_KEYS:            [49, 50, 51, 52, 53, 54, 55, 56, 57],
 
     /**
      * Initiate command palette.
@@ -73,6 +74,9 @@ Craft.AmCommand = Garnish.Base.extend(
         self.addListener(window, 'keydown', function(ev) {
             if ((ev.metaKey || ev.ctrlKey) && ev.shiftKey && ev.keyCode == self.P_KEY) {
                 self.openPalette(ev);
+            }
+            else if ((ev.metaKey || ev.ctrlKey) && self.NUM_KEYS.indexOf(ev.keyCode) > -1) {
+                self.triggerCommand(ev, false);
             }
             else if (ev.keyCode == Garnish.UP_KEY) {
                 self.moveCommandFocus(ev, 'up');
@@ -191,10 +195,11 @@ Craft.AmCommand = Garnish.Base.extend(
                     totalResults = filtered.length;
 
                 // Find matches
-                var results = filtered.map(function(el) {
+                var results = filtered.map(function(el, i) {
+                    var shortcut = (i < 9) ? '<span class="right">&#8984;' + (i + 1) + '</span>' : '';
                     var name = '<span class="amcommand__commands--name' + ('more' in el.original && el.original.more ? ' go' : '') + '">' + el.string + '</span>';
                     var info = ('info' in el.original) ? '<span class="amcommand__commands--info">' + el.original.info + '</span>' : '';
-                    return '<li data-id="' + el.index + '">' + name + info + '</li>';
+                    return '<li data-id="' + el.index + '">' + shortcut + name + info + '</li>';
                 });
                 self.$commandsContainer.html(results.join(''));
                 self.resetPalette();
@@ -414,13 +419,18 @@ Craft.AmCommand = Garnish.Base.extend(
                     // Remove focus from all, and focus the clicked command
                     self.$commands.removeClass('focus');
                     $current.addClass('focus');
-                } else {
+                }
+                else if (ev.type == 'keydown' && self.NUM_KEYS.indexOf(ev.keyCode) > -1) {
+                    var commandNumber = self.NUM_KEYS.indexOf(ev.keyCode);
+                    var $current = self.$commands.filter(':eq(' + commandNumber + ')');
+                }
+                else {
                     var $current = self.$commands.filter('.focus');
                 }
                 if ($current.length) {
                     var commandId = $current.data('id');
 
-                    if(commandId in self.commandsArray) {
+                    if (commandId in self.commandsArray) {
                         var confirmed       = true,
                             commandData     = self.commandsArray[commandId],
                             warn            = ('warn' in commandData) ? commandData.warn : false,
