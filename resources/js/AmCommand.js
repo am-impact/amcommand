@@ -73,7 +73,12 @@ Craft.AmCommand = Garnish.Base.extend(
 
         self.addListener(window, 'keydown', function(ev) {
             if ((ev.metaKey || ev.ctrlKey) && ev.shiftKey && ev.keyCode == self.P_KEY) {
-                self.openPalette(ev);
+                if (! self.isOpen) {
+                    self.openPalette(ev);
+                }
+                else {
+                    self.closePalette(ev);
+                }
             }
             else if ((ev.metaKey || ev.ctrlKey) && self.NUM_KEYS.indexOf(ev.keyCode) > -1) {
                 self.triggerCommand(ev, false);
