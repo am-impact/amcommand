@@ -87,8 +87,10 @@
  */
 .amcommand__commands > ul {
     max-height: 400px;
-    margin-top: 15px;
     overflow: auto;
+}
+.amcommand__commands > ul > li:first-child {
+    margin-top: 15px;
 }
 .amcommand__commands li {
     border-top: 1px dotted rgba(115, 127, 140, 0.15);
