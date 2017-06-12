@@ -11,7 +11,7 @@ Craft.AmCommand = Garnish.Base.extend(
     $commands:           $('.amcommand__commands li'),
     $button:             $('#nav-amcommand'),
     $buttonExecute:      $('.amcommand__search input[type=button]'),
-    ignoreSearchKeys:    [Garnish.UP_KEY, Garnish.DOWN_KEY, Garnish.LEFT_KEY, Garnish.RIGHT_KEY, Garnish.RETURN_KEY, Garnish.ESC_KEY],
+    ignoreSearchKeys:    [Garnish.UP_KEY, Garnish.DOWN_KEY, Garnish.LEFT_KEY, Garnish.RIGHT_KEY, Garnish.RETURN_KEY, Garnish.ESC_KEY, Garnish.CMD_KEY],
     fuzzyOptions:        {
         pre: "<strong>",
         post: "</strong>",
