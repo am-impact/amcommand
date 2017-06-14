@@ -77,7 +77,7 @@ Craft.AmCommand = Garnish.Base.extend(
         self.addListener(self.$searchField, 'keyup', function(ev) {
             // Make sure we don't trigger ignored keys
             if (self.ignoreSearchKeys.indexOf(ev.keyCode) < 0) {
-                self.search(ev, false);
+                self.search(ev, false, false);
 
                 // Allow element searches when we no commands triggered
                 if (self.isOpen && self.allowElementSearch && self.$searchField.val().length) {
@@ -176,7 +176,7 @@ Craft.AmCommand = Garnish.Base.extend(
                     self.rememberPalette.currentSet = 0;
                     self.commandsArray = self.rememberPalette.commandsArray[1];
                 }
-                self.search(ev, false);
+                self.search(ev, false, false);
                 self.isOpen = false;
                 self.loading = false; // Reset loading if the user cancels the page request
             });
@@ -203,17 +203,19 @@ Craft.AmCommand = Garnish.Base.extend(
     /**
      * Search the available commands.
      *
-     * @param object ev       The triggered event.
-     * @param bool   realtime Whether the search was triggered by a realtime action.
+     * @param object ev              The triggered event.
+     * @param bool   isRealtime      Whether the search was triggered by a realtime action.
+     * @param bool   isElementSearch Whether the search was triggered by an element search.
      */
-    search: function(ev, realtime) {
+    search: function(ev, isRealtime, isElementSearch) {
         var self = this;
 
-        if (! self.isAction || realtime) {
+        if (! self.isAction || isRealtime) {
             var commandsArray = self.allowElementSearch ? self.combinedCommandsArray : self.commandsArray,
-                searchValue = realtime ? '' : self.$searchField.val(),
+                searchValue = isRealtime ? '' : self.$searchField.val(),
                 filtered = fuzzy.filter(searchValue, commandsArray, self.fuzzyOptions),
-                totalResults = filtered.length;
+                totalResults = filtered.length,
+                performUpdate = true;
 
             if (! self.allowElementSearch || (searchValue.length && self.allowElementSearch)) {
                 // Find matches
@@ -223,12 +225,24 @@ Craft.AmCommand = Garnish.Base.extend(
                     var info = ('info' in el.original) ? '<span class="amcommand__commands--info">' + el.original.info + '</span>' : '';
                     return '<li data-id="' + el.index + '">' + shortcut + name + info + '</li>';
                 });
-                self.$commandsContainer.removeClass('hidden');
-                self.$commandsContainer.html(results.join(''));
-                if (! results.length) {
-                    self.$commandsContainer.addClass('hidden');
+
+                // Element search deliver anything new?
+                if (isElementSearch) {
+                    var currentMatches = self.$commands.length;
+                    if (currentMatches == results.length) {
+                        performUpdate = false;
+                    }
                 }
-                self.resetPalette();
+
+                // Update palettte
+                if (performUpdate) {
+                    self.$commandsContainer.removeClass('hidden');
+                    self.$commandsContainer.html(results.join(''));
+                    if (! results.length) {
+                        self.$commandsContainer.addClass('hidden');
+                    }
+                    self.resetPalette();
+                }
             }
             else {
                 // Hide commands
@@ -396,7 +410,7 @@ Craft.AmCommand = Garnish.Base.extend(
         }
 
         // Display the commands
-        self.search(undefined, false);
+        self.search(undefined, false, false);
 
         // Reset executed command
         if (self.rememberPalette.currentSet > 0) {
@@ -577,12 +591,12 @@ Craft.AmCommand = Garnish.Base.extend(
                         // Display combined commands
                         self.elementCommandsArray = response.result;
                         self.combinedCommandsArray = $.extend([], self.commandsArray, self.elementCommandsArray);
-                        self.search(undefined, false);
+                        self.search(undefined, false, true);
                     }
                     else if (self.isAction && self.isActionRealtime && response.isNewSet) {
                         // Display new commands
                         self.commandsArray = response.result;
-                        self.search(undefined, true);
+                        self.search(undefined, true, false);
                     }
                     else if (response.isAction) {
                         // Executed function
@@ -626,7 +640,7 @@ Craft.AmCommand = Garnish.Base.extend(
 
                             // Display new commands
                             self.commandsArray = response.result;
-                            self.search(undefined, false);
+                            self.search(undefined, false, false);
                         }
                     }
                     else if (response.deleteCommand)
@@ -638,7 +652,7 @@ Craft.AmCommand = Garnish.Base.extend(
 
                         // We delete the current command, and keep the command palette open
                         self.deleteCommand($current.data('id'));
-                        self.search(undefined, true);
+                        self.search(undefined, true, false);
                         self.$commands.show();
 
                         // Close the command palette if all commands are hidden
