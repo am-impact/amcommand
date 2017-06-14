@@ -51,9 +51,12 @@ class AmCommand_ToolsService extends BaseApplicationComponent
      */
     public function initTool($variables)
     {
+        // Do we have the required information?
         if (! isset($variables['tool'])) {
             return false;
         }
+
+        // Which tool are we firing up?
         switch ($variables['tool']) {
             case 'ClearCaches':
                 // Clear all caches
@@ -72,12 +75,12 @@ class AmCommand_ToolsService extends BaseApplicationComponent
                 break;
         }
 
+        // We need power mate!
         craft()->config->maxPowerCaptain();
 
+        // Start the tool!
         $tool = craft()->components->getComponentByTypeAndClass(ComponentType::Tool, $variables['tool']);
-
         $response = $tool->performAction($params);
-
         if (is_array($response) && isset($response['batches'])) {
             for ($i = 0; $i < count($response['batches']); $i++) {
                 foreach ($response['batches'][$i] as $batch) {
@@ -85,6 +88,7 @@ class AmCommand_ToolsService extends BaseApplicationComponent
                 }
             }
         }
+
         return true;
     }
 }

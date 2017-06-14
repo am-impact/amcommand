@@ -10,7 +10,10 @@ class AmCommand_EntriesService extends BaseApplicationComponent
      */
     public function newEntry()
     {
+        // Gather commands
         $commands = array();
+
+        // Only add sections where the current user can edit
         $availableSections = craft()->sections->getEditableSections();
         foreach ($availableSections as $section) {
             if ($section->type != SectionType::Single) {
@@ -20,6 +23,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
                 );
             }
         }
+
         return $commands;
     }
 
@@ -30,7 +34,10 @@ class AmCommand_EntriesService extends BaseApplicationComponent
      */
     public function editEntries()
     {
+        // Gather commands
         $commands = array();
+
+        // Only add sections where the current user can edit
         $availableSections = craft()->sections->getEditableSections();
         foreach ($availableSections as $section) {
             $type = ucfirst(Craft::t(ucfirst($section->type)));
@@ -70,6 +77,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
                 }
             }
         }
+
         return $commands;
     }
 
@@ -82,6 +90,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
      */
     public function editEntry($variables)
     {
+        // Do we have the required information?
         if (! isset($variables['sectionHandle'])) {
             return false;
         }
@@ -114,6 +123,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
                 );
             }
         }
+
         return $commands;
     }
 
@@ -126,13 +136,18 @@ class AmCommand_EntriesService extends BaseApplicationComponent
      */
     public function deleteEntries($variables)
     {
+        // Do we have the required information?
         if (! isset($variables['deleteAll'])) {
             return false;
         }
+
         // Do we want to delete all entries or just one?
         $deleteAll = $variables['deleteAll'] == 'true';
-        // Create new list of commands
+
+        // Gather commands
         $commands = array();
+
+        // Only add sections where the current user can edit
         $availableSections = craft()->sections->getEditableSections();
         foreach ($availableSections as $section) {
             if ($section->type != SectionType::Single) {
@@ -164,6 +179,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
         if (! count($commands)) {
             craft()->amCommand->setReturnMessage(Craft::t('There are no entries within the available sections.'));
         }
+
         return $commands;
     }
 
@@ -176,9 +192,11 @@ class AmCommand_EntriesService extends BaseApplicationComponent
      */
     public function deleteEntriesFromSection($variables)
     {
+        // Do we have the required information?
         if (! isset($variables['sectionId']) || ! isset($variables['sectionHandle']) || ! isset($variables['deleteAll'])) {
             return false;
         }
+
         // Delete them all?
         $deleteAll = $variables['deleteAll'] == 'true';
 
@@ -205,6 +223,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             } else {
                 craft()->amCommand->setReturnMessage(Craft::t('Couldn’t delete entries.'));
             }
+
             return $result;
         } else {
             // Return entries with the option to delete one
@@ -224,6 +243,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             if (! count($commands)) {
                 craft()->amCommand->setReturnMessage(Craft::t('No entries in this section exist yet.'));
             }
+
             return $commands;
         }
     }
@@ -237,9 +257,12 @@ class AmCommand_EntriesService extends BaseApplicationComponent
      */
     public function deleteEntry($variables)
     {
+        // Do we have the required information?
         if (! isset($variables['entryId'])) {
             return false;
         }
+
+        // Delete entry!
         $entry  = craft()->entries->getEntryById($variables['entryId']);
         $result = craft()->entries->deleteEntry($entry);
         if ($result) {
@@ -248,6 +271,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
         } else {
             craft()->amCommand->setReturnMessage(Craft::t('Couldn’t delete entry.'));
         }
+
         return $result;
     }
 
@@ -260,7 +284,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
      */
     public function duplicateEntry($variables)
     {
-        // Do we have an entry?
+        // Do we have the required information?
         if (! isset($variables['entryId'])) {
             return false;
         }
@@ -283,6 +307,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
         // Ask new entry's title
         $variables['locale'] = $currentEntry->locale;
         craft()->amCommand->setReturnAction(Craft::t('Title of new entry:'), $currentEntry->getContent()->title, 'duplicateAnEntry', 'amCommand_entries', $variables);
+
         return true;
     }
 
@@ -295,6 +320,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
      */
     public function duplicateAnEntry($variables)
     {
+        // Do we have the required information?
         if (! isset($variables['entryId']) || ! isset($variables['searchText'])) {
             return false;
         }
@@ -302,6 +328,8 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             craft()->amCommand->setReturnMessage(Craft::t('Title isn’t set.'));
             return false;
         }
+
+        // Start duplicating!
         $result = false;
         $duplicatePrimaryLocaleEntry = false;
         foreach (craft()->i18n->getSiteLocales() as $locale) {
@@ -372,6 +400,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
         } else {
             craft()->amCommand->setReturnMessage(Craft::t('Couldn’t duplicate entry.'));
         }
+
         return $result;
     }
 
@@ -384,7 +413,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
      */
     public function compareEntryVersion($variables)
     {
-        // Do we have an entry?
+        // Do we have the required information?
         if (! isset($variables['entryId'])) {
             return false;
         }

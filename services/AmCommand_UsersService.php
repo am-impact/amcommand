@@ -17,7 +17,10 @@ class AmCommand_UsersService extends BaseApplicationComponent
      */
     public function editUser()
     {
+        // Gather commands
         $commands = array();
+
+        // Find users
         $users = craft()->amCommand_elements->getElements(ElementType::User);
         if ($users) {
             foreach ($users as $user) {
@@ -30,6 +33,7 @@ class AmCommand_UsersService extends BaseApplicationComponent
         if (! count($commands)) {
             craft()->amCommand->setReturnMessage(Craft::t('Besides your account, no other account could be found.'));
         }
+
         return $commands;
     }
 
@@ -40,7 +44,10 @@ class AmCommand_UsersService extends BaseApplicationComponent
      */
     public function deleteUser()
     {
+        // Gather commands
         $commands = array();
+
+        // Find users
         $users = craft()->amCommand_elements->getElements(ElementType::User);
         foreach ($users as $user) {
             if ($this->_currentUser && $this->_currentUser->id != $user['id']) {
@@ -58,6 +65,7 @@ class AmCommand_UsersService extends BaseApplicationComponent
         if (! count($commands)) {
             craft()->amCommand->setReturnMessage(Craft::t('Besides your account, no other account could be found.'));
         }
+
         return $commands;
     }
 
@@ -70,10 +78,13 @@ class AmCommand_UsersService extends BaseApplicationComponent
      */
     public function deleteAnUser($variables)
     {
+        // Do we have the required information?
         if (! isset($variables['userId'])) {
             return false;
         }
-        $user   = craft()->users->getUserById($variables['userId']);
+
+        // Delete user!
+        $user = craft()->users->getUserById($variables['userId']);
         $result = craft()->users->deleteUser($user);
         if ($result) {
             craft()->amCommand->deleteCurrentCommand();
@@ -81,6 +92,7 @@ class AmCommand_UsersService extends BaseApplicationComponent
         } else {
             craft()->amCommand->setReturnMessage(Craft::t('Couldn’t delete “{name}”.', array('name', $user->username)));
         }
+
         return $result;
     }
 
@@ -91,7 +103,10 @@ class AmCommand_UsersService extends BaseApplicationComponent
      */
     public function loginUser()
     {
+        // Gather commands
         $commands = array();
+
+        // Find users
         $users = craft()->amCommand_elements->getElements(ElementType::User);
         foreach ($users as $user) {
             if ($this->_currentUser && $this->_currentUser->id != $user['id']) {
@@ -109,6 +124,7 @@ class AmCommand_UsersService extends BaseApplicationComponent
         if (! count($commands)) {
             craft()->amCommand->setReturnMessage(Craft::t('Besides your account, no other account could be found.'));
         }
+
         return $commands;
     }
 
@@ -121,22 +137,31 @@ class AmCommand_UsersService extends BaseApplicationComponent
      */
     public function loginAsUser($variables)
     {
+        // Do we have the required information?
         if (! isset($variables['userId'])) {
             return false;
         }
+
+        // Login as user!
         if (craft()->userSession->loginByUserId($variables['userId'])) {
             craft()->userSession->setNotice(Craft::t('Logged in.'));
             craft()->amCommand->setReturnMessage(Craft::t('Login as user'));
 
+            // Redirect
             if (craft()->userSession->getUser()->can('accessCp')) {
                 craft()->amCommand->setReturnUrl(UrlHelper::getCpUrl('dashboard'));
-            } else {
+            }
+            else {
                 craft()->amCommand->setReturnUrl(UrlHelper::getSiteUrl(''));
             }
+
             return true;
-        } else {
+        }
+        else {
+            // We could not login..
             craft()->amCommand->setReturnMessage(Craft::t('There was a problem impersonating this user.'));
             Craft::log(craft()->userSession->getUser()->username . ' tried to log in using userId: '.$variables['userId'].' but something went wrong.', LogLevel::Error);
+
             return false;
         }
     }
@@ -158,6 +183,7 @@ class AmCommand_UsersService extends BaseApplicationComponent
             $userInfo[] = $user['lastName'];
         }
         $userInfo[] = '(' . $user['email'] . ')';
+
         return implode(' ', $userInfo);
     }
 

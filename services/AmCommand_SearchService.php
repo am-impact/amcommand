@@ -10,8 +10,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
      */
     public function searchOptionCraft()
     {
-        $this->_setAction('Craft');
-        return true;
+        return $this->_setAction('Craft');
     }
 
     /**
@@ -21,8 +20,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
      */
     public function searchOptionStackExchange()
     {
-        $this->_setAction('StackExchange');
-        return true;
+        return $this->_setAction('StackExchange');
     }
 
     /**
@@ -39,9 +37,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
             return false;
         }
 
-        // Start element search
-        $this->_setRealtimeAction($variables['elementType']);
-        return true;
+        return $this->_setRealtimeAction($variables['elementType']);
     }
 
     /**
@@ -107,11 +103,13 @@ class AmCommand_SearchService extends BaseApplicationComponent
      */
     private function _setAction($searchOption)
     {
+        // Start action
         $variables = array(
             'option' => $searchOption
         );
-
         craft()->amCommand->setReturnAction(Craft::t('Search on {option}', array('option' => Craft::t($searchOption))), '', 'searchOn', 'amCommand_search', $variables, false);
+
+        return true;
     }
 
     /**
@@ -121,13 +119,16 @@ class AmCommand_SearchService extends BaseApplicationComponent
      */
     private function _setRealtimeAction($searchOption)
     {
+        // Get the element type info
+        $actualElementType = craft()->elements->getElementType($searchOption);
+
+        // Start action
         $variables = array(
             'option' => $searchOption
         );
-
-        $actualElementType = craft()->elements->getElementType($searchOption);
-
         craft()->amCommand->setReturnAction(Craft::t('Search for {option}', array('option' => $actualElementType->getName())), '', 'searchOn', 'amCommand_search', $variables, true, true);
+
+        return true;
     }
 
     /**
@@ -141,6 +142,10 @@ class AmCommand_SearchService extends BaseApplicationComponent
      */
     private function _searchForElementType($elementType, $searchCriteria, $addElementTypeInfo = false)
     {
+        // Gather commands
+        $commands = array();
+
+        // Find elements
         $elementTypeInfo = craft()->elements->getElementType($elementType);
         $criteria = craft()->elements->getCriteria($elementType, $searchCriteria);
         $criteria->search = '*' . $searchCriteria . '*';
@@ -148,8 +153,6 @@ class AmCommand_SearchService extends BaseApplicationComponent
         $criteria->locale = craft()->language;
         $criteria->order = 'score';
         $elements = $criteria->find();
-
-        $commands = array();
         foreach ($elements as $element) {
             switch ($elementType) {
                 case ElementType::User:

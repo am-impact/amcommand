@@ -36,6 +36,7 @@ class AmCommand_PluginsService extends BaseApplicationComponent
         if (! count($commands)) {
             craft()->amCommand->setReturnMessage(Craft::t('There are no enabled plugins with settings.'));
         }
+
         return $commands;
     }
 }

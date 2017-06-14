@@ -61,7 +61,10 @@ class AmCommand_SettingsService extends BaseApplicationComponent
      */
     public function editSections()
     {
+        // Gather commands
         $commands = array();
+
+        // Find sections
         $sections = craft()->sections->getAllSections();
         foreach ($sections as $section) {
             $commands[] = array(
@@ -69,6 +72,7 @@ class AmCommand_SettingsService extends BaseApplicationComponent
                 'url'  => UrlHelper::getCpUrl('settings/sections/' . $section->id),
             );
         }
+
         return $commands;
     }
 
@@ -79,12 +83,16 @@ class AmCommand_SettingsService extends BaseApplicationComponent
      */
     public function editSectionEntryTypes()
     {
+        // Gather commands
         $commands = array();
+
+        // Find sections
         $sections = craft()->sections->getAllSections();
         foreach ($sections as $section) {
-            $entryTypes      = $section->getEntryTypes();
+            // Find the entry types
+            $entryTypes = $section->getEntryTypes();
             $totalEntryTypes = count($entryTypes);
-            $sectionName     = $totalEntryTypes > 1 ? $section->name . ': ' : '';
+            $sectionName = $totalEntryTypes > 1 ? $section->name . ': ' : '';
             foreach ($entryTypes as $entryType) {
                 $commands[] = array(
                     'name' => $sectionName . $entryType->name,
@@ -92,6 +100,7 @@ class AmCommand_SettingsService extends BaseApplicationComponent
                 );
             }
         }
+
         return $commands;
     }
 
@@ -102,7 +111,10 @@ class AmCommand_SettingsService extends BaseApplicationComponent
      */
     public function editGlobalSets()
     {
+        // Gather commands
         $commands = array();
+
+        // Find global sets
         $criteria = craft()->elements->getCriteria(ElementType::GlobalSet);
         $globalSets = $criteria->find();
         if ($globalSets) {
@@ -116,6 +128,7 @@ class AmCommand_SettingsService extends BaseApplicationComponent
         if (! count($commands)) {
             craft()->amCommand->setReturnMessage(Craft::t('No global sets exist yet.'));
         }
+
         return $commands;
     }
 
@@ -126,7 +139,10 @@ class AmCommand_SettingsService extends BaseApplicationComponent
      */
     public function createFieldInGroup()
     {
+        // Gather commands
         $commands = array();
+
+        // Find field groups
         $groups = craft()->fields->getAllGroups();
         if ($groups) {
             foreach ($groups as $group) {
@@ -136,6 +152,7 @@ class AmCommand_SettingsService extends BaseApplicationComponent
                 );
             }
         }
+
         return $commands;
     }
 
@@ -146,7 +163,10 @@ class AmCommand_SettingsService extends BaseApplicationComponent
      */
     public function editFields()
     {
+        // Gather commands
         $commands = array();
+
+        // Find fields
         $fields = craft()->fields->getAllFields();
         if ($fields) {
             foreach ($fields as $field) {
@@ -156,6 +176,7 @@ class AmCommand_SettingsService extends BaseApplicationComponent
                 );
             }
         }
+
         return $commands;
     }
 
@@ -166,7 +187,10 @@ class AmCommand_SettingsService extends BaseApplicationComponent
      */
     public function duplicateFields()
     {
+        // Gather commands
         $commands = array();
+
+        // Find fields
         $fields = craft()->fields->getAllFields();
         if ($fields) {
             foreach ($fields as $field) {
@@ -195,10 +219,12 @@ class AmCommand_SettingsService extends BaseApplicationComponent
      */
     public function fieldDuplicator($variables = array())
     {
+        // Do we have the required information?
         if (! isset($variables['step'])) {
             return false;
         }
 
+        // Which step are we at?
         switch ($variables['step']) {
             case 1:
                 // Set action variables
@@ -270,6 +296,7 @@ class AmCommand_SettingsService extends BaseApplicationComponent
      */
     public function overviewDetailSectionGenerator($variables = array())
     {
+        // Do we have the required information?
         if (! isset($variables['step'])) {
             // Set action variables
             $title = Craft::t('Name of the overview section?');
@@ -286,6 +313,7 @@ class AmCommand_SettingsService extends BaseApplicationComponent
             return true;
         }
 
+        // Which step are we at?
         switch ($variables['step']) {
             case 1:
                 // Get overview name
@@ -367,7 +395,7 @@ class AmCommand_SettingsService extends BaseApplicationComponent
      */
     private function _createSections($variables)
     {
-        // Double check required information
+        // Do we have the required information?
         if (! isset($variables['overviewName']) || ! isset($variables['detailName']) || ! isset($variables['detailType'])) {
             return false;
         }

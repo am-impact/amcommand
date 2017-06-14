@@ -64,8 +64,10 @@ class AmCommand_TasksService extends BaseApplicationComponent
      */
     public function listTasks()
     {
+        // Gather commands
         $commands = array();
 
+        // Find tasks
         $tasks = craft()->tasks->getAllTasks();
         if (! $tasks) {
             craft()->amCommand->setReturnMessage(Craft::t('There are no tasks at the moment.'));
@@ -94,9 +96,11 @@ class AmCommand_TasksService extends BaseApplicationComponent
      */
     public function listTaskTypes()
     {
+        // Gather commands
         $commands = array();
-        $taskTypes = array();
 
+        // Find task types
+        $taskTypes = array();
         $tasks = craft()->tasks->getAllTasks();
         if (! $tasks) {
             craft()->amCommand->setReturnMessage(Craft::t('There are no tasks at the moment.'));
@@ -130,9 +134,12 @@ class AmCommand_TasksService extends BaseApplicationComponent
      */
     public function deleteTask($variables)
     {
+        // Do we have the required information?
         if (! isset($variables['taskId'])) {
             return false;
         }
+
+        // Delete task!
         $result = craft()->tasks->deleteTaskById($variables['taskId']);
         if ($result === true) {
             craft()->amCommand->deleteCurrentCommand();
@@ -140,6 +147,7 @@ class AmCommand_TasksService extends BaseApplicationComponent
         } else {
             craft()->amCommand->setReturnMessage(Craft::t('Couldn’t delete task.'));
         }
+
         return $result ? true : false;
     }
 
@@ -191,10 +199,12 @@ class AmCommand_TasksService extends BaseApplicationComponent
      */
     public function deleteAllTasksByType($variables)
     {
+        // Do we have the required information?
         if (! isset($variables['taskType'])) {
             return false;
         }
 
+        // Delete all tasks!
         $tasks = craft()->db->createCommand()
             ->select('*')
             ->from('tasks')

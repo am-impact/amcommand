@@ -8,7 +8,10 @@ class AmCommand_GlobalsService extends BaseApplicationComponent
      */
     public function editGlobals()
     {
+        // Gather commands
         $commands = array();
+
+        // Find global sets
         $criteria = craft()->elements->getCriteria(ElementType::GlobalSet);
         $globalSets = $criteria->find();
         foreach ($globalSets as $globalSet) {
@@ -22,6 +25,7 @@ class AmCommand_GlobalsService extends BaseApplicationComponent
         if (! count($commands)) {
             craft()->amCommand->setReturnMessage(Craft::t('No global sets exist yet.'));
         }
+
         return $commands;
     }
 }

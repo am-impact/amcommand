@@ -63,19 +63,22 @@ class AmCommandService extends BaseApplicationComponent
                 return false;
             }
             $commandResult = craft()->$service->$command($variables);
-        } else {
+        }
+        else {
             if (! method_exists($this, $command)) {
                 return false;
             }
             $commandResult = $this->$command($variables);
         }
+
         // Treat the result as a new list of commands
         if (is_array($commandResult)) {
             if ($service == 'amCommand_search') {
                 return $commandResult;
             }
             return $this->_sortCommands($commandResult);
-        } else {
+        }
+        else {
             return $commandResult;
         }
     }
@@ -259,6 +262,7 @@ class AmCommandService extends BaseApplicationComponent
         usort($commands, function($a, $b) use ($reverseSorting) {
             return $reverseSorting ? strnatcmp($b['name'], $a['name']) : strnatcmp($a['name'], $b['name']);
         });
+
         return $commands;
     }
 
@@ -344,6 +348,7 @@ class AmCommandService extends BaseApplicationComponent
                 );
             }
         }
+
         return $currentCommands;
     }
 
@@ -364,6 +369,7 @@ class AmCommandService extends BaseApplicationComponent
                 'service' => 'amCommand_globals'
             );
         }
+
         return $currentCommands;
     }
 
@@ -415,6 +421,7 @@ class AmCommandService extends BaseApplicationComponent
                 );
             }
         }
+
         return $currentCommands;
     }
 
@@ -460,6 +467,7 @@ class AmCommandService extends BaseApplicationComponent
                 }
             }
         }
+
         return $currentCommands;
     }
 
@@ -475,6 +483,7 @@ class AmCommandService extends BaseApplicationComponent
         if (! craft()->userSession->isAdmin()) {
             return $currentCommands;
         }
+
         $currentCommands[] = array(
             'name'    => Craft::t('Tasks'),
             'info'    => Craft::t('Manage Craft tasks.'),
@@ -568,6 +577,7 @@ class AmCommandService extends BaseApplicationComponent
             'call'    => 'getSettingsUrl',
             'service' => 'amCommand_plugins'
         );
+
         return $currentCommands;
     }
 }
