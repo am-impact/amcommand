@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.0.2",
+        "downloadUrl": "https://github.com/am-impact/amcommand/archive/master.zip",
+        "date": "2017-06-14T16:00:00+01:00",
+        "notes": [
+            "[Fixed] Combining commands (default and found commands by the element search) were not always merged correctly.",
+            "[Fixed] Only add the search criteria to commands found by the element search, if none of the characters were found."
+        ]
+    },
+    {
         "version": "2.0.1",
         "downloadUrl": "https://github.com/am-impact/amcommand/archive/master.zip",
         "date": "2017-06-14T14:00:00+01:00",

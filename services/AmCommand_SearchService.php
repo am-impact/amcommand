@@ -178,7 +178,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
                     break;
             }
 
-            // Is they keywords available in the command?
+            // Are the keywords available in the command?
             $addSearchCriteria = false;
             foreach (str_split($searchCriteria) as $char) {
                 if (stripos($command['name'], $char) === false) {
