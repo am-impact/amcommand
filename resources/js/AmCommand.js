@@ -87,7 +87,7 @@ Craft.AmCommand = Garnish.Base.extend(
                     self.elementSearchTimer = setTimeout($.proxy(function() {
                         // Trigger element search
                         var variables = {
-                            'option': 'Elements',
+                            'option': 'DirectElements',
                             'searchText': self.$searchField.val()
                         };
                         self.loading = true;

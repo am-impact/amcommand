@@ -427,6 +427,7 @@ class AmCommandService extends BaseApplicationComponent
      */
     private function _getSearchCommands($currentCommands)
     {
+        // Site searches
         $currentCommands[] = array(
             'name'    => Craft::t('Search on {option}', array('option' => 'Craft')),
             'info'    => 'https://craftcms.com',
@@ -441,24 +442,24 @@ class AmCommandService extends BaseApplicationComponent
             'call'    => 'searchOptionStackExchange',
             'service' => 'amCommand_search'
         );
-        $currentCommands[] = array(
-            'name'    => Craft::t('Search for {option}', array('option' => Craft::t('Categories'))),
-            'more'    => true,
-            'call'    => 'searchOptionCategories',
-            'service' => 'amCommand_search'
-        );
-        $currentCommands[] = array(
-            'name'    => Craft::t('Search for {option}', array('option' => Craft::t('Entries'))),
-            'more'    => true,
-            'call'    => 'searchOptionEntries',
-            'service' => 'amCommand_search'
-        );
-        $currentCommands[] = array(
-            'name'    => Craft::t('Search for {option}', array('option' => Craft::t('Users'))),
-            'more'    => true,
-            'call'    => 'searchOptionUsers',
-            'service' => 'amCommand_search'
-        );
+
+        // Element searches
+        if (is_array($this->_settings->elementSearchElementTypes)) {
+            foreach ($this->_settings->elementSearchElementTypes as $elementType => $submittedInfo) {
+                if (isset($submittedInfo['enabled']) && $submittedInfo['enabled'] === '1') {
+                    $actualElementType = craft()->elements->getElementType($elementType);
+                    $currentCommands[] = array(
+                        'name'    => Craft::t('Search for {option}', array('option' => $actualElementType->getName())),
+                        'more'    => true,
+                        'call'    => 'searchOptionElementType',
+                        'service' => 'amCommand_search',
+                        'vars'    => array(
+                            'elementType' => $elementType
+                        )
+                    );
+                }
+            }
+        }
         return $currentCommands;
     }
 

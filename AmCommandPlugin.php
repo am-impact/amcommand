@@ -49,59 +49,34 @@ class AmCommandPlugin extends BasePlugin
      */
     public function getSettingsHtml()
     {
-        $commands = array(
-            'newEntry' => array(
-                'name' => Craft::t('New entry'),
-                'info' => Craft::t('Create a new entry in one of the available sections.')
-            ),
-            'editEntries' => array(
-                'name' => Craft::t('Edit entries'),
-                'info' => Craft::t('Edit an entry in one of the available sections.')
-            ),
-            'deleteEntries' => array(
-                'name' => Craft::t('Delete entries'),
-                'info' => Craft::t('Delete an entry in one of the available sections.')
-            ),
-            'deleteAllEntries' => array(
-                'name' => Craft::t('Delete all entries'),
-                'info' => Craft::t('Delete all entries in one of the available sections.') . ' (' . Craft::t('This action may only be performed by admins.') . ')'
-            ),
-            'duplicateEntry' => array(
-                'name' => Craft::t('Duplicate entry'),
-                'info' => Craft::t('Duplicate the current entry.')
-            ),
-            'compareEntryVersion' => array(
-                'name' => Craft::t('Compare entry version'),
-                'info' => Craft::t('Compare the current entry with older versions.')
-            ),
-            'editGlobals' => array(
-                'name' => Craft::t('Globals'),
-                'info' => Craft::t('Edit')
-            ),
-            'userCommands' => array(
-                'name' => Craft::t('Administrate users'),
-                'info' => Craft::t('Create, edit or delete a user.')
-            ),
-            'searchCommands' => array(
-                'name' => Craft::t('Search'),
-                'info' => Craft::t('You’re able to search within a site that offers help.')
-            ),
-            'settings' => array(
-                'name' => Craft::t('Settings'),
-                'info' => Craft::t('This action may only be performed by admins.')
-            ),
-            'tasks' => array(
-                'name' => Craft::t('Tasks'),
-                'info' => Craft::t('This action may only be performed by admins.')
-            ),
-            'tools' => array(
-                'name' => Craft::t('Tools'),
-                'info' => Craft::t('This action may only be performed by admins.')
-            )
-        );
+        // Settings
+        $settings = $this->getSettings();
+        $elementSearchElementTypes = array();
+
+        // Find supported element types for element search, based on the settings
+        if (is_array($settings->elementSearchElementTypes)) {
+            foreach ($settings->elementSearchElementTypes as $elementType => $submittedInfo) {
+                $elementSearchElementTypes[$elementType] = $submittedInfo;
+            }
+        }
+
+        // Find supported element types for element search, based on all element types
+        $elementTypes = craft()->elements->getAllElementTypes();
+        foreach ($elementTypes as $elementType => $elementTypeInfo) {
+            if (! isset($elementSearchElementTypes[$elementType])) {
+                $elementSearchElementTypes[$elementType] = array(
+                    'elementType' => $elementType,
+                    'enabled' => 0,
+                );
+            }
+        }
+
+        // Sort by element type
+        ksort($elementSearchElementTypes);
+
         return craft()->templates->render('amcommand/settings', array(
-            'commands' => $commands,
-            'settings' => $this->getSettings()
+            'settings' => $settings,
+            'elementSearchElementTypes' => $elementSearchElementTypes,
         ));
     }
 
@@ -120,7 +95,7 @@ class AmCommandPlugin extends BasePlugin
             $commands = craft()->amCommand->getCommands($this->getSettings());
 
             // Get the HTML
-            $html = craft()->templates->render('amcommand/command');
+            $html = craft()->templates->render('amcommand/palette');
             craft()->templates->includeFootHtml($html);
 
             // Load javascript
@@ -141,18 +116,7 @@ class AmCommandPlugin extends BasePlugin
     protected function defineSettings()
     {
         return array(
-            'newEntry'            => array(AttributeType::Bool, 'default' => true),
-            'editEntries'         => array(AttributeType::Bool, 'default' => true),
-            'deleteEntries'       => array(AttributeType::Bool, 'default' => true),
-            'deleteAllEntries'    => array(AttributeType::Bool, 'default' => true),
-            'duplicateEntry'      => array(AttributeType::Bool, 'default' => true),
-            'compareEntryVersion' => array(AttributeType::Bool, 'default' => true),
-            'editGlobals'         => array(AttributeType::Bool, 'default' => true),
-            'userCommands'        => array(AttributeType::Bool, 'default' => true),
-            'searchCommands'      => array(AttributeType::Bool, 'default' => true),
-            'settings'            => array(AttributeType::Bool, 'default' => true),
-            'tasks'               => array(AttributeType::Bool, 'default' => true),
-            'tools'               => array(AttributeType::Bool, 'default' => true),
+            'elementSearchElementTypes' => array(AttributeType::Mixed),
         );
     }
 }

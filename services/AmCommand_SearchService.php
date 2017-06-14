@@ -26,35 +26,21 @@ class AmCommand_SearchService extends BaseApplicationComponent
     }
 
     /**
-     * Get the search option action for Craft Categories.
+     * Get the search option action for an Element Type.
+     *
+     * @param array $variables
      *
      * @return bool
      */
-    public function searchOptionCategories()
+    public function searchOptionElementType($variables)
     {
-        $this->_setRealtimeAction('Categories');
-        return true;
-    }
+        // Do we have the required information?
+        if (! isset($variables['elementType'])) {
+            return false;
+        }
 
-    /**
-     * Get the search option action for Craft Entries.
-     *
-     * @return bool
-     */
-    public function searchOptionEntries()
-    {
-        $this->_setRealtimeAction('Entries');
-        return true;
-    }
-
-    /**
-     * Get the search option action for Craft Users.
-     *
-     * @return bool
-     */
-    public function searchOptionUsers()
-    {
-        $this->_setRealtimeAction('Users');
+        // Start element search
+        $this->_setRealtimeAction($variables['elementType']);
         return true;
     }
 
@@ -67,14 +53,19 @@ class AmCommand_SearchService extends BaseApplicationComponent
      */
     public function searchOn($variables)
     {
+        // Do we have the required information?
         if (! isset($variables['searchText']) || ! isset($variables['option'])) {
             return false;
         }
+
+        // Do we have the keywords?
         $searchCriteria = $variables['searchText'];
         if (empty($searchCriteria) || trim($searchCriteria) == '') {
             craft()->amCommand->setReturnMessage(Craft::t('Search criteria isn’t set.'));
             return false;
         }
+
+        // Where will we search?
         switch ($variables['option']) {
             case 'Craft':
                 craft()->amCommand->setReturnUrl('https://craftcms.com/search?q=' . $searchCriteria, true);
@@ -82,25 +73,30 @@ class AmCommand_SearchService extends BaseApplicationComponent
             case 'StackExchange':
                 craft()->amCommand->setReturnUrl('http://craftcms.stackexchange.com/search?q=' . $searchCriteria, true);
                 break;
-            case 'Categories':
-                return $this->_searchForElement(ElementType::Category, $searchCriteria);
-                break;
-            case 'Entries':
-                return $this->_searchForElement(ElementType::Entry, $searchCriteria);
-                break;
-            case 'Users':
-                return $this->_searchForElement(ElementType::User, $searchCriteria);
-                break;
-            case 'Elements':
-                $entries = $this->_searchForElement(ElementType::Entry, $searchCriteria, true);
-                $categories = $this->_searchForElement(ElementType::Category, $searchCriteria, true);
-                $users = $this->_searchForElement(ElementType::User, $searchCriteria, true);
-                return array_merge($entries, $categories, $users);
+            case 'DirectElements':
+                // Gather elements
+                $elements = array();
+
+                // Start element searches
+                $plugin = craft()->plugins->getPlugin('amcommand');
+                if ($plugin) {
+                    $pluginSettings = $plugin->getSettings();
+                    if (is_array($pluginSettings->elementSearchElementTypes)) {
+                        foreach ($pluginSettings->elementSearchElementTypes as $elementType => $submittedInfo) {
+                            if (isset($submittedInfo['enabled']) && $submittedInfo['enabled'] === '1') {
+                                $elements = array_merge($elements, $this->_searchForElementType($elementType, $searchCriteria, true));
+                            }
+                        }
+                    }
+                }
+
+                return $elements;
                 break;
             default:
-                return false;
+                return $this->_searchForElementType($variables['option'], $searchCriteria);
                 break;
         }
+
         return true;
     }
 
@@ -129,7 +125,9 @@ class AmCommand_SearchService extends BaseApplicationComponent
             'option' => $searchOption
         );
 
-        craft()->amCommand->setReturnAction(Craft::t('Search for {option}', array('option' => Craft::t($searchOption))), '', 'searchOn', 'amCommand_search', $variables, true, true);
+        $actualElementType = craft()->elements->getElementType($searchOption);
+
+        craft()->amCommand->setReturnAction(Craft::t('Search for {option}', array('option' => $actualElementType->getName())), '', 'searchOn', 'amCommand_search', $variables, true, true);
     }
 
     /**
@@ -141,7 +139,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
      *
      * @return array
      */
-    private function _searchForElement($elementType, $searchCriteria, $addElementTypeInfo = false)
+    private function _searchForElementType($elementType, $searchCriteria, $addElementTypeInfo = false)
     {
         $elementTypeInfo = craft()->elements->getElementType($elementType);
         $criteria = craft()->elements->getCriteria($elementType, $searchCriteria);
@@ -156,11 +154,8 @@ class AmCommand_SearchService extends BaseApplicationComponent
             switch ($elementType) {
                 case ElementType::User:
                     $userInfo = array();
-                    if ($element->firstName) {
-                        $userInfo[] = $element->firstName;
-                    }
-                    if ($element->lastName) {
-                        $userInfo[] = $element->lastName;
+                    if (($fullName = $element->getFullName()) !== '') {
+                        $userInfo[] = $fullName;
                     }
                     $userInfo[] = $element->email;
 
@@ -173,13 +168,14 @@ class AmCommand_SearchService extends BaseApplicationComponent
 
                 default:
                     $commands[] = array(
-                        'name' => $element->title,
+                        'name' => $element->__toString(),
                         'info' => ($addElementTypeInfo ? $elementTypeInfo->getName() . ' | ' : '') . Craft::t('URI') . ': ' . $element->uri,
                         'url'  => $element->getCpEditUrl()
                     );
                     break;
             }
         }
+
         return $commands;
     }
 }
