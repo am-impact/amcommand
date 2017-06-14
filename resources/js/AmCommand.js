@@ -406,7 +406,7 @@ Craft.AmCommand = Garnish.Base.extend(
         // Enable element search?
         if (self.rememberPalette.currentSet == 0) {
             self.allowElementSearch = true;
-            self.combinedCommandsArray = $.extend([], self.commandsArray, self.elementCommandsArray);
+            self.combinedCommandsArray = self.commandsArray.concat(self.elementCommandsArray);
         }
 
         // Display the commands
@@ -590,7 +590,7 @@ Craft.AmCommand = Garnish.Base.extend(
                     else if (isElementSearch && response.isNewSet) {
                         // Display combined commands
                         self.elementCommandsArray = response.result;
-                        self.combinedCommandsArray = $.extend([], self.commandsArray, self.elementCommandsArray);
+                        self.combinedCommandsArray = self.commandsArray.concat(self.elementCommandsArray);
                         self.search(undefined, false, true);
                     }
                     else if (self.isAction && self.isActionRealtime && response.isNewSet) {
