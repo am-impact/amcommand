@@ -162,7 +162,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
                     }
                     $userInfo[] = $element->email;
 
-                    $commands[] = array(
+                    $command = array(
                         'name' => $element->username,
                         'info' => ($addElementTypeInfo ? $elementTypeInfo->getName() . ' | ' : '') . implode(' - ', $userInfo),
                         'url'  => $element->getCpEditUrl()
@@ -170,13 +170,20 @@ class AmCommand_SearchService extends BaseApplicationComponent
                     break;
 
                 default:
-                    $commands[] = array(
+                    $command = array(
                         'name' => $element->__toString(),
                         'info' => ($addElementTypeInfo ? $elementTypeInfo->getName() . ' | ' : '') . Craft::t('URI') . ': ' . $element->uri,
                         'url'  => $element->getCpEditUrl()
                     );
                     break;
             }
+
+            // Is they keywords available in the command?
+            if (stripos($command['name'], $searchCriteria) === false) {
+                $command['name'] .= ' {' . $searchCriteria . '}';
+            }
+
+            $commands[] = $command;
         }
 
         return $commands;
