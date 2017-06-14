@@ -34,7 +34,8 @@ class AmCommand_CommandsController extends BaseController
                 'success' => false,
                 'message' => $message ? $message : Craft::t('Couldn’t trigger the command.')
             ));
-        } else {
+        }
+        else {
             $this->returnJson(array(
                 'success'       => true,
                 'title'         => $title,

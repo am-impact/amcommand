@@ -89,7 +89,8 @@ class AmCommand_UsersService extends BaseApplicationComponent
         if ($result) {
             craft()->amCommand->deleteCurrentCommand();
             craft()->amCommand->setReturnMessage(Craft::t('User deleted.'));
-        } else {
+        }
+        else {
             craft()->amCommand->setReturnMessage(Craft::t('Couldn’t delete “{name}”.', array('name', $user->username)));
         }
 

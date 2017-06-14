@@ -60,7 +60,8 @@ class AmCommand_EntriesService extends BaseApplicationComponent
                         'sectionHandle' => $section->handle
                     )
                 );
-            } else {
+            }
+            else {
                 // Get the Single entry
                 $criteria = craft()->elements->getCriteria(ElementType::Entry);
                 $criteria->sectionId = $section->id;
@@ -220,12 +221,14 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             if ($result) {
                 craft()->amCommand->setReturnUrl(UrlHelper::getCpUrl('entries/' . $variables['sectionHandle']));
                 craft()->amCommand->setReturnMessage(Craft::t('Entries deleted.'));
-            } else {
+            }
+            else {
                 craft()->amCommand->setReturnMessage(Craft::t('Couldn’t delete entries.'));
             }
 
             return $result;
-        } else {
+        }
+        else {
             // Return entries with the option to delete one
             $commands = array();
             foreach ($entries as $entry) {
@@ -268,7 +271,8 @@ class AmCommand_EntriesService extends BaseApplicationComponent
         if ($result) {
             craft()->amCommand->deleteCurrentCommand();
             craft()->amCommand->setReturnMessage(Craft::t('Entry deleted.'));
-        } else {
+        }
+        else {
             craft()->amCommand->setReturnMessage(Craft::t('Couldn’t delete entry.'));
         }
 
@@ -397,7 +401,8 @@ class AmCommand_EntriesService extends BaseApplicationComponent
                 craft()->amCommand->setReturnUrl($duplicatePrimaryLocaleEntry->getCpEditUrl());
             }
             craft()->amCommand->setReturnMessage(Craft::t('Entry duplicated.'));
-        } else {
+        }
+        else {
             craft()->amCommand->setReturnMessage(Craft::t('Couldn’t duplicate entry.'));
         }
 
@@ -535,7 +540,8 @@ class AmCommand_EntriesService extends BaseApplicationComponent
                         $blocks[] = $newMatrixBlock;
                     }
                     $attributes[$field->handle] = $blocks;
-                } else {
+                }
+                else {
                     $attributes[$field->handle] = $model->{$field->handle}->ids();
                 }
             }

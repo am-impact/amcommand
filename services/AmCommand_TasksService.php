@@ -144,7 +144,8 @@ class AmCommand_TasksService extends BaseApplicationComponent
         if ($result === true) {
             craft()->amCommand->deleteCurrentCommand();
             craft()->amCommand->setReturnMessage(Craft::t('Task deleted.'));
-        } else {
+        }
+        else {
             craft()->amCommand->setReturnMessage(Craft::t('Couldn’t delete task.'));
         }
 
