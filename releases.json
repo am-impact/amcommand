@@ -1,5 +1,29 @@
 [
     {
+        "version": "2.0.0",
+        "downloadUrl": "https://github.com/am-impact/amcommand/archive/master.zip",
+        "date": "2017-06-14T10:00:00+01:00",
+        "notes": [
+            "[Added] New command: New command: compare entry version. This command becomes available when you are viewing an entry in the CP.",
+            "[Added] New command: Create overview and detail section command. This will create a single with channel / structure for the detailed entry. Will create templates folder as well.",
+            "[Added] New command: Plugin settings. Quickly navigate to a plugin's settings.",
+            "[Added] New section and field commands.",
+            "[Added] Allow commands to be sorted in reversed order.",
+            "[Added] Allow commands to return HTML to be displayed.",
+            "[Improved] UI update.",
+            "[Improved] Renewed functionality of the palette. It works more like Alfred on Mac OS now.",
+            "[Improved] Shortcuts CMD / CTRL + 1 till 9 to quickly trigger a command.",
+            "[Improved] Redirect to entries section after deleting all entries from that section.",
+            "[Improved] Show the amount of entries on edit / delete commands in the command's description.",
+            "[Improved] Close palette when CMD + SHIFT + P is pressed again.",
+            "[Improved] Allow direct element search when no deeper command is executed.",
+            "[Improved] All commands are enabled from now on. You no longer can disable a command.",
+            "[Improved] Enable / disable certain Element Types for element searches, in the plugin's settings.",
+            "[Fixed] Fix searching when on a different locale.",
+            "[Fixed] Locale fix for the entry one is about to duplicate."
+        ]
+    },
+    {
         "version": "1.2.0",
         "downloadUrl": "https://github.com/am-impact/amcommand/archive/master.zip",
         "date": "2016-11-03T10:00:00+01:00",
