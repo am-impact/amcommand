@@ -562,6 +562,12 @@ class AmCommandService extends BaseApplicationComponent
             'name' => Craft::t('Settings') . ': ' . Craft::t('Plugins'),
             'url'  => UrlHelper::getUrl('settings/plugins')
         );
+        $currentCommands[] = array(
+            'name'    => Craft::t('Settings') . ': ' . Craft::t('Plugin settings'),
+            'more'    => true,
+            'call'    => 'getSettingsUrl',
+            'service' => 'amCommand_plugins'
+        );
         return $currentCommands;
     }
 }
