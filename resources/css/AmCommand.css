@@ -44,7 +44,7 @@
     width: 100%;
     border: 0;
     background: rgba(238, 238, 238, 0.72);
-    padding: 8px 10px 10px;
+    padding: 8px 30px 10px 10px;
     border-radius: 0;
     font-size: 28px;
     line-height: 1;
@@ -54,31 +54,14 @@
     box-shadow: none;
 }
 
-.amcommand__search--hasButton {
-    overflow: hidden;
-}
-
-.amcommand__search--hasButton input[type=text] {
-    float: left;
-    width: 88%;
-}
-
-.amcommand__search--hasButton input[type=button] {
-    float: right;
-    width: 10%;
-    height: 52px;
-    outline: none;
-    font-size: 25px;
-}
-
 
 /**
  * Loaders
  */
 .amcommand__loader {
-    left: 46%;
-    position: relative;
-    margin-top: 10px;
+    position: absolute;
+    top: 25px;
+    right: 20px;
 }
 
 
@@ -87,10 +70,8 @@
  */
 .amcommand__commands > ul {
     max-height: 400px;
-    overflow: auto;
-}
-.amcommand__commands > ul > li:first-child {
     margin-top: 15px;
+    overflow: auto;
 }
 .amcommand__commands li {
     border-top: 1px dotted rgba(115, 127, 140, 0.15);

@@ -67,7 +67,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
      */
     public function searchOn($variables)
     {
-        if (! isset($variables['searchText'])) {
+        if (! isset($variables['searchText']) || ! isset($variables['option'])) {
             return false;
         }
         $searchCriteria = $variables['searchText'];
@@ -91,6 +91,12 @@ class AmCommand_SearchService extends BaseApplicationComponent
             case 'Users':
                 return $this->_searchForElement(ElementType::User, $searchCriteria);
                 break;
+            case 'Elements':
+                $entries = $this->_searchForElement(ElementType::Entry, $searchCriteria, true);
+                $categories = $this->_searchForElement(ElementType::Category, $searchCriteria, true);
+                $users = $this->_searchForElement(ElementType::User, $searchCriteria, true);
+                return array_merge($entries, $categories, $users);
+                break;
             default:
                 return false;
                 break;
@@ -99,7 +105,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
     }
 
     /**
-     * Set the return action.
+     * Set the return action (site search).
      *
      * @param string $searchOption
      */
@@ -112,6 +118,11 @@ class AmCommand_SearchService extends BaseApplicationComponent
         craft()->amCommand->setReturnAction(Craft::t('Search on {option}', array('option' => Craft::t($searchOption))), '', 'searchOn', 'amCommand_search', $variables, false);
     }
 
+    /**
+     * Set the return action (element search).
+     *
+     * @param string $searchOption
+     */
     private function _setRealtimeAction($searchOption)
     {
         $variables = array(
@@ -126,11 +137,13 @@ class AmCommand_SearchService extends BaseApplicationComponent
      *
      * @param string $elementType
      * @param string $searchCriteria
+     * @param bool   $addElementTypeInfo [Optional] Whether to display the element type.
      *
      * @return array
      */
-    private function _searchForElement($elementType, $searchCriteria)
+    private function _searchForElement($elementType, $searchCriteria, $addElementTypeInfo = false)
     {
+        $elementTypeInfo = craft()->elements->getElementType($elementType);
         $criteria = craft()->elements->getCriteria($elementType, $searchCriteria);
         $criteria->search = '*' . $searchCriteria . '*';
         $criteria->status = null;
@@ -153,7 +166,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
 
                     $commands[] = array(
                         'name' => $element->username,
-                        'info' => implode(' - ', $userInfo),
+                        'info' => ($addElementTypeInfo ? $elementTypeInfo->getName() . ' | ' : '') . implode(' - ', $userInfo),
                         'url'  => $element->getCpEditUrl()
                     );
                     break;
@@ -161,7 +174,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
                 default:
                     $commands[] = array(
                         'name' => $element->title,
-                        'info' => Craft::t('URI') . ': ' . $element->uri,
+                        'info' => ($addElementTypeInfo ? $elementTypeInfo->getName() . ' | ' : '') . Craft::t('URI') . ': ' . $element->uri,
                         'url'  => $element->getCpEditUrl()
                     );
                     break;
