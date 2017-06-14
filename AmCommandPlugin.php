@@ -52,6 +52,11 @@ class AmCommandPlugin extends BasePlugin
         // Settings
         $settings = $this->getSettings();
         $elementSearchElementTypes = array();
+        $defaultEnabledElementTypes = array(
+            ElementType::Category,
+            ElementType::Entry,
+            ElementType::User,
+        );
 
         // Find supported element types for element search, based on the settings
         if (is_array($settings->elementSearchElementTypes)) {
@@ -66,7 +71,7 @@ class AmCommandPlugin extends BasePlugin
             if (! isset($elementSearchElementTypes[$elementType])) {
                 $elementSearchElementTypes[$elementType] = array(
                     'elementType' => $elementType,
-                    'enabled' => 0,
+                    'enabled' => in_array($elementType, $defaultEnabledElementTypes) ? 1 : 0,
                 );
             }
         }
