@@ -6,27 +6,61 @@ _Command palette in Craft; Because you can_
 
 When you install this plugin, you'll have the ability to show a command palette when you navigate through the backend in Craft.
 
-You can open the command palette by using the keyboard combination: (command key for Apple users) CTRL + SHIFT + P, or you can use the lightning button that'll be added to the header actions.
-
-![Header actions](https://raw.githubusercontent.com/am-impact/am-impact.github.io/master/img/readme/amcommand/header-actions.jpg "Header Actions")
-
-The command palette will show admin functions if you are logged in as an admin, and all available sections (non Single) that the user has access to.
-
-![Command palette](https://raw.githubusercontent.com/am-impact/am-impact.github.io/master/img/readme/amcommand/command.jpg "Command Palette")
+You can open the command palette by using the keyboard combination: (command key for Apple users) CTRL + SHIFT + P, or you click on Command in the CP navigation.
 
 It's equipped with fuzzy search!
 
-![Fuzzy search](https://raw.githubusercontent.com/am-impact/am-impact.github.io/master/img/readme/amcommand/fuzzy-search.jpg "Fuzzy Search")
-
 Use the keyboard arrows (up and down) to navigate to your desired command.
-
-![Focus](https://raw.githubusercontent.com/am-impact/am-impact.github.io/master/img/readme/amcommand/focus.jpg "Focus")
 
 When you hit the return key or click on a command, the command palette will navigate to the location and show what it's loading.
 
-![Loading](https://raw.githubusercontent.com/am-impact/am-impact.github.io/master/img/readme/amcommand/loading.jpg "Loading")
+Use (command key for Apple users) CTRL + RETURN (or click) to fire the command in a new window.
 
-You can close the command by either clicking anywhere on the page (besides the command palette) or by pressing the ESC key.
+## Current commands
+
+### Default commands
+
+| Command | Description |
+| --------- | ----------- |
+| Content: Delete all entries | Delete all entries in one of the available sections. |
+| Content: Delete entries | Delete an entry in one of the available sections. |
+| Content: Edit entries | Edit an entry in one of the available sections. |
+| Content: New entry | Create a new entry in one of the available sections. |
+| Dashboard | Redirect. |
+| Globals: Edit | Edit one of your globals. |
+| Search on Craft | Redirect - Search on Craft with given keywords. |
+| Search on StackExchange | Redirect - Search on StackExchange with given keywords. |
+| Settings: Assets | Redirect. |
+| Settings: Categories | Redirect. |
+| Settings: Fields | Redirect. |
+| Settings: Fields - Duplicate | Duplicate a field. |
+| Settings: Fields - Edit | Edit one of the fields. |
+| Settings: Globals | Redirect. |
+| Settings: Globals - Global Sets | Edit the settings for one of the globals. |
+| Settings: New... | Add something new in the settings... |
+| Settings: Plugins | Redirect. |
+| Settings: Plugin settings | Edit the settings for one of the enabled plugins |
+| Settings: Routes | Redirect. |
+| Settings: Sections | Redirect. |
+| Settings: Sections - Edit | Edit a section. |
+| Settings: Sections - Edit entry type | Edit an entry type of a section. (Field Layout and such) |
+| Settings: Users | Redirect. |
+| Tasks | Manage Craft tasks. |
+| Tools | Use one of the most used tools. |
+| Users: Delete users | Delete a user other than your own. |
+| Users: Edit users | Edit a user. |
+| Users: Login as user | Log in as a different user, and navigate to their dashboard. |
+| Users: New user | Create a user. |
+| Users: Sign out | End current session. |
+| Users: My Account | Redirect. |
+
+### Special commands
+
+| Command | Description |
+| --------- | ----------- |
+| Content: Compare entry version | Compare the current entry you are viewing in the CP with older versions. |
+| Content: Duplicate entry | Duplicate the current entry you are viewing in the CP. |
+| Simply type! | You will be able to search in elements directly when you haven't triggered a (deeper command, that returns a new list or such things) command yet. |
 
 ## Adding your own commands
 
