@@ -21,7 +21,7 @@ class AmCommandPlugin extends BasePlugin
 
     public function getVersion()
     {
-        return '2.0.1';
+        return '2.0.2';
     }
 
     public function getSchemaVersion()
