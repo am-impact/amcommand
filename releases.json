@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.0.1",
+        "downloadUrl": "https://github.com/am-impact/amcommand/archive/master.zip",
+        "date": "2017-06-14T14:00:00+01:00",
+        "notes": [
+            "[Improved] Display settings in a nicer way.",
+            "[Fixed] Install default plugin settings through a migration, regarding the element types used for the element search.",
+            "[Fixed] When search keywords were not found, display them in the command between brackets, when found by element search."
+        ]
+    },
+    {
         "version": "2.0.0",
         "downloadUrl": "https://github.com/am-impact/amcommand/archive/master.zip",
         "date": "2017-06-14T10:00:00+01:00",
