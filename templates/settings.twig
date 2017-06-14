@@ -1,20 +1,29 @@
 {% import "_includes/forms" as forms %}
 
-{{ forms.editableTableField({
-    label: 'Enabled Element Types'|t,
-    id: 'elementSearchElementTypes',
-    name: 'elementSearchElementTypes',
-    instructions: 'You are able to enable or disable certain Element Types from the direct element search when the palette is opened.'|t,
-    cols: {
-        elementType: {
-            heading: 'Element Type'|t,
-            type: 'singleline'
-        },
-        enabled: {
-            heading: 'Enable (1) / Disable (0)'|t,
-            type: 'number'
-        },
-    },
-    rows: elementSearchElementTypes,
-    first: true
-}) }}
+<table class="data fullwidth">
+    <thead>
+        <tr>
+            <th scope="col" style="width: 50%;">{{ 'Element Type'|t }}</th>
+            <th scope="col">{{ 'Enabled'|t }}</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for row in elementSearchElementTypes %}
+        <tr>
+            <td>
+                {{ row.elementType }}
+                <input type="hidden" name="elementSearchElementTypes[{{ row.elementType }}][elementType]" value="{{ row.elementType }}">
+            </td>
+            <td>
+                {{ forms.lightswitchField({
+                    first: loop.first,
+                    id: 'enabled-' ~ row.elementType,
+                    name: 'elementSearchElementTypes['~ row.elementType ~'][enabled]',
+                    on: row.enabled
+                }) }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+

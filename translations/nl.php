@@ -18,7 +18,7 @@ return array(
     'Delete all entries' => 'Verwijder alle inhoud',
     'Delete all entries in one of the available sections.' => 'Verwijder alle inhoud in één van de beschikbare secties.',
     'Delete an entry in one of the available sections.' => 'Verwijder een bericht in één van de beschikbare secties.',
-    'Enable (1) / Disable (0)' => 'Aan (1) / Uit (0)',
+    'Enabled' => 'Ingeschakeld',
     'Enabled Element Types' => 'Ingeschakelde Element Types',
     'Delete a task' => 'Verwijder een taak',
     'Delete all failed tasks' => 'Verwijder alle gefaalde taken',

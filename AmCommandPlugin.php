@@ -21,12 +21,12 @@ class AmCommandPlugin extends BasePlugin
 
     public function getVersion()
     {
-        return '2.0.0';
+        return '2.0.1';
     }
 
     public function getSchemaVersion()
     {
-        return '1.1.4';
+        return '2.0.1';
     }
 
     public function getDeveloper()
