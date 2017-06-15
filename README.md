@@ -4,17 +4,15 @@ _Command palette in Craft; Because you can_
 
 ## Functionality
 
-When you install this plugin, you'll have the ability to show a command palette when you navigate through the backend in Craft.
+If you have ever used Alfred, you know you'll be zipping through the control panel in no time!
 
 You can open the command palette by using the keyboard combination: (command key for Apple users) CTRL + SHIFT + P, or you click on Command in the CP navigation.
 
-It's equipped with fuzzy search!
-
 Use the keyboard arrows (up and down) to navigate to your desired command.
-
 When you hit the return key or click on a command, the command palette will navigate to the location and show what it's loading.
-
 Use (command key for Apple users) CTRL + RETURN (or click) to fire the command in a new window.
+
+![Palette](https://raw.githubusercontent.com/am-impact/am-impact.github.io/master/img/readme/amcommand/palette.gif "Palette")
 
 ## Current commands
 
