@@ -45,8 +45,9 @@ Craft.AmCommand = Garnish.Base.extend(
     isActionRealtime:   false,
     actionData:         [],
     actionTimer:        false,
-    loading:            false,
     loadingCommand:     '',
+    loadingRequest:     false,
+    loadingElements:    false,
     allowElementSearch: true,
     elementSearchTimer: false,
 
@@ -90,7 +91,6 @@ Craft.AmCommand = Garnish.Base.extend(
                             'option': 'DirectElements',
                             'searchText': self.$searchField.val()
                         };
-                        self.loading = true;
                         self.triggerCallback('searchOn', 'amCommand_search', variables, true);
                     }, this), 600);
                 }
@@ -121,7 +121,8 @@ Craft.AmCommand = Garnish.Base.extend(
             else if (ev.keyCode == Garnish.ESC_KEY) {
                 if (self.rememberPalette.currentSet > 0) {
                     self.restoreCommands();
-                } else {
+                }
+                else {
                     self.closePalette(ev);
                 }
             }
@@ -178,7 +179,12 @@ Craft.AmCommand = Garnish.Base.extend(
                 }
                 self.search(ev, false, false);
                 self.isOpen = false;
-                self.loading = false; // Reset loading if the user cancels the page request
+                if (self.loadingRequest) {
+                    self.loadingRequest.abort();
+                    self.$loader.addClass('hidden');
+                }
+                self.loadingRequest = false;
+                self.loadingElements = false;
             });
             if (ev !== undefined) {
                 ev.preventDefault();
@@ -210,7 +216,7 @@ Craft.AmCommand = Garnish.Base.extend(
     search: function(ev, isRealtime, isElementSearch) {
         var self = this;
 
-        if (! self.isAction || isRealtime) {
+        if ((! self.isAction || isRealtime) && (! self.loadingRequest || self.loadingElements)) {
             var commandsArray = self.allowElementSearch ? self.combinedCommandsArray : self.commandsArray,
                 searchValue = isRealtime ? '' : self.$searchField.val(),
                 filtered = fuzzy.filter(searchValue, commandsArray, self.fuzzyOptions),
@@ -328,10 +334,12 @@ Craft.AmCommand = Garnish.Base.extend(
         if (success) {
             if (customMessage !== false) {
                 Craft.cp.displayNotice(customMessage);
-            } else {
+            }
+            else {
                 Craft.cp.displayNotice('<span class="amcommand__notice">' + Craft.t('Command executed') + ' &raquo;</span>' + executedCommand);
             }
-        } else {
+        }
+        else {
             Craft.cp.displayError(customMessage);
         }
     },
@@ -415,7 +423,8 @@ Craft.AmCommand = Garnish.Base.extend(
         // Reset executed command
         if (self.rememberPalette.currentSet > 0) {
             self.$tabsContainer.text(self.rememberPalette.commandNames[ self.rememberPalette.currentSet ]);
-        } else {
+        }
+        else {
             self.$tabsContainer.addClass('hidden');
         }
 
@@ -446,7 +455,6 @@ Craft.AmCommand = Garnish.Base.extend(
         variables['searchText'] = self.$searchField.val();
 
         // Trigger action
-        self.loading = true;
         self.triggerCallback(self.actionData.call, self.actionData.service, variables, false);
     },
 
@@ -459,15 +467,15 @@ Craft.AmCommand = Garnish.Base.extend(
     triggerCommand: function(ev, ctrlPressed) {
         var self = this;
 
-        if (self.isOpen && ! self.loading) {
+        if (self.isOpen) {
             if (self.isAction && ! self.isActionRealtime) {
                 var variables = self.actionData.vars;
                 variables['searchText'] = self.$searchField.val();
 
                 // Trigger action
-                self.loading = true;
                 self.triggerCallback(self.actionData.call, self.actionData.service, variables, false);
-            } else {
+            }
+            else {
                 if (ev.type == 'click') {
                     if (ev.ctrlKey || ev.metaKey) {
                         ctrlPressed = true;
@@ -510,7 +518,6 @@ Craft.AmCommand = Garnish.Base.extend(
                         }
                         // Can we execute the command?
                         if (confirmed) {
-                            self.loading = true;
                             if (callback) {
                                 self.triggerCallback(callback, callbackService, callbackVars, false);
                             }
@@ -518,7 +525,8 @@ Craft.AmCommand = Garnish.Base.extend(
                                 // Open the URL in a new window if the CTRL or Command key was pressed
                                 if (ctrlPressed) {
                                     window.open(url);
-                                } else {
+                                }
+                                else {
                                     window.location = url;
                                 }
                                 self.displayMessage(true, false, commandData.name);
@@ -542,163 +550,193 @@ Craft.AmCommand = Garnish.Base.extend(
      */
     triggerCallback: function(name, service, vars, isElementSearch) {
         var self = this,
+            allowRequest = false,
             displayDefaultMessage = false,
             $current = self.$commands.filter('.focus');
 
-        // Hide current commands and display a loader
-        if (! isElementSearch) {
-            self.$commands.hide();
+        if (! self.loadingRequest) {
+            allowRequest = true;
         }
-        self.$loader.removeClass('hidden');
+        else if (self.loadingElements) {
+            allowRequest = true;
 
-        Craft.postActionRequest('amCommand/commands/triggerCommand', {command: name, service: service, vars: vars}, $.proxy(function(response, textStatus) {
-            if (textStatus == 'success') {
-                self.loading = false;
-                self.$loader.addClass('hidden');
+            if (self.loadingRequest) {
+                self.loadingElements = false;
+                self.loadingRequest.abort();
+            }
+        }
 
-                if (response.success) {
-                    // Was there a custom title set?
-                    if (response.title) {
-                        self.loadingCommand = response.title;
-                    }
+        if (allowRequest) {
+            // Hide current commands and display a loader
+            if (! isElementSearch) {
+                self.$commands.hide();
+            }
+            self.$loader.removeClass('hidden');
 
-                    // What result do we have? HTML, an action, new command set or just a result message?
-                    if (response.isHtml) {
-                        // It is a command that shows HTML, but did we get any?
-                        if (response.result == '') {
-                            self.$commands.show(); // Show current commands again
-                        } else {
-                            // Remember current commands
-                            self.rememberCommands();
-                            self.isHtml = true;
+            // Are we going to load elements?
+            if (isElementSearch) {
+                self.loadingElements = true;
+            }
 
-                            // Display executed command above search field
-                            self.$tabsContainer.text(self.loadingCommand);
-                            self.$tabsContainer.removeClass('hidden');
+            self.loadingRequest = Craft.postActionRequest('amCommand/commands/triggerCommand', { command: name, service: service, vars: vars }, $.proxy(function (response, textStatus) {
+                self.loadingRequest = false;
+                if (textStatus == 'success') {
+                    self.$loader.addClass('hidden');
 
-                            // Adjust palette
-                            self.$searchContainer.addClass('hidden');
-                            self.$container.velocity({ width: '80%' }, 400);
-
-                            // Show HTML
-                            self.$commandsContainer.html(response.result);
-                            Craft.appendHeadHtml(response.headHtml);
-                            Craft.appendFootHtml(response.footHtml);
-                            Craft.initUiElements(self.$commandsContainer);
+                    if (response.success) {
+                        // Was there a custom title set?
+                        if (response.title) {
+                            self.loadingCommand = response.title;
                         }
-                    }
-                    else if (isElementSearch && response.isNewSet) {
-                        // Display combined commands
-                        self.elementCommandsArray = response.result;
-                        self.combinedCommandsArray = self.commandsArray.concat(self.elementCommandsArray);
-                        self.search(undefined, false, true);
-                    }
-                    else if (self.isAction && self.isActionRealtime && response.isNewSet) {
-                        // Display new commands
-                        self.commandsArray = response.result;
-                        self.search(undefined, true, false);
-                    }
-                    else if (response.isAction) {
-                        // Executed function
-                        self.loadingCommand = response.isAction.tabs;
 
-                        // Remember current commands and action information
-                        self.rememberCommands();
-                        self.isAction = true;
-                        self.isActionAsync = response.isAction.async;
-                        self.isActionRealtime = response.isAction.realtime;
-                        self.actionData = response.isAction;
+                        // What result do we have? HTML, an action, new command set or just a result message?
+                        if (response.isHtml) {
+                            // It is a command that shows HTML, but did we get any?
+                            if (response.result == '') {
+                                self.$commands.show(); // Show current commands again
+                            }
+                            else {
+                                // Remember current commands
+                                self.rememberCommands();
+                                self.isHtml = true;
 
-                        // Display text
-                        self.$tabsContainer.text(response.isAction.tabs);
-                        self.$tabsContainer.removeClass('hidden');
+                                // Display executed command above search field
+                                self.$tabsContainer.text(self.loadingCommand);
+                                self.$tabsContainer.removeClass('hidden');
 
-                        // Reset palette
-                        self.commandsArray = [];
-                        self.$commandsContainer.html('');
-                        self.$commandsContainer.addClass('hidden');
+                                // Adjust palette
+                                self.$searchContainer.addClass('hidden');
+                                self.$container.velocity({ width: '80%' }, 400);
 
-                        // Display text in search field
-                        self.$searchField.val(response.isAction.searchText);
-                        self.$searchField.focus();
-                    }
-                    else if (response.isNewSet) {
-                        // It is a command that loads a new set of commands, but did we get any?
-                        if (response.result == '') {
-                            self.$commands.show(); // Show current commands again
-                        } else {
-                            // Remember current commands
+                                // Show HTML
+                                self.$commandsContainer.html(response.result);
+                                Craft.appendHeadHtml(response.headHtml);
+                                Craft.appendFootHtml(response.footHtml);
+                                Craft.initUiElements(self.$commandsContainer);
+                            }
+                        }
+                        else if (isElementSearch && response.isNewSet) {
+                            // Display combined commands
+                            self.loadingElements = false;
+                            self.elementCommandsArray = response.result;
+                            self.combinedCommandsArray = self.commandsArray.concat(self.elementCommandsArray);
+                            self.search(undefined, false, true);
+                        }
+                        else if (self.isAction && self.isActionRealtime && response.isNewSet) {
+                            // Display new commands
+                            self.commandsArray = response.result;
+                            self.search(undefined, true, false);
+                        }
+                        else if (response.isAction) {
+                            // Executed function
+                            self.loadingCommand = response.isAction.tabs;
+
+                            // Remember current commands and action information
                             self.rememberCommands();
+                            self.isAction = true;
+                            self.isActionAsync = response.isAction.async;
+                            self.isActionRealtime = response.isAction.realtime;
+                            self.actionData = response.isAction;
 
-                            // Display executed command above search field
-                            self.$tabsContainer.text(self.loadingCommand);
+                            // Display text
+                            self.$tabsContainer.text(response.isAction.tabs);
                             self.$tabsContainer.removeClass('hidden');
 
+                            // Reset palette
+                            self.commandsArray = [];
+                            self.$commandsContainer.html('');
+                            self.$commandsContainer.addClass('hidden');
+
+                            // Display text in search field
+                            self.$searchField.val(response.isAction.searchText);
+                            self.$searchField.focus();
+                        }
+                        else if (response.isNewSet) {
+                            // It is a command that loads a new set of commands, but did we get any?
+                            if (response.result == '') {
+                                self.$commands.show(); // Show current commands again
+                            }
+                            else {
+                                // Remember current commands
+                                self.rememberCommands();
+
+                                // Display executed command above search field
+                                self.$tabsContainer.text(self.loadingCommand);
+                                self.$tabsContainer.removeClass('hidden');
+
+                                // Reset focus
+                                self.$searchField.val('');
+                                self.$searchField.focus();
+
+                                // Display new commands
+                                self.commandsArray = response.result;
+                                self.search(undefined, false, false);
+                            }
+                        }
+                        else if (response.deleteCommand) {
                             // Reset focus
                             self.$searchField.val('');
                             self.$searchField.focus();
+                            self.$commands.removeClass('focus');
 
-                            // Display new commands
-                            self.commandsArray = response.result;
-                            self.search(undefined, false, false);
+                            // We delete the current command, and keep the command palette open
+                            self.deleteCommand($current.data('id'));
+                            self.search(undefined, true, false);
+                            self.$commands.show();
+
+                            // Close the command palette if all commands are hidden
+                            if (self.commandsArray.length <= 0) {
+                                self.displayMessage(false, Craft.t('There are no more commands available.'), false);
+                                self.closePalette();
+                            }
                         }
-                    }
-                    else if (response.deleteCommand)
-                    {
-                        // Reset focus
-                        self.$searchField.val('');
-                        self.$searchField.focus();
-                        self.$commands.removeClass('focus');
-
-                        // We delete the current command, and keep the command palette open
-                        self.deleteCommand($current.data('id'));
-                        self.search(undefined, true, false);
-                        self.$commands.show();
-
-                        // Close the command palette if all commands are hidden
-                        if (self.commandsArray.length <= 0) {
-                            self.displayMessage(false, Craft.t('There are no more commands available.'), false);
+                        else {
+                            // Command was executed, nothing special happened afterwards
+                            displayDefaultMessage = true;
                             self.closePalette();
                         }
-                    } else {
-                        // Command was executed, nothing special happened afterwards
-                        displayDefaultMessage = true;
-                        self.closePalette();
-                    }
 
-                    // Show message
-                    if (response.message) {
-                        self.displayMessage((response.result != ''), response.message, false);
-                    }
-                    else if (displayDefaultMessage) {
-                        self.displayMessage(true, false, $current.children('.amcommand__commands--name').text());
-                    }
+                        // Show message
+                        if (response.message) {
+                            self.displayMessage((response.result != ''), response.message, false);
+                        }
+                        else if (displayDefaultMessage) {
+                            self.displayMessage(true, false, $current.children('.amcommand__commands--name').text());
+                        }
 
-                    // Redirect?
-                    if (response.redirect) {
-                        if (response.redirect.newWindow) {
-                            window.open(response.redirect.url);
-                        } else {
-                            window.location = response.redirect.url;
+                        // Redirect?
+                        if (response.redirect) {
+                            if (response.redirect.newWindow) {
+                                window.open(response.redirect.url);
+                            }
+                            else {
+                                window.location = response.redirect.url;
+                            }
                         }
                     }
-                } else {
-                    // Delete current commands if realtime action
-                    if (self.isAction && self.isActionRealtime) {
-                        self.commandsArray = [];
-                        self.$commandsContainer.html('');
-                        self.$commandsContainer.addClass('hidden');
-                    }
+                    else {
+                        // Delete current commands if realtime action
+                        if (self.isAction && self.isActionRealtime) {
+                            self.commandsArray = [];
+                            self.$commandsContainer.html('');
+                            self.$commandsContainer.addClass('hidden');
+                        }
 
-                    // Show current commands again and display a message
-                    self.$commands.show();
-                    self.$searchField.focus();
-                    if (! isElementSearch) {
-                        self.displayMessage(false, response.message, false);
+                        // Show current commands again and display a message
+                        self.$commands.show();
+                        self.$searchField.focus();
+                        if (! isElementSearch) {
+                            self.displayMessage(false, response.message, false);
+                        }
                     }
                 }
-            }
-        }, self), {async: self.isActionAsync});
+            }, self), {
+                async: self.isActionAsync,
+                complete: function(jqXHR, textStatus) {
+                    // Overwrite complete in craft.js
+                }
+            });
+        }
     },
 
     /**
@@ -710,7 +748,7 @@ Craft.AmCommand = Garnish.Base.extend(
         var self = this,
             len = self.commandsArray.length;
 
-        if (!len) {
+        if (! len) {
             return;
         }
         while (index < len) {
