@@ -16,7 +16,6 @@
 
 .amcommand__tabs {
     padding: 12px 15px 10px;
-    border-radius: 5px 5px 0 0;
     color: #29323d;
     cursor: default;
     font-size: 15px;
@@ -109,6 +108,10 @@
     display: block;
     font-size: 80%;
     margin-top: 5px;
+}
+
+.amcommand__commands--shortcut {
+    float: right;
 }
 
 

@@ -1,29 +1,44 @@
 {% import "_includes/forms" as forms %}
 
-<table class="data fullwidth">
-    <thead>
-        <tr>
-            <th scope="col" style="width: 50%;">{{ 'Element Type'|t }}</th>
-            <th scope="col">{{ 'Enabled'|t }}</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for row in elementSearchElementTypes %}
-        <tr>
-            <td>
-                {{ row.elementType }}
-                <input type="hidden" name="elementSearchElementTypes[{{ row.elementType }}][elementType]" value="{{ row.elementType }}">
-            </td>
-            <td>
-                {{ forms.lightswitchField({
-                    first: loop.first,
-                    id: 'enabled-' ~ row.elementType,
-                    name: 'elementSearchElementTypes['~ row.elementType ~'][enabled]',
-                    on: row.enabled
-                }) }}
-            </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+{{ forms.selectField({
+    label: "Theme"|t,
+    instructions: "Which theme do you want to use?"|t,
+    id: 'theme',
+    name: 'theme',
+    options: themes,
+    value: settings.theme,
+    first: true
+}) }}
 
+{% set elementTypesInput %}
+    <table class="data fullwidth">
+        <thead>
+            <tr>
+                <th scope="col" style="width: 50%;">{{ 'Element Type'|t }}</th>
+                <th scope="col">{{ 'Enabled'|t }}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in elementSearchElementTypes %}
+            <tr>
+                <td>
+                    {{ row.elementType }}
+                    <input type="hidden" name="elementSearchElementTypes[{{ row.elementType }}][elementType]" value="{{ row.elementType }}">
+                </td>
+                <td>
+                    {{ forms.lightswitchField({
+                        first: loop.first,
+                        id: 'enabled-' ~ row.elementType,
+                        name: 'elementSearchElementTypes['~ row.elementType ~'][enabled]',
+                        on: row.enabled
+                    }) }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endset %}
+{{ forms.field({
+    label: 'Element search Element Types'|t,
+    instructions: 'Which Element Types you want to support for direct search.'|t,
+}, elementTypesInput) }}

@@ -1,0 +1,134 @@
+.amcommand {
+    display: none;
+    background: #333f4d;
+    border-radius: 0;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    top: 20%;
+    position: fixed;
+    width: 600px;
+    z-index: 1337;
+    -webkit-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
+}
+
+.amcommand__tabs {
+    padding: 12px 15px 10px;
+    cursor: default;
+    font-size: 15px;
+    background: #333f4d;
+    color: #FFF;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.amcommand__container {
+    padding: 15px;
+}
+
+.amcommand__search {
+    position: relative;
+}
+
+
+/**
+ * Input
+ */
+.amcommand__search input[type=text] {
+    width: 100%;
+    border: 0;
+    background: #fafafa;
+    padding: 8px 30px 10px 10px;
+    border-radius: 0;
+    font-size: 28px;
+    line-height: 1;
+}
+
+.amcommand__search input[type=text]:focus {
+    box-shadow: none;
+}
+
+
+/**
+ * Loaders
+ */
+.amcommand__loader {
+    position: absolute;
+    top: 12px;
+    right: 6px;
+}
+
+
+/**
+ * Commands
+ */
+.amcommand__commands > ul {
+    max-height: 400px;
+    margin-top: 15px;
+    overflow: auto;
+}
+.amcommand__commands li {
+    font-size: 18px;
+    padding: 10px 10px;
+}
+
+.amcommand__commands li:hover {
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+}
+
+.amcommand__commands li.focus {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.amcommand__commands .go:hover:after {
+    color: inherit;
+}
+.amcommand__commands li.focus .go:after {
+    color: inherit;
+}
+
+.amcommand__commands--name {
+    color: #d7d9db;
+    display: block;
+    font-size: 100%;
+}
+
+.amcommand__commands li.focus .amcommand__commands--name {
+    color: #fff;
+}
+
+.amcommand__commands--info {
+    color: #b9bfc6;
+    display: block;
+    font-size: 80%;
+    margin-top: 5px;
+}
+
+.amcommand__commands--shortcut {
+    float: right;
+    color: #d7d9db;
+}
+
+.amcommand__commands li.focus .amcommand__commands--shortcut {
+    color: #fff;
+}
+
+
+/**
+ * Notices
+ */
+
+.amcommand__notice {
+    font-weight: bold;
+    padding-right: 10px;
+}
+
+
+/**
+ * Icon
+ */
+.visuallyhidden {
+    display: none;
+}
