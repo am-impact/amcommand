@@ -4,7 +4,7 @@
 
 .amcommand__tabs {
     background: #333f4d;
-    color: #FFF;
+    color: #fff;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -13,7 +13,20 @@
  * Input
  */
 .amcommand__search input[type=text] {
-    background: #fafafa;
+    background: #333f4d;
+    border: 1px solid #fafafa;
+    color: #fff;
+}
+
+
+/**
+ * Loaders
+ */
+.amcommand__loader {
+    border-top: 3px solid rgba(255,255,255, 0.2);
+    border-right: 3px solid rgba(255,255,255, 0.2);
+    border-bottom: 3px solid rgba(255,255,255, 0.2);
+    border-left: 3px solid #FFFFFF;
 }
 
 
