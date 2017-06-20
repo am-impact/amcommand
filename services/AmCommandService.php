@@ -293,6 +293,10 @@ class AmCommandService extends BaseApplicationComponent
                         'vars'    => array(
                             'entryId' => $entryId,
                             'locale'  => craft()->request->getSegment(-1),
+                        ),
+                        'icon'    => array(
+                            'type' => 'font',
+                            'content' => 'section',
                         )
                     );
                 }
@@ -304,6 +308,10 @@ class AmCommandService extends BaseApplicationComponent
                     'vars'    => array(
                         'entryId' => $entryId,
                         'locale'  => craft()->request->getSegment(-1),
+                    ),
+                    'icon'    => array(
+                        'type' => 'font',
+                        'content' => 'section',
                     )
                 );
             }
@@ -316,14 +324,22 @@ class AmCommandService extends BaseApplicationComponent
                 'info'    => Craft::t('Create a new entry in one of the available sections.'),
                 'more'    => true,
                 'call'    => 'newEntry',
-                'service' => 'amCommand_entries'
+                'service' => 'amCommand_entries',
+                'icon'    => array(
+                    'type' => 'font',
+                    'content' => 'section',
+                )
             );
             $currentCommands[] = array(
                 'name'    => Craft::t('Content') . ': ' . Craft::t('Edit entries'),
                 'info'    => Craft::t('Edit an entry in one of the available sections.'),
                 'more'    => true,
                 'call'    => 'editEntries',
-                'service' => 'amCommand_entries'
+                'service' => 'amCommand_entries',
+                'icon'    => array(
+                    'type' => 'font',
+                    'content' => 'section',
+                )
             );
             $currentCommands[] = array(
                 'name'    => Craft::t('Content') . ': ' . Craft::t('Delete entries'),
@@ -333,6 +349,10 @@ class AmCommandService extends BaseApplicationComponent
                 'service' => 'amCommand_entries',
                 'vars'    => array(
                     'deleteAll' => false
+                ),
+                'icon'    => array(
+                    'type' => 'font',
+                    'content' => 'section',
                 )
             );
             if (craft()->userSession->isAdmin()) {
@@ -344,6 +364,10 @@ class AmCommandService extends BaseApplicationComponent
                     'service' => 'amCommand_entries',
                     'vars'    => array(
                         'deleteAll' => true
+                    ),
+                    'icon'    => array(
+                        'type' => 'font',
+                        'content' => 'section',
                     )
                 );
             }
@@ -366,7 +390,11 @@ class AmCommandService extends BaseApplicationComponent
                 'name'    => Craft::t('Globals') . ': ' . Craft::t('Edit'),
                 'more'    => true,
                 'call'    => 'editGlobals',
-                'service' => 'amCommand_globals'
+                'service' => 'amCommand_globals',
+                'icon'    => array(
+                    'type' => 'font',
+                    'content' => 'globe',
+                )
             );
         }
 
@@ -384,36 +412,52 @@ class AmCommandService extends BaseApplicationComponent
     {
         $currentCommands[] = array(
             'name'    => Craft::t('Dashboard'),
-            'url'     => UrlHelper::getUrl('dashboard')
+            'url'     => UrlHelper::getUrl('dashboard'),
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'gauge',
+            )
         );
         $currentCommands[] = array(
-            'name'    => Craft::t('Users') . ': ' . Craft::t('Sign out'),
-            'info'    => Craft::t('End current session.'),
-            'url'     => UrlHelper::getUrl('logout')
+            'name' => Craft::t('Sign out'),
+            'info' => Craft::t('End current session.'),
+            'url'  => UrlHelper::getUrl('logout')
         );
         $currentCommands[] = array(
-            'name'    => Craft::t('Users') . ': ' . Craft::t('My Account'),
-            'url'     => UrlHelper::getUrl('myaccount')
+            'name' => Craft::t('My Account'),
+            'url'  => UrlHelper::getUrl('myaccount')
         );
         if (craft()->userSession->isAdmin() || craft()->userSession->getUser()->can('editUsers')) {
             $currentCommands[] = array(
                 'name'    => Craft::t('Users') . ': ' . Craft::t('New user'),
                 'info'    => Craft::t('Create a user.'),
-                'url'     => UrlHelper::getUrl('users/new')
+                'url'     => UrlHelper::getUrl('users/new'),
+                'icon'    => array(
+                    'type' => 'font',
+                    'content' => 'users',
+                )
             );
             $currentCommands[] = array(
                 'name'    => Craft::t('Users') . ': ' . Craft::t('Edit users'),
                 'info'    => Craft::t('Edit a user.'),
                 'more'    => true,
                 'call'    => 'editUser',
-                'service' => 'amCommand_users'
+                'service' => 'amCommand_users',
+                'icon'    => array(
+                    'type' => 'font',
+                    'content' => 'users',
+                )
             );
             $currentCommands[] = array(
                 'name'    => Craft::t('Users') . ': ' . Craft::t('Delete users'),
                 'info'    => Craft::t('Delete a user other than your own.'),
                 'more'    => true,
                 'call'    => 'deleteUser',
-                'service' => 'amCommand_users'
+                'service' => 'amCommand_users',
+                'icon'    => array(
+                    'type' => 'font',
+                    'content' => 'users',
+                )
             );
             if (craft()->userSession->isAdmin()) {
                 $currentCommands[] = array(
@@ -421,7 +465,11 @@ class AmCommandService extends BaseApplicationComponent
                     'info'    => Craft::t('Log in as a different user, and navigate to their dashboard.'),
                     'more'    => true,
                     'call'    => 'loginUser',
-                    'service' => 'amCommand_users'
+                    'service' => 'amCommand_users',
+                    'icon'    => array(
+                        'type' => 'font',
+                        'content' => 'users',
+                    )
                 );
             }
         }
@@ -444,14 +492,22 @@ class AmCommandService extends BaseApplicationComponent
             'info'    => 'https://craftcms.com',
             'more'    => true,
             'call'    => 'searchOptionCraft',
-            'service' => 'amCommand_search'
+            'service' => 'amCommand_search',
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'search',
+            )
         );
         $currentCommands[] = array(
             'name'    => Craft::t('Search on {option}', array('option' => 'StackExchange')),
             'info'    => 'http://craftcms.stackexchange.com',
             'more'    => true,
             'call'    => 'searchOptionStackExchange',
-            'service' => 'amCommand_search'
+            'service' => 'amCommand_search',
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'search',
+            )
         );
 
         // Element searches
@@ -466,6 +522,10 @@ class AmCommandService extends BaseApplicationComponent
                         'service' => 'amCommand_search',
                         'vars'    => array(
                             'elementType' => $elementType
+                        ),
+                        'icon'    => array(
+                            'type' => 'font',
+                            'content' => 'search',
                         )
                     );
                 }

@@ -49,8 +49,8 @@ Use (command key for Apple users) CTRL + RETURN (or click) to fire the command i
 | Users: Edit users | Edit a user. |
 | Users: Login as user | Log in as a different user, and navigate to their dashboard. |
 | Users: New user | Create a user. |
-| Users: Sign out | End current session. |
-| Users: My Account | Redirect. |
+| Sign out | End current session. |
+| My Account | Redirect. |
 
 ### Special commands
 
