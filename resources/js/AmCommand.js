@@ -226,10 +226,11 @@ Craft.AmCommand = Garnish.Base.extend(
             if (! self.allowElementSearch || (searchValue.length && self.allowElementSearch)) {
                 // Find matches
                 var results = filtered.map(function(el, i) {
-                    var shortcut = (i < 9) ? '<span class="amcommand__commands--shortcut">&#8984;' + (i + 1) + '</span>' : '';
-                    var name = '<span class="amcommand__commands--name' + ('more' in el.original && el.original.more ? ' go' : '') + '">' + el.string + '</span>';
-                    var info = ('info' in el.original) ? '<span class="amcommand__commands--info">' + el.original.info + '</span>' : '';
-                    return '<li data-id="' + el.index + '">' + shortcut + name + info + '</li>';
+                    var icon = ('icon' in el.original) ? '<span class="amcommand__icon"' + (el.original.icon.type == 'font' ? ' data-icon="' + el.original.icon.path + '"' : '') + '>' + (el.original.icon.type != 'font' ? el.original.icon.path : '') + '</span>' : '';
+                    var shortcut = (i < 9) ? '<span class="amcommand__shortcut">&#8984;' + (i + 1) + '</span>' : '';
+                    var name = '<span class="amcommand__name' + ('more' in el.original && el.original.more ? ' go' : '') + '">' + el.string + '</span>';
+                    var info = ('info' in el.original) ? '<span class="amcommand__info">' + el.original.info + '</span>' : '';
+                    return '<li data-id="' + el.index + '">' + icon + '<div class="amcommand__content">' + name + info + '</div>' + shortcut + '</li>';
                 });
 
                 // Element search deliver anything new?

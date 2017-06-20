@@ -72,9 +72,14 @@
     overflow: auto;
 }
 .amcommand__commands li {
+    display: flex;
     border-top: 1px dotted rgba(115, 127, 140, 0.15);
     font-size: 18px;
     padding: 10px 10px;
+}
+
+.amcommand__content {
+    flex: 1;
 }
 
 .amcommand__commands li:hover {
@@ -93,25 +98,55 @@
     color: inherit;
 }
 
-.amcommand__commands--name {
+.amcommand__name {
     color: rgba(0, 0, 0, 0.82);
     display: block;
     font-size: 100%;
 }
 
-.amcommand__commands li.focus .amcommand__commands--name {
+.amcommand__commands li.focus .amcommand__name {
     color: rgba(0, 0, 0, 0.90);
 }
 
-.amcommand__commands--info {
+.amcommand__info {
     color: #b9bfc6;
     display: block;
     font-size: 80%;
     margin-top: 5px;
 }
 
-.amcommand__commands--shortcut {
-    float: right;
+.amcommand__shortcut {
+    flex: 0 0 35px;
+    padding: 0 0 0 5px;
+}
+
+.amcommand__commands li.focus .amcommand__shortcut {
+    color: rgba(0, 0, 0, 0.90);
+}
+
+.amcommand__icon {
+    flex: 0 0 33px;
+    padding: 0 5px 4px 0;
+    font-size: 30px;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.82);
+}
+
+.amcommand__commands li.focus .amcommand__icon {
+    color: rgba(0, 0, 0, 0.90);
+}
+
+.amcommand__icon svg {
+    width: 33px;
+    max-height: 33px;
+}
+
+.amcommand__icon svg path {
+    fill: rgba(0, 0, 0, 0.82);
+}
+
+.amcommand__commands li.focus .amcommand__icon svg path {
+    fill: rgba(0, 0, 0, 0.90);;
 }
 
 

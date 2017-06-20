@@ -145,6 +145,35 @@ class AmCommand_SearchService extends BaseApplicationComponent
         // Gather commands
         $commands = array();
 
+        // Optional icons
+        $elementTypeIcons = array(
+            ElementType::User => array(
+                'type' => 'font',
+                'path' => 'users',
+            ),
+            ElementType::Entry => array(
+                'type' => 'font',
+                'path' => 'section',
+            ),
+        );
+        $elementTypeParts = explode('_', $elementType);
+        if (isset($elementTypeParts[0])) {
+            // Do we have a plugin for this Element Type?
+            $lcHandle = StringHelper::toLowerCase($elementTypeParts[0]);
+            $plugin = craft()->plugins->getPlugin($lcHandle);
+            if ($plugin) {
+                // Try to find the icon
+                $iconPath = craft()->path->getPluginsPath().$lcHandle.'/resources/icon-mask.svg';
+
+                if (IOHelper::fileExists($iconPath)) {
+                    $elementTypeIcons[$elementType] = array(
+                        'type' => 'svg',
+                        'path' => IOHelper::getFileContents($iconPath),
+                    );
+                }
+            }
+        }
+
         // Find elements
         $elementTypeInfo = craft()->elements->getElementType($elementType);
         $criteria = craft()->elements->getCriteria($elementType, $searchCriteria);
@@ -165,7 +194,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
                     $command = array(
                         'name' => $element->username,
                         'info' => ($addElementTypeInfo ? $elementTypeInfo->getName() . ' | ' : '') . implode(' - ', $userInfo),
-                        'url'  => $element->getCpEditUrl()
+                        'url'  => $element->getCpEditUrl(),
                     );
                     break;
 
@@ -173,9 +202,14 @@ class AmCommand_SearchService extends BaseApplicationComponent
                     $command = array(
                         'name' => $element->__toString(),
                         'info' => ($addElementTypeInfo ? $elementTypeInfo->getName() . ' | ' : '') . Craft::t('URI') . ': ' . $element->uri,
-                        'url'  => $element->getCpEditUrl()
+                        'url'  => $element->getCpEditUrl(),
                     );
                     break;
+            }
+
+            // Is there an icon available?
+            if (isset($elementTypeIcons[$elementType])) {
+                $command['icon'] = $elementTypeIcons[$elementType];
             }
 
             // Are the keywords available in the command?

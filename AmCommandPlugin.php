@@ -86,7 +86,11 @@ class AmCommandPlugin extends BasePlugin
             craft()->templates->includeTranslations('Command executed', 'Are you sure you want to execute this command?', 'There are no more commands available.');
 
             // Load CSS
-            craft()->templates->includeCssResource('amcommand/css/' . $this->_getSelectedTheme($settings));
+            craft()->templates->includeCssResource('amcommand/css/Command.css');
+            $themeFile = $this->_getSelectedTheme($settings);
+            if ($themeFile) {
+                craft()->templates->includeCssResource('amcommand/css/' . $themeFile);
+            }
         }
     }
 
@@ -130,13 +134,13 @@ class AmCommandPlugin extends BasePlugin
      *
      * @param array $settings
      *
-     * @return string
+     * @return false|string
      */
     private function _getSelectedTheme($settings)
     {
         // Did we select one?
-        if (empty($settings->theme)) {
-            return 'Command.css';
+        if (empty($settings->theme) || $settings->theme == 'Command.css') {
+            return false;
         }
 
         // Find theme
@@ -145,8 +149,7 @@ class AmCommandPlugin extends BasePlugin
             return $settings->theme;
         }
 
-        // Default
-        return 'Command.css';
+        return false;
     }
 
     /**
