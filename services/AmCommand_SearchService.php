@@ -149,19 +149,19 @@ class AmCommand_SearchService extends BaseApplicationComponent
         $elementTypeIcons = array(
             ElementType::User => array(
                 'type' => 'font',
-                'path' => 'users',
+                'content' => 'users',
             ),
             ElementType::Entry => array(
                 'type' => 'font',
-                'path' => 'section',
+                'content' => 'section',
             ),
             ElementType::Category => array(
                 'type' => 'font',
-                'path' => 'categories',
+                'content' => 'categories',
             ),
             ElementType::GlobalSet => array(
                 'type' => 'font',
-                'path' => 'globe',
+                'content' => 'globe',
             ),
         );
         $elementTypeParts = explode('_', $elementType);
@@ -176,7 +176,7 @@ class AmCommand_SearchService extends BaseApplicationComponent
                 if (IOHelper::fileExists($iconPath)) {
                     $elementTypeIcons[$elementType] = array(
                         'type' => 'svg',
-                        'path' => IOHelper::getFileContents($iconPath),
+                        'content' => IOHelper::getFileContents($iconPath),
                     );
                 }
             }

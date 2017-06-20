@@ -493,93 +493,165 @@ class AmCommandService extends BaseApplicationComponent
             'info'    => Craft::t('Manage Craft tasks.'),
             'more'    => true,
             'call'    => 'taskCommands',
-            'service' => 'amCommand_tasks'
+            'service' => 'amCommand_tasks',
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'settings',
+            )
         );
         $currentCommands[] = array(
             'name'    => Craft::t('Tools'),
             'info'    => Craft::t('Use one of the most used tools.'),
             'more'    => true,
             'call'    => 'listTools',
-            'service' => 'amCommand_tools'
+            'service' => 'amCommand_tools',
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'settings',
+            )
         );
         $currentCommands[] = array(
             'name'    => Craft::t('Settings') . ': ' . Craft::t('New') . '...',
             'info'    => Craft::t('Add something new in the settings...'),
             'more'    => true,
             'call'    => 'createNewSetting',
-            'service' => 'amCommand_settings'
+            'service' => 'amCommand_settings',
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'settings',
+            )
         );
         $currentCommands[] = array(
             'name' => Craft::t('Settings') . ': ' . Craft::t('Fields'),
-            'url'  => UrlHelper::getUrl('settings/fields')
+            'url'  => UrlHelper::getUrl('settings/fields'),
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'field',
+            )
         );
         $currentCommands[] = array(
             'name'    => Craft::t('Settings') . ': ' . Craft::t('Fields') . ' - ' . Craft::t('Edit'),
             'more'    => true,
             'call'    => 'editFields',
-            'service' => 'amCommand_settings'
+            'service' => 'amCommand_settings',
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'field',
+            )
         );
         $currentCommands[] = array(
             'name'    => Craft::t('Settings') . ': ' . Craft::t('Fields') . ' - ' . Craft::t('Duplicate'),
             'more'    => true,
             'call'    => 'duplicateFields',
-            'service' => 'amCommand_settings'
+            'service' => 'amCommand_settings',
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'field',
+            )
         );
         $currentCommands[] = array(
             'name' => Craft::t('Settings') . ': ' . Craft::t('Sections'),
-            'url'  => UrlHelper::getUrl('settings/sections')
+            'url'  => UrlHelper::getUrl('settings/sections'),
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'section',
+            )
         );
         $currentCommands[] = array(
             'name'    => Craft::t('Settings') . ': ' . Craft::t('Sections') . ' - ' . Craft::t('Edit'),
             'more'    => true,
             'call'    => 'editSections',
-            'service' => 'amCommand_settings'
+            'service' => 'amCommand_settings',
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'section',
+            )
         );
         $currentCommands[] = array(
             'name'    => Craft::t('Settings') . ': ' . Craft::t('Sections') . ' - ' . Craft::t('Edit entry type'),
             'more'    => true,
             'call'    => 'editSectionEntryTypes',
-            'service' => 'amCommand_settings'
+            'service' => 'amCommand_settings',
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'section',
+            )
         );
         $currentCommands[] = array(
             'name' => Craft::t('Settings') . ': ' . Craft::t('Globals'),
-            'url'  => UrlHelper::getUrl('settings/globals')
+            'url'  => UrlHelper::getUrl('settings/globals'),
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'settings',
+            )
         );
         $currentCommands[] = array(
             'name'    => Craft::t('Settings') . ': ' . Craft::t('Globals') . ' - ' . Craft::t('Global Sets'),
             'more'    => true,
             'call'    => 'editGlobalSets',
-            'service' => 'amCommand_settings'
+            'service' => 'amCommand_settings',
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'settings',
+            )
         );
         $currentCommands[] = array(
             'name' => Craft::t('Settings') . ': ' . Craft::t('Users'),
-            'url'  => UrlHelper::getUrl('settings/users')
+            'url'  => UrlHelper::getUrl('settings/users'),
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'settings',
+            )
         );
         $currentCommands[] = array(
             'name' => Craft::t('Settings') . ': ' . Craft::t('Routes'),
-            'url'  => UrlHelper::getUrl('settings/routes')
+            'url'  => UrlHelper::getUrl('settings/routes'),
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'routes',
+            )
         );
         $currentCommands[] = array(
             'name' => Craft::t('Settings') . ': ' . Craft::t('Categories'),
-            'url'  => UrlHelper::getUrl('settings/categories')
+            'url'  => UrlHelper::getUrl('settings/categories'),
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'settings',
+            )
         );
         $currentCommands[] = array(
             'name' => Craft::t('Settings') . ': ' . Craft::t('Assets'),
-            'url'  => UrlHelper::getUrl('settings/assets')
+            'url'  => UrlHelper::getUrl('settings/assets'),
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'settings',
+            )
         );
         $currentCommands[] = array(
             'name' => Craft::t('Settings') . ': ' . Craft::t('Locales'),
-            'url'  => UrlHelper::getUrl('settings/locales')
+            'url'  => UrlHelper::getUrl('settings/locales'),
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'language',
+            )
         );
         $currentCommands[] = array(
             'name' => Craft::t('Settings') . ': ' . Craft::t('Plugins'),
-            'url'  => UrlHelper::getUrl('settings/plugins')
+            'url'  => UrlHelper::getUrl('settings/plugins'),
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'plugin',
+            )
         );
         $currentCommands[] = array(
             'name'    => Craft::t('Settings') . ': ' . Craft::t('Plugin settings'),
             'more'    => true,
             'call'    => 'getSettingsUrl',
-            'service' => 'amCommand_plugins'
+            'service' => 'amCommand_plugins',
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'plugin',
+            )
         );
 
         return $currentCommands;
