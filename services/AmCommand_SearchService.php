@@ -155,6 +155,14 @@ class AmCommand_SearchService extends BaseApplicationComponent
                 'type' => 'font',
                 'path' => 'section',
             ),
+            ElementType::Category => array(
+                'type' => 'font',
+                'path' => 'categories',
+            ),
+            ElementType::GlobalSet => array(
+                'type' => 'font',
+                'path' => 'globe',
+            ),
         );
         $elementTypeParts = explode('_', $elementType);
         if (isset($elementTypeParts[0])) {
