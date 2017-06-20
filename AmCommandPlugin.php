@@ -113,20 +113,21 @@ class AmCommandPlugin extends BasePlugin
      */
     private function _getThemes()
     {
-        $options = array('' => Craft::t('Default'));
+        // Gather themes
+        $themes = array();
         $path = craft()->path->getPluginsPath().'amcommand/resources/css/';
-
         if (IOHelper::folderExists($path)) {
             $themeFiles = IOHelper::getFolderContents($path, false, '\.css$');
 
             if (is_array($themeFiles)) {
                 foreach ($themeFiles as $file) {
-                    $options[IOHelper::getFileName($file)] = IOHelper::getFileName($file, false);
+                    $themes[IOHelper::getFileName($file)] = IOHelper::getFileName($file, false);
                 }
             }
         }
+        natsort($themes);
 
-        return $options;
+        return array_merge(array('' => Craft::t('Default')), $themes);
     }
 
     /**
