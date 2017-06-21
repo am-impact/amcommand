@@ -1,0 +1,115 @@
+.amcommand {
+    width: 400px;
+    border-radius: 5px;
+}
+
+.amcommand__tabs {
+    padding: 8px 15px;
+    font-size: 100%;
+}
+
+
+/**
+ * Input
+ */
+.amcommand__search input[type=text] {
+    background: initial;
+    border-radius: initial;
+    font-size: 100%;
+    line-height: initial;
+    padding: 5px 46px 5px 5px;
+    border: 1px solid #e3e5e8;
+    border-radius: 3px;
+    -webkit-box-shadow: 0 0 5px rgba(51, 170, 255, 0);
+    -moz-box-shadow: 0 0 5px rgba(51, 170, 255, 0);
+    box-shadow: 0 0 5px rgba(51, 170, 255, 0);
+}
+
+.amcommand__search input[type=text]:focus {
+    border-color: #7dafe8;
+    outline: none;
+    -webkit-box-shadow: 0 0 5px #80caff;
+    -moz-box-shadow: 0 0 5px #80caff;
+    box-shadow: 0 0 5px #80caff;
+}
+
+
+/**
+ * Loaders
+ */
+ .amcommand__loader,
+.amcommand__loader:after {
+    border-radius: 50%;
+    width: 13px;
+    height: 13px;
+}
+.amcommand__loader {
+    top: 5px;
+    right: 14px;
+    border-top: 3px solid rgba(235,237,239, 0.4);
+    border-right: 3px solid rgba(235,237,239, 0.4);
+    border-bottom: 3px solid rgba(235,237,239, 0.4);
+    border-left: 3px solid #333f4d;
+}
+
+
+/**
+ * Commands
+ */
+.amcommand__commands li {
+    padding: 5px;
+    font-size: 100%;
+    color: #0d78f2;
+}
+
+.amcommand__commands .go:hover:after {
+    color: inherit;
+}
+.amcommand__commands li.focus .go:after {
+    color: inherit;
+}
+
+.amcommand__name {
+    color: inherit;
+}
+
+.amcommand__commands li.focus .amcommand__name {
+    color: inherit;
+}
+
+.amcommand__info {
+    color: #b9bfc6;
+    margin: 0;
+}
+
+.amcommand__shortcut {
+    flex: 0 0 35px;
+    padding: 0 0 0 5px;
+}
+
+.amcommand__commands li.focus .amcommand__shortcut {
+    color: inherit;
+}
+
+.amcommand__icon {
+    color: inherit;
+    font-size: 18px;
+}
+
+.amcommand__commands li.focus .amcommand__icon {
+    color: inherit;
+}
+
+.amcommand__icon svg {
+    width: 23px;
+    max-height: 23px;
+}
+
+.amcommand__icon svg path {
+    fill: rgba(13, 120, 242, 0.82);
+}
+
+.amcommand__commands li.focus .amcommand__icon svg path {
+    fill: rgba(13, 120, 242, 0.90);;
+}
+
