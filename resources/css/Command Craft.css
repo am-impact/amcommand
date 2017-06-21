@@ -1,0 +1,18 @@
+.amcommand {
+    background: rgba(51, 63, 77, 0.75);
+    border-radius: 14px;
+    padding: 6px;
+}
+
+.amcommand__tabs {
+    border-radius: 10px 10px 0 0;
+}
+
+.amcommand__container {
+    background: #ffffff;
+    border-radius: 10px;
+}
+
+.amcommand .amcommand__tabs:not(.hidden) + .amcommand__container {
+    border-radius: 0 0 10px 10px;
+}
