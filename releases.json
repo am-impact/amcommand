@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.1.0",
+        "downloadUrl": "https://github.com/am-impact/amcommand/archive/master.zip",
+        "date": "2017-06-22T10:00:00+01:00",
+        "notes": [
+            "[Added] Commands can have icons now. The element search returns the corresponding icon, and the general commands have an icon now.",
+            "[Added] Change the palette to a theme of your choice. This can be changed in the settings, and currently we have the following themes: Default, Classic, Craft and Dark.",
+            "[Improved] Allows commands still be triggered while an element search is running the background. You now had to wait till the elements were returned before your could trigger a general command you'd already searched for and wanted to execute."
+        ]
+    },
+    {
         "version": "2.0.2",
         "downloadUrl": "https://github.com/am-impact/amcommand/archive/master.zip",
         "date": "2017-06-14T16:00:00+01:00",
