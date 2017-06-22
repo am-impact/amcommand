@@ -121,7 +121,11 @@ class AmCommandPlugin extends BasePlugin
 
             if (is_array($themeFiles)) {
                 foreach ($themeFiles as $file) {
-                    $themes[IOHelper::getFileName($file)] = IOHelper::getFileName($file, false);
+                    $fileName = IOHelper::getFileName($file);
+                    if ($fileName == 'Command.css') {
+                        continue; // Skip default
+                    }
+                    $themes[$fileName] = IOHelper::getFileName($file, false);
                 }
             }
         }
