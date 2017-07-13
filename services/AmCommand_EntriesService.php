@@ -339,7 +339,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
         foreach (craft()->i18n->getSiteLocales() as $locale) {
             // Current entry based on locale
             $currentEntry = craft()->entries->getEntryById($variables['entryId'], $locale->getId());
-            if (is_null($currentEntry)) {
+            if (! $currentEntry) {
                 continue;
             }
 
@@ -347,16 +347,6 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             $currentSection = $currentEntry->getSection();
             if ($currentSection->type == SectionType::Single) {
                 return false;
-            }
-
-            // Current entry data
-            $currentParent     = $currentEntry->getParent();
-            $currentTitle      = $currentEntry->getContent()->title;
-            $currentAttributes = $this->_getContentFromModel($currentEntry);
-
-            // Override title?
-            if ($locale->id == $variables['locale']) {
-                $currentTitle = $variables['searchText'];
             }
 
             // New entry
@@ -368,8 +358,10 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             $newEntry->enabled    = $currentEntry->enabled;
             $newEntry->postDate   = $currentEntry->postDate;
             $newEntry->expiryDate = $currentEntry->expiryDate;
-            if (! is_null($currentParent)) {
-                $newEntry->parentId = $currentParent->id; // Structure type entry
+
+            // Add parent
+            if ($currentEntry->getParent()) {
+                $newEntry->parentId = $currentEntry->getParent()->id;
             }
 
             // Set element ID, because we already have created the duplicated primary locale entry
@@ -378,8 +370,8 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             }
 
             // Set entry title and content
-            $newEntry->getContent()->title = $currentTitle;
-            $newEntry->getContent()->setAttributes($currentAttributes);
+            $newEntry->getContent()->title = ($locale->id == $variables['locale']) ? $variables['searchText'] : $currentEntry->getContent()->title;
+            $newEntry->getContent()->setAttributes($this->_getContentFromElement($currentEntry, $locale->getId()));
 
             // Save duplicate entry
             $result = craft()->entries->saveEntry($newEntry);
@@ -508,32 +500,40 @@ class AmCommand_EntriesService extends BaseApplicationComponent
     }
 
     /**
-     * Get content from a model.
+     * Get content from an element.
      *
-     * @param EntryModel/MatrixBlockModel $model
+     * @param object $element
+     * @param string $toLocale
      *
      * @return array
      */
-    private function _getContentFromModel($model)
+    private function _getContentFromElement($element, $toLocale)
     {
+        // Gather attributes
         $attributes = array();
-        $content = $model->getContent()->getAttributes();
-        $fieldLayout = $model->getFieldLayout();
+
+        // Get basic content attributes
+        $content = $element->getContent()->getAttributes();
+
+        // Gather attributes based on the element's available fields
+        $fieldLayout = $element->getFieldLayout();
         foreach ($fieldLayout->getFields() as $fieldLayoutField) {
             $field = $fieldLayoutField->getField();
-            if ($model->{$field->handle} instanceof ElementCriteriaModel) {
+            if ($element->{$field->handle} instanceof ElementCriteriaModel) {
                 if ($field->type == 'Matrix') {
+                    // Matrix required new models rather than returning the existing ones
+                    // If you don't, these Matrix models will be saved to a different entry / entry locale
                     $blocks = array();
-                    foreach ($model->{$field->handle}->find() as $matrixBlock) {
+                    foreach ($element->{$field->handle}->status(null)->limit(null)->find() as $matrixBlock) {
                         // Create Matrix Block
                         $newMatrixBlock = new MatrixBlockModel();
                         $newMatrixBlock->fieldId = $matrixBlock->fieldId;
-                        $newMatrixBlock->typeId  = $matrixBlock->typeId;
+                        $newMatrixBlock->typeId = $matrixBlock->typeId;
                         $newMatrixBlock->ownerId = null;
-                        $newMatrixBlock->locale  = $model->locale;
+                        $newMatrixBlock->locale = $toLocale;
 
                         // Set content
-                        $blockData = $this->_getContentFromModel($matrixBlock);
+                        $blockData = $this->_getContentFromElement($matrixBlock, $toLocale);
                         $newMatrixBlock->setContentFromPost($blockData);
 
                         // Add block to Matrix Field
@@ -542,13 +542,14 @@ class AmCommand_EntriesService extends BaseApplicationComponent
                     $attributes[$field->handle] = $blocks;
                 }
                 else {
-                    $attributes[$field->handle] = $model->{$field->handle}->ids();
+                    $attributes[$field->handle] = $element->{$field->handle}->status(null)->limit(null)->ids();
                 }
             }
             else if (isset($content[$field->handle])) {
                 $attributes[$field->handle] = $content[$field->handle];
             }
         }
+
         return $attributes;
     }
 }
