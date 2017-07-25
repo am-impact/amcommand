@@ -1,18 +1,16 @@
 <?php
 /**
- * Command plugin for Craft CMS 3.x
+ * Command palette for Craft.
  *
- * Command palette in Craft; Because you can
- *
- * @link      http://www.am-impact.nl
+ * @author    a&m impact
  * @copyright Copyright (c) 2017 a&m impact
+ * @link      http://www.am-impact.nl
  */
 
 return [
     'Add something new in the settings...' => 'Maak iets nieuws aan in de instellingen...',
     'Are you sure you want to execute this command?' => 'Weet u zeker dat u dit commando uit wilt voeren?',
     'Besides your account, no other account could be found.' => 'Afgezien van uw account, kon er geen ander account gevonden worden.',
-    'By default, the command palette will only allow users to see and use commands they have permissions for.' => 'Standaard laat de command palette gebruikers alleen commando\'s zien en gebruiken waar ze rechten voor hebben.',
     'Command executed' => 'Commando uitgevoerd',
     'Compare entry version' => 'Vergelijk bericht versie',
     'Compare the current entry with older versions.' => 'Vergelijk het huidige bericht met oudere versies.',
@@ -28,7 +26,9 @@ return [
     'Delete all entries' => 'Verwijder alle inhoud',
     'Delete all entries in one of the available sections.' => 'Verwijder alle inhoud in één van de beschikbare secties.',
     'Delete an entry in one of the available sections.' => 'Verwijder een bericht in één van de beschikbare secties.',
-    'Enabled commands' => 'Ingeschakelde commando\'s',
+    'Enabled' => 'Ingeschakeld',
+    'Enabled Element Types' => 'Ingeschakelde Element Types',
+    'Default' => 'Standaard',
     'Delete a task' => 'Verwijder een taak',
     'Delete all failed tasks' => 'Verwijder alle gefaalde taken',
     'Delete all tasks' => 'Verwijder alle taken',
@@ -38,9 +38,10 @@ return [
     'Duplicate' => 'Dupliceren',
     'Duplicate entry' => 'Dupliceer bericht',
     'Duplicate the current entry.' => 'Dupliceer het huidige bericht.',
-    'E.g.: Users that do not have permission to edit entries within a specific section, that section won’t even show for them.' => 'Voorbeeld: Gebruikers die geen rechten hebben om inhoud aan te passen in een specifieke sectie, zal niet eens getoond worden.',
     'Edit a user.' => 'Bewerk een gebruiker.',
     'Edit an entry in one of the available sections.' => 'Bewerk een bericht in één van de beschikbare secties.',
+    'Element search Element Types' => 'Element zoeken Element Types',
+    'Element Type' => 'Element Type',
     'End current session.' => 'Huidige sessie beëindigen.',
     'Entries deleted.' => 'Berichten verwijderd.',
     'Entry duplicated.' => 'Bericht gedupliceerd.',
@@ -55,6 +56,7 @@ return [
     'Name of the overview section?' => 'Naam van de overzicht sectie?',
     'New' => 'Nieuw',
     'No entries in this section exist yet.' => 'Er bestaat nog geen inhoud in deze sectie.',
+    'Plugin settings' => 'Plugin instellingen',
     'Restart failed tasks' => 'Herstart gefaalde taken',
     'Search criteria isn’t set.' => 'Zoekcriteria is niet ingesteld.',
     'Search for {option}' => 'Zoeken naar {option}',
@@ -62,16 +64,21 @@ return [
     'Sections created.' => 'Secties aangemaakt.',
     'Tasks' => 'Taken',
     'Task deleted.' => 'Taak verwijderd.',
+    'Theme' => 'Thema',
     'There are no entries within the available sections.' => 'Er zijn geen berichten in de beschikbare secties.',
     'There are no more commands available.' => 'Er zijn geen commando\'s meer beschikbaar.',
     'There are no older versions of this entry.' => 'Er zijn geen oudere versies van dit bericht.',
+    'There are no enabled plugins with settings.' => 'Er zijn geen ingeschakelde plugins met instellingen.',
     'There are no tasks at the moment.' => 'Er zijn op dit moment geen taken.',
     'There is no running task at the moment.' => 'Er is op dit moment geen lopende taak.',
     'Title isn’t set.' => 'De titel is niet ingevuld.',
     'Title of new entry:' => 'Titel van het nieuwe bericht:',
     'Total entries in this section: {total}' => 'Aantal entries in deze sectie: {total}',
     'Type of the detail section?' => 'Type van de detail sectie?',
-    'Use one of the most used utilities.' => 'Gebruik één van de meest gebruikte utilities.',
+    'Use one of the most used tools.' => 'Gebruik één van de meest gebruikte tools.',
+    'Which Element Types you want to support for direct search.' => 'Welke Element Types u wilt ondersteunen voor het direct zoeken.',
+    'Which theme do you want to use?' => 'Welk thema wilt u gebruiken?',
     'You can disable commands you do not wish to use, by unchecking the checkboxes below.' => 'U kunt commando\'s uitschakelen die u niet wenst te gebruiken, door de boxen hieronder uit te vinken.',
-    'You’re able to search within a site that offers help.' => 'Je hebt de mogelijkheid om te zoeken binnen een site die hulp bied.'
+    'You’re able to search within a site that offers help.' => 'Je hebt de mogelijkheid om te zoeken binnen een site die hulp bied.',
+    'You are able to enable or disable certain Element Types from the direct element search when the palette is opened.' => 'U heeft de mogelijkheid om bepaalde Element Types aan of uit te zetten voor het directe element zoeken zodra de palette opent.',
 ];

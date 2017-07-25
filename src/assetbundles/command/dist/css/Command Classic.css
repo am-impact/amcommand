@@ -1,0 +1,123 @@
+/**
+ * Command palette for Craft.
+ *
+ * @author    a&m impact
+ * @copyright Copyright (c) 2017 a&m impact
+ * @link      http://www.am-impact.nl
+ */
+
+.command {
+    width: 400px;
+    border-radius: 5px;
+}
+
+.command__tabs {
+    padding: 8px 15px;
+    font-size: 100%;
+}
+
+
+/**
+ * Input
+ */
+.command__search input[type=text] {
+    background: initial;
+    border-radius: initial;
+    font-size: 100%;
+    line-height: initial;
+    padding: 5px 46px 5px 5px;
+    border: 1px solid #e3e5e8;
+    border-radius: 3px;
+    -webkit-box-shadow: 0 0 5px rgba(51, 170, 255, 0);
+    -moz-box-shadow: 0 0 5px rgba(51, 170, 255, 0);
+    box-shadow: 0 0 5px rgba(51, 170, 255, 0);
+}
+
+.command__search input[type=text]:focus {
+    border-color: #7dafe8;
+    outline: none;
+    -webkit-box-shadow: 0 0 5px #80caff;
+    -moz-box-shadow: 0 0 5px #80caff;
+    box-shadow: 0 0 5px #80caff;
+}
+
+
+/**
+ * Loaders
+ */
+ .command__loader,
+.command__loader:after {
+    border-radius: 50%;
+    width: 13px;
+    height: 13px;
+}
+.command__loader {
+    top: 5px;
+    right: 14px;
+    border-top: 3px solid rgba(235,237,239, 0.4);
+    border-right: 3px solid rgba(235,237,239, 0.4);
+    border-bottom: 3px solid rgba(235,237,239, 0.4);
+    border-left: 3px solid #333f4d;
+}
+
+
+/**
+ * Commands
+ */
+.command__commands li {
+    padding: 5px;
+    font-size: 100%;
+    color: #0d78f2;
+}
+
+.command__commands .go:hover:after {
+    color: inherit;
+}
+.command__commands li.focus .go:after {
+    color: inherit;
+}
+
+.command__name {
+    color: inherit;
+}
+
+.command__commands li.focus .command__name {
+    color: inherit;
+}
+
+.command__info {
+    color: #b9bfc6;
+    margin: 0;
+}
+
+.command__shortcut {
+    flex: 0 0 35px;
+    padding: 0 0 0 5px;
+}
+
+.command__commands li.focus .command__shortcut {
+    color: inherit;
+}
+
+.command__icon {
+    color: inherit;
+    font-size: 18px;
+}
+
+.command__commands li.focus .command__icon {
+    color: inherit;
+}
+
+.command__icon svg {
+    width: 23px;
+    max-height: 23px;
+}
+
+.command__icon svg path {
+    fill: rgba(13, 120, 242, 0.82);
+}
+
+.command__commands li.focus .command__icon svg path {
+    fill: rgba(13, 120, 242, 0.90);;
+}
+

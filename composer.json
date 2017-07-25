@@ -1,8 +1,8 @@
 {
     "name": "amimpact/command",
-    "description": "Command palette in Craft; Because you can",
+    "description": "Command palette in Craft.",
     "type": "craft-plugin",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "keywords": [
         "craft",
         "cms",
@@ -18,7 +18,7 @@
         }
     ],
     "require": {
-        "craftcms/cms": "~3.0.0-beta.1"
+        "craftcms/cms": "~3.0.0-beta.22"
     },
     "autoload": {
         "psr-4": {
@@ -28,18 +28,19 @@
     "extra": {
         "name": "Command",
         "handle": "command",
-        "version": "2.0.0",
-        "schemaVersion": "2.0.0",
+        "version": "3.0.0",
+        "schemaVersion": "3.0.0",
         "hasSettings": true,
         "hasCpSection": true,
         "developer": "a&m impact",
         "developerUrl": "http://www.am-impact.nl",
-        "description": "Command palette in Craft; Because you can",
+        "description": "Command palette in Craft.",
         "documentationUrl": "https://github.com/am-impact/amcommand/blob/master/README.md",
         "components": {
             "entries": "amimpact\\command\\services\\Entries",
             "general": "amimpact\\command\\services\\General",
             "globals": "amimpact\\command\\services\\Globals",
+            "plugins": "amimpact\\command\\services\\Plugins",
             "search": "amimpact\\command\\services\\Search",
             "settings": "amimpact\\command\\services\\Settings",
             "tasks": "amimpact\\command\\services\\Tasks",

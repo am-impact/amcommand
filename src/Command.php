@@ -1,17 +1,16 @@
 <?php
 /**
- * Command plugin for Craft CMS 3.x
+ * Command palette for Craft.
  *
- * Command palette in Craft; Because you can
- *
- * @link      http://www.am-impact.nl
+ * @author    a&m impact
  * @copyright Copyright (c) 2017 a&m impact
+ * @link      http://www.am-impact.nl
  */
 
 namespace amimpact\command;
 
-use amimpact\command\models\Settings;
 use amimpact\command\assetbundles\Command\CommandBundle;
+use amimpact\command\models\Settings;
 
 use Craft;
 use craft\base\Plugin;
@@ -24,12 +23,34 @@ class Command extends Plugin
     public static $plugin;
 
     /**
+     * @inheritdoc
+     */
+    public $schemaVersion = '3.0.0';
+
+    /**
+     * @inheritdoc
+     */
+    public $hasCpSettings = true;
+
+    /**
      * Init Command.
      */
     public function init()
     {
         parent::init();
         self::$plugin = $this;
+
+        $this->setComponents([
+            'entries' => \amimpact\command\services\Entries::class,
+            'general' => \amimpact\command\services\General::class,
+            'globals' => \amimpact\command\services\Globals::class,
+            'plugins' => \amimpact\command\services\Plugins::class,
+            'search' => \amimpact\command\services\Search::class,
+            'settings' => \amimpact\command\services\Settings::class,
+            'tasks' => \amimpact\command\services\Tasks::class,
+            'utilities' => \amimpact\command\services\Utilities::class,
+            'users' => \amimpact\command\services\Users::class,
+        ]);
 
         // We only want to see the command palette in the backend, and want to initiate it once
         if (Craft::$app->getRequest()->getIsCpRequest() && ! Craft::$app->getUser()->getIsGuest() && ! Craft::$app->getRequest()->getAcceptsJson()) {
@@ -68,52 +89,13 @@ class Command extends Plugin
      */
     protected function settingsHtml(): string
     {
-        $commands = [
-            'newEntry' => [
-                'name' => Craft::t('command', 'New entry'),
-                'info' => Craft::t('command', 'Create a new entry in one of the available sections.')
-            ],
-            'editEntries' => [
-                'name' => Craft::t('command', 'Edit entries'),
-                'info' => Craft::t('command', 'Edit an entry in one of the available sections.')
-            ],
-            'deleteEntries' => [
-                'name' => Craft::t('command', 'Delete entries'),
-                'info' => Craft::t('command', 'Delete an entry in one of the available sections.')
-            ],
-            'deleteAllEntries' => [
-                'name' => Craft::t('command', 'Delete all entries'),
-                'info' => Craft::t('command', 'Delete all entries in one of the available sections.') . ' (' . Craft::t('command', 'This action may only be performed by admins.') . ')'
-            ],
-            'editGlobals' => [
-                'name' => Craft::t('command', 'Globals'),
-                'info' => Craft::t('command', 'Edit')
-            ],
-            'userCommands' => [
-                'name' => Craft::t('command', 'Administrate users'),
-                'info' => Craft::t('command', 'Create, edit or delete a user.')
-            ],
-            'searchCommands' => [
-                'name' => Craft::t('command', 'Search'),
-                'info' => Craft::t('command', 'You’re able to search within a site that offers help.')
-            ],
-            'settings' => [
-                'name' => Craft::t('command', 'Settings'),
-                'info' => Craft::t('command', 'This action may only be performed by admins.')
-            ],
-            'tasks' => [
-                'name' => Craft::t('command', 'Tasks'),
-                'info' => Craft::t('command', 'This action may only be performed by admins.')
-            ],
-            'utilities' => [
-                'name' => Craft::t('command', 'Utilities'),
-                'info' => Craft::t('command', 'This action may only be performed by admins.')
-            ]
-        ];
+        // Settings
+        $settings = $this->getSettings();
 
         return Craft::$app->view->renderTemplate('command/settings', [
-            'commands' => $commands,
-            'settings' => $this->getSettings()
+            'settings' => $settings,
+            'themes' => $settings->getThemes(),
+            'elementSearchElementTypes' => $settings->getElementSearchElementTypes(),
         ]);
     }
 }

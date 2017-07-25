@@ -1,11 +1,10 @@
 <?php
 /**
- * Command plugin for Craft CMS 3.x
+ * Command palette for Craft.
  *
- * Command palette in Craft; Because you can
- *
- * @link      http://www.am-impact.nl
+ * @author    a&m impact
  * @copyright Copyright (c) 2017 a&m impact
+ * @link      http://www.am-impact.nl
  */
 
 namespace amimpact\command\services;
@@ -110,7 +109,8 @@ class Users extends Component
         if ($success) {
             Command::$plugin->general->deleteCurrentCommand();
             Command::$plugin->general->setReturnMessage(Craft::t('app', 'User deleted.'));
-        } else {
+        }
+        else {
             Command::$plugin->general->setReturnMessage(Craft::t('app', 'Couldn’t delete “{name}”.', ['name', $user->username]));
         }
 
@@ -171,17 +171,21 @@ class Users extends Component
             Craft::$app->getSession()->setNotice(Craft::t('app', 'Logged in.'));
             Command::$plugin->general->setReturnMessage(Craft::t('command', 'Login as user'));
 
+            // Redirect
             if (Craft::$app->getUser()->can('accessCp')) {
                 Command::$plugin->general->setReturnUrl(UrlHelper::cpUrl('dashboard'));
-            } else {
+            }
+            else {
                 Command::$plugin->general->setReturnUrl(UrlHelper::siteUrl(''));
             }
+
             return true;
         }
 
         // Login failed
         Command::$plugin->general->setReturnMessage(Craft::t('app', 'There was a problem impersonating this user.'));
         Craft::info($this->_currentUser->username . ' tried to log in using userId: '.$variables['userId'].' but something went wrong.', __METHOD__);
+
         return false;
     }
 }

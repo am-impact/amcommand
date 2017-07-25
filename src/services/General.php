@@ -1,11 +1,10 @@
 <?php
 /**
- * Command plugin for Craft CMS 3.x
+ * Command palette for Craft.
  *
- * Command palette in Craft; Because you can
- *
- * @link      http://www.am-impact.nl
+ * @author    a&m impact
  * @copyright Copyright (c) 2017 a&m impact
+ * @link      http://www.am-impact.nl
  */
 
 namespace amimpact\command\services;
@@ -285,18 +284,6 @@ class General extends Component
     }
 
     /**
-     * Check whether a command is enabled.
-     *
-     * @param string $command
-     *
-     * @return bool
-     */
-    private function _isEnabled($command)
-    {
-        return (bool) $this->_settings->$command;
-    }
-
-    /**
      * Order the commands by name.
      *
      * @param array $commands
@@ -309,6 +296,7 @@ class General extends Component
         usort($commands, function($a, $b) use ($reverseSorting) {
             return $reverseSorting ? strnatcmp($b['name'], $a['name']) : strnatcmp($a['name'], $b['name']);
         });
+
         return $commands;
     }
 
@@ -322,42 +310,44 @@ class General extends Component
     private function _getContentCommands($currentCommands)
     {
         // New, edit and delete commands
-        $newEnabled = $this->_isEnabled('newEntry');
-        $editEnabled = $this->_isEnabled('editEntries');
-        $deleteEnabled = $this->_isEnabled('deleteEntries');
-        $deleteAllEnabled = $this->_isEnabled('deleteAllEntries');
-        if (($newEnabled || $editEnabled || $deleteEnabled || $deleteAllEnabled) && (Craft::$app->getUser()->getIsAdmin() || Craft::$app->sections->getTotalEditableSections() > 0)) {
-            if ($newEnabled) {
-                $currentCommands[] = [
-                    'name'    => Craft::t('app', 'Content') . ': ' . Craft::t('app', 'New entry'),
-                    'info'    => Craft::t('command', 'Create a new entry in one of the available sections.'),
-                    'more'    => true,
-                    'call'    => 'createEntry',
-                    'service' => 'entries',
-                ];
-            }
-            if ($editEnabled) {
-                $currentCommands[] = [
-                    'name'    => Craft::t('app', 'Content') . ': ' . Craft::t('app', 'Edit entries'),
-                    'info'    => Craft::t('command', 'Edit an entry in one of the available sections.'),
-                    'more'    => true,
-                    'call'    => 'editEntries',
-                    'service' => 'entries'
-                ];
-            }
-            if ($deleteEnabled) {
-                $currentCommands[] = [
-                    'name'    => Craft::t('app', 'Content') . ': ' . Craft::t('app', 'Delete entries'),
-                    'info'    => Craft::t('command', 'Delete an entry in one of the available sections.'),
-                    'more'    => true,
-                    'call'    => 'deleteEntries',
-                    'service' => 'entries',
-                    'vars'    => [
-                        'deleteAll' => false
-                    ]
-                ];
-            }
-            if ($deleteAllEnabled && Craft::$app->getUser()->getIsAdmin()) {
+        if (Craft::$app->getUser()->getIsAdmin() || Craft::$app->sections->getTotalEditableSections() > 0) {
+            $currentCommands[] = [
+                'name'    => Craft::t('app', 'Content') . ': ' . Craft::t('app', 'New entry'),
+                'info'    => Craft::t('command', 'Create a new entry in one of the available sections.'),
+                'more'    => true,
+                'call'    => 'createEntry',
+                'service' => 'entries',
+                'icon'    => [
+                    'type' => 'font',
+                    'content' => 'section',
+                ]
+            ];
+            $currentCommands[] = [
+                'name'    => Craft::t('app', 'Content') . ': ' . Craft::t('app', 'Edit entries'),
+                'info'    => Craft::t('command', 'Edit an entry in one of the available sections.'),
+                'more'    => true,
+                'call'    => 'editEntries',
+                'service' => 'entries',
+                'icon'    => [
+                    'type' => 'font',
+                    'content' => 'section',
+                ]
+            ];
+            $currentCommands[] = [
+                'name'    => Craft::t('app', 'Content') . ': ' . Craft::t('app', 'Delete entries'),
+                'info'    => Craft::t('command', 'Delete an entry in one of the available sections.'),
+                'more'    => true,
+                'call'    => 'deleteEntries',
+                'service' => 'entries',
+                'vars'    => [
+                    'deleteAll' => false
+                ],
+                'icon'    => [
+                    'type' => 'font',
+                    'content' => 'section',
+                ]
+            ];
+            if (Craft::$app->getUser()->getIsAdmin()) {
                 $currentCommands[] = [
                     'name'    => Craft::t('app', 'Content') . ': ' . Craft::t('command', 'Delete all entries'),
                     'info'    => Craft::t('command', 'Delete all entries in one of the available sections.'),
@@ -366,6 +356,10 @@ class General extends Component
                     'service' => 'entries',
                     'vars'    => [
                         'deleteAll' => true
+                    ],
+                    'icon'    => [
+                        'type' => 'font',
+                        'content' => 'section',
                     ]
                 ];
             }
@@ -382,12 +376,16 @@ class General extends Component
      */
     private function _getGlobalCommands($currentCommands)
     {
-        if ($this->_isEnabled('editGlobals') && (Craft::$app->getUser()->getIsAdmin() || Craft::$app->globals->getTotalEditableSets() > 0)) {
+        if (Craft::$app->getUser()->getIsAdmin() || Craft::$app->globals->getTotalEditableSets() > 0) {
             $currentCommands[] = [
                 'name'    => Craft::t('app', 'Globals') . ': ' . Craft::t('app', 'Edit'),
                 'more'    => true,
                 'call'    => 'editGlobals',
-                'service' => 'globals'
+                'service' => 'globals',
+                'icon'    => [
+                    'type' => 'font',
+                    'content' => 'globe',
+                ]
             ];
         }
         return $currentCommands;
@@ -402,45 +400,67 @@ class General extends Component
      */
     private function _getUserCommands($currentCommands)
     {
-        if ($this->_isEnabled('userCommands')) {
+        $currentCommands[] = [
+            'name' => Craft::t('app', 'Dashboard'),
+            'url'  => UrlHelper::cpUrl('dashboard'),
+            'icon' => [
+                'type' => 'font',
+                'content' => 'gauge',
+            ]
+        ];
+        $currentCommands[] = [
+            'name' => Craft::t('app', 'Sign out'),
+            'info' => Craft::t('command', 'End current session.'),
+            'url'  => UrlHelper::cpUrl('logout')
+        ];
+        $currentCommands[] = [
+            'name' => Craft::t('app', 'My Account'),
+            'url'  => UrlHelper::cpUrl('myaccount')
+        ];
+        if (Craft::$app->getUser()->getIsAdmin() || Craft::$app->getUser()->getIdentity()->can('editUsers')) {
             $currentCommands[] = [
-                'name'    => Craft::t('app', 'Dashboard'),
-                'url'     => UrlHelper::cpUrl('dashboard')
+                'name' => Craft::t('app', 'Users') . ': ' . Craft::t('app', 'New user'),
+                'info' => Craft::t('command', 'Create a user.'),
+                'url'  => UrlHelper::cpUrl('users/new'),
+                'icon' => [
+                    'type' => 'font',
+                    'content' => 'users',
+                ]
             ];
             $currentCommands[] = [
-                'name'    => Craft::t('app', 'Users') . ': ' . Craft::t('app', 'Sign out'),
-                'info'    => Craft::t('command', 'End current session.'),
-                'url'     => UrlHelper::cpUrl('logout')
+                'name'    => Craft::t('app', 'Users') . ': ' . Craft::t('app', 'Edit users'),
+                'info'    => Craft::t('command', 'Edit a user.'),
+                'more'    => true,
+                'call'    => 'editUsers',
+                'service' => 'users',
+                'icon' => [
+                    'type' => 'font',
+                    'content' => 'users',
+                ]
             ];
-            if (Craft::$app->getUser()->getIsAdmin() || Craft::$app->getUser()->getIdentity()->can('editUsers')) {
+            $currentCommands[] = [
+                'name'    => Craft::t('app', 'Users') . ': ' . Craft::t('app', 'Delete users'),
+                'info'    => Craft::t('command', 'Delete a user other than your own.'),
+                'more'    => true,
+                'call'    => 'deleteUsers',
+                'service' => 'users',
+                'icon' => [
+                    'type' => 'font',
+                    'content' => 'users',
+                ]
+            ];
+            if (Craft::$app->getUser()->getIsAdmin()) {
                 $currentCommands[] = [
-                    'name'    => Craft::t('app', 'Users') . ': ' . Craft::t('app', 'New user'),
-                    'info'    => Craft::t('command', 'Create a user.'),
-                    'url'     => UrlHelper::cpUrl('users/new')
-                ];
-                $currentCommands[] = [
-                    'name'    => Craft::t('app', 'Users') . ': ' . Craft::t('app', 'Edit users'),
-                    'info'    => Craft::t('command', 'Edit a user.'),
+                    'name'    => Craft::t('app', 'Users') . ': ' . Craft::t('command', 'Login as user'),
+                    'info'    => Craft::t('command', 'Log in as a different user, and navigate to their dashboard.'),
                     'more'    => true,
-                    'call'    => 'editUsers',
-                    'service' => 'users'
+                    'call'    => 'loginUsers',
+                    'service' => 'users',
+                    'icon' => [
+                        'type' => 'font',
+                        'content' => 'users',
+                    ]
                 ];
-                $currentCommands[] = [
-                    'name'    => Craft::t('app', 'Users') . ': ' . Craft::t('app', 'Delete users'),
-                    'info'    => Craft::t('command', 'Delete a user other than your own.'),
-                    'more'    => true,
-                    'call'    => 'deleteUsers',
-                    'service' => 'users'
-                ];
-                if (Craft::$app->getUser()->getIsAdmin()) {
-                    $currentCommands[] = [
-                        'name'    => Craft::t('app', 'Users') . ': ' . Craft::t('command', 'Login as user'),
-                        'info'    => Craft::t('command', 'Log in as a different user, and navigate to their dashboard.'),
-                        'more'    => true,
-                        'call'    => 'loginUsers',
-                        'service' => 'users'
-                    ];
-                }
             }
         }
         return $currentCommands;
@@ -455,40 +475,52 @@ class General extends Component
      */
     private function _getSearchCommands($currentCommands)
     {
-        if ($this->_isEnabled('searchCommands')) {
-            $currentCommands[] = [
-                'name'    => Craft::t('command', 'Search on {option}', ['option' => 'Craft']),
-                'info'    => 'https://craftcms.com',
-                'more'    => true,
-                'call'    => 'searchOptionCraft',
-                'service' => 'search'
-            ];
-            $currentCommands[] = [
-                'name'    => Craft::t('command', 'Search on {option}', ['option' => 'StackExchange']),
-                'info'    => 'http://craftcms.stackexchange.com',
-                'more'    => true,
-                'call'    => 'searchOptionStackExchange',
-                'service' => 'search'
-            ];
-            $currentCommands[] = [
-                'name'    => Craft::t('command', 'Search for {option}', ['option' => Craft::t('app', 'Categories')]),
-                'more'    => true,
-                'call'    => 'searchOptionCategories',
-                'service' => 'search'
-            ];
-            $currentCommands[] = [
-                'name'    => Craft::t('command', 'Search for {option}', ['option' => Craft::t('app', 'Entries')]),
-                'more'    => true,
-                'call'    => 'searchOptionEntries',
-                'service' => 'search'
-            ];
-            $currentCommands[] = [
-                'name'    => Craft::t('command', 'Search for {option}', ['option' => Craft::t('app', 'Users')]),
-                'more'    => true,
-                'call'    => 'searchOptionUsers',
-                'service' => 'search'
-            ];
+        // Site searches
+        $currentCommands[] = [
+            'name'    => Craft::t('command', 'Search on {option}', ['option' => 'Craft']),
+            'info'    => 'https://craftcms.com',
+            'more'    => true,
+            'call'    => 'searchOptionCraft',
+            'service' => 'search',
+            'icon'    => [
+                'type' => 'font',
+                'content' => 'search',
+            ]
+        ];
+        $currentCommands[] = [
+            'name'    => Craft::t('command', 'Search on {option}', ['option' => 'StackExchange']),
+            'info'    => 'http://craftcms.stackexchange.com',
+            'more'    => true,
+            'call'    => 'searchOptionStackExchange',
+            'service' => 'search',
+            'icon'    => [
+                'type' => 'font',
+                'content' => 'search',
+            ]
+        ];
+
+        // Element searches
+        if (is_array($this->_settings->elementSearchElementTypes)) {
+            foreach ($this->_settings->elementSearchElementTypes as $elementType => $submittedInfo) {
+                if (isset($submittedInfo['enabled']) && $submittedInfo['enabled'] === '1') {
+                    $actualElementType = Craft::$app->elements->getElementTypeByRefHandle($elementType);
+                    $currentCommands[] = [
+                        'name'    => Craft::t('command', 'Search for {option}', ['option' => $actualElementType::displayName()]),
+                        'more'    => true,
+                        'call'    => 'searchOptionElementType',
+                        'service' => 'search',
+                        'vars'    => [
+                            'elementType' => $elementType
+                        ],
+                        'icon'    => [
+                            'type' => 'font',
+                            'content' => 'search',
+                        ]
+                    ];
+                }
+            }
         }
+
         return $currentCommands;
     }
 
@@ -504,87 +536,161 @@ class General extends Component
         if (! Craft::$app->getUser()->getIsAdmin()) {
             return $currentCommands;
         }
-        if ($this->_isEnabled('tasks')) {
-            $currentCommands[] = [
-                'name'    => Craft::t('command', 'Tasks'),
-                'info'    => Craft::t('command', 'Manage Craft tasks.'),
-                'more'    => true,
-                'call'    => 'getTaskCommands',
-                'service' => 'tasks'
-            ];
-        }
-        if ($this->_isEnabled('utilities')) {
-            $currentCommands[] = [
-                'name'    => Craft::t('app', 'Utilities'),
-                'info'    => Craft::t('command', 'Use one of the most used utilities.'),
-                'more'    => true,
-                'call'    => 'getUtilities',
-                'service' => 'utilities'
-            ];
-        }
-        if ($this->_isEnabled('settings')) {
-            $currentCommands[] = [
-                'name'    => Craft::t('app', 'Settings') . ': ' . Craft::t('command', 'New') . '...',
-                'info'    => Craft::t('command', 'Add something new in the settings...'),
-                'more'    => true,
-                'call'    => 'createNewSetting',
-                'service' => 'settings'
-            ];
-            $currentCommands[] = [
-                'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Fields'),
-                'url'  => UrlHelper::cpUrl('settings/fields')
-            ];
-            $currentCommands[] = [
-                'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Sections'),
-                'url'  => UrlHelper::cpUrl('settings/sections')
-            ];
-            $currentCommands[] = [
-                'name'    => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Sections') . ' - ' . Craft::t('app', 'Edit'),
-                'more'    => true,
-                'call'    => 'editSections',
-                'service' => 'settings'
-            ];
-            $currentCommands[] = [
-                'name'    => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Sections') . ' - ' . Craft::t('app', 'Edit entry type'),
-                'more'    => true,
-                'call'    => 'editSectionEntryTypes',
-                'service' => 'settings'
-            ];
-            $currentCommands[] = [
-                'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Globals'),
-                'url'  => UrlHelper::cpUrl('settings/globals')
-            ];
-            $currentCommands[] = [
-                'name'    => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Globals') . ' - ' . Craft::t('app', 'Global Sets'),
-                'more'    => true,
-                'call'    => 'editGlobalSets',
-                'service' => 'settings'
-            ];
-            $currentCommands[] = [
-                'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Users'),
-                'url'  => UrlHelper::cpUrl('settings/users')
-            ];
-            $currentCommands[] = [
-                'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Routes'),
-                'url'  => UrlHelper::cpUrl('settings/routes')
-            ];
-            $currentCommands[] = [
-                'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Categories'),
-                'url'  => UrlHelper::cpUrl('settings/categories')
-            ];
-            $currentCommands[] = [
-                'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Assets'),
-                'url'  => UrlHelper::cpUrl('settings/assets')
-            ];
-            $currentCommands[] = [
-                'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Sites'),
-                'url'  => UrlHelper::cpUrl('settings/sites')
-            ];
-            $currentCommands[] = [
-                'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Plugins'),
-                'url'  => UrlHelper::cpUrl('settings/plugins')
-            ];
-        }
+        $currentCommands[] = [
+            'name'    => Craft::t('command', 'Tasks'),
+            'info'    => Craft::t('command', 'Manage Craft tasks.'),
+            'more'    => true,
+            'call'    => 'getTaskCommands',
+            'service' => 'tasks',
+            'icon' => [
+                'type' => 'font',
+                'content' => 'settings',
+            ]
+        ];
+        $currentCommands[] = [
+            'name'    => Craft::t('app', 'Utilities'),
+            'info'    => Craft::t('command', 'Use one of the most used utilities.'),
+            'more'    => true,
+            'call'    => 'getUtilities',
+            'service' => 'utilities',
+            'icon' => [
+                'type' => 'font',
+                'content' => 'settings',
+            ]
+        ];
+        $currentCommands[] = [
+            'name'    => Craft::t('app', 'Settings') . ': ' . Craft::t('command', 'New') . '...',
+            'info'    => Craft::t('command', 'Add something new in the settings...'),
+            'more'    => true,
+            'call'    => 'createNewSetting',
+            'service' => 'settings',
+            'icon' => [
+                'type' => 'font',
+                'content' => 'settings',
+            ]
+        ];
+        $currentCommands[] = [
+            'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Fields'),
+            'url'  => UrlHelper::cpUrl('settings/fields'),
+            'icon' => [
+                'type' => 'font',
+                'content' => 'field',
+            ]
+        ];
+        $currentCommands[] = [
+            'name'    => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Fields') . ' - ' . Craft::t('app', 'Edit'),
+            'more'    => true,
+            'call'    => 'editFields',
+            'service' => 'settings',
+            'icon'    => [
+                'type' => 'font',
+                'content' => 'field',
+            ]
+        ];
+        $currentCommands[] = [
+            'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Sections'),
+            'url'  => UrlHelper::cpUrl('settings/sections'),
+            'icon' => [
+                'type' => 'font',
+                'content' => 'section',
+            ]
+        ];
+        $currentCommands[] = [
+            'name'    => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Sections') . ' - ' . Craft::t('app', 'Edit'),
+            'more'    => true,
+            'call'    => 'editSections',
+            'service' => 'settings',
+            'icon' => [
+                'type' => 'font',
+                'content' => 'section',
+            ]
+        ];
+        $currentCommands[] = [
+            'name'    => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Sections') . ' - ' . Craft::t('app', 'Edit entry type'),
+            'more'    => true,
+            'call'    => 'editSectionEntryTypes',
+            'service' => 'settings',
+            'icon' => [
+                'type' => 'font',
+                'content' => 'section',
+            ]
+        ];
+        $currentCommands[] = [
+            'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Globals'),
+            'url'  => UrlHelper::cpUrl('settings/globals'),
+            'icon' => [
+                'type' => 'font',
+                'content' => 'settings',
+            ]
+        ];
+        $currentCommands[] = [
+            'name'    => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Globals') . ' - ' . Craft::t('app', 'Global Sets'),
+            'more'    => true,
+            'call'    => 'editGlobalSets',
+            'service' => 'settings',
+            'icon' => [
+                'type' => 'font',
+                'content' => 'settings',
+            ]
+        ];
+        $currentCommands[] = [
+            'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Users'),
+            'url'  => UrlHelper::cpUrl('settings/users'),
+            'icon' => [
+                'type' => 'font',
+                'content' => 'settings',
+            ]
+        ];
+        $currentCommands[] = [
+            'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Routes'),
+            'url'  => UrlHelper::cpUrl('settings/routes'),
+            'icon' => [
+                'type' => 'font',
+                'content' => 'routes',
+            ]
+        ];
+        $currentCommands[] = [
+            'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Categories'),
+            'url'  => UrlHelper::cpUrl('settings/categories'),
+            'icon' => [
+                'type' => 'font',
+                'content' => 'settings',
+            ]
+        ];
+        $currentCommands[] = [
+            'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Assets'),
+            'url'  => UrlHelper::cpUrl('settings/assets'),
+            'icon' => [
+                'type' => 'font',
+                'content' => 'settings',
+            ]
+        ];
+        $currentCommands[] = [
+            'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Sites'),
+            'url'  => UrlHelper::cpUrl('settings/sites'),
+            'icon' => [
+                'type' => 'font',
+                'content' => 'world',
+            ]
+        ];
+        $currentCommands[] = [
+            'name' => Craft::t('app', 'Settings') . ': ' . Craft::t('app', 'Plugins'),
+            'url'  => UrlHelper::cpUrl('settings/plugins'),
+            'icon' => [
+                'type' => 'font',
+                'content' => 'plugin',
+            ]
+        ];
+        $currentCommands[] = array(
+            'name'    => Craft::t('app', 'Settings') . ': ' . Craft::t('command', 'Plugin settings'),
+            'more'    => true,
+            'call'    => 'getSettingsUrl',
+            'service' => 'plugins',
+            'icon'    => array(
+                'type' => 'font',
+                'content' => 'plugin',
+            )
+        );
         return $currentCommands;
     }
 }

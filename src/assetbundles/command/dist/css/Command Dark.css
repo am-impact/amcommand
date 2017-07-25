@@ -1,0 +1,86 @@
+/**
+ * Command palette for Craft.
+ *
+ * @author    a&m impact
+ * @copyright Copyright (c) 2017 a&m impact
+ * @link      http://www.am-impact.nl
+ */
+
+.command {
+    background: #333f4d;
+}
+
+.command__tabs {
+    background: #333f4d;
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+
+/**
+ * Input
+ */
+.command__search input[type=text] {
+    background: #333f4d;
+    border: 1px solid #fafafa;
+    color: #fff;
+}
+
+
+/**
+ * Loaders
+ */
+.command__loader {
+    border-top: 3px solid rgba(255,255,255, 0.2);
+    border-right: 3px solid rgba(255,255,255, 0.2);
+    border-bottom: 3px solid rgba(255,255,255, 0.2);
+    border-left: 3px solid #FFFFFF;
+}
+
+
+/**
+ * Commands
+ */
+.command__commands li:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.command__commands li.focus {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.command__name {
+    color: #d7d9db;
+}
+
+.command__commands li.focus .command__name {
+    color: #fff;
+}
+
+.command__info {
+    color: #b9bfc6;
+}
+
+.command__shortcut {
+    color: #d7d9db;
+}
+
+.command__commands li.focus .command__shortcut {
+    color: #fff;
+}
+
+.command__icon {
+    color: #d7d9db;
+}
+
+.command__commands li.focus .command__icon {
+    color: #fff;
+}
+
+.command__icon svg path {
+    fill: #d7d9db;
+}
+
+.command__commands li.focus .command__icon svg path {
+    fill: #fff;
+}

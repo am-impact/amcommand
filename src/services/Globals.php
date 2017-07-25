@@ -1,11 +1,10 @@
 <?php
 /**
- * Command plugin for Craft CMS 3.x
+ * Command palette for Craft.
  *
- * Command palette in Craft; Because you can
- *
- * @link      http://www.am-impact.nl
+ * @author    a&m impact
  * @copyright Copyright (c) 2017 a&m impact
+ * @link      http://www.am-impact.nl
  */
 
 namespace amimpact\command\services;

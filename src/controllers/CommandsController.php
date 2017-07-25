@@ -1,11 +1,10 @@
 <?php
 /**
- * Command plugin for Craft CMS 3.x
+ * Command palette for Craft.
  *
- * Command palette in Craft; Because you can
- *
- * @link      http://www.am-impact.nl
+ * @author    a&m impact
  * @copyright Copyright (c) 2017 a&m impact
+ * @link      http://www.am-impact.nl
  */
 
 namespace amimpact\command\controllers;
@@ -50,7 +49,8 @@ class CommandsController extends Controller
                 'success' => false,
                 'message' => $message ? $message : Craft::t('command', 'Couldn’t trigger the command.')
             ]);
-        } else {
+        }
+        else {
             return $this->asJson([
                 'success'       => true,
                 'title'         => $title,
@@ -61,7 +61,7 @@ class CommandsController extends Controller
                 'isAction'      => $action,
                 'isHtml'        => Command::$plugin->general->getReturnHtml(),
                 'headHtml'      => Craft::$app->view->getHeadHtml(),
-                'footHtml'      => Craft::$app->view->getFootHtml(),
+                'footHtml'      => Craft::$app->view->getBodyHtml(),
                 'deleteCommand' => $delete
             ]);
         }

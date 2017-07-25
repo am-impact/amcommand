@@ -1,11 +1,10 @@
 <?php
 /**
- * Command plugin for Craft CMS 3.x
+ * Command palette for Craft.
  *
- * Command palette in Craft; Because you can
- *
- * @link      http://www.am-impact.nl
+ * @author    a&m impact
  * @copyright Copyright (c) 2017 a&m impact
+ * @link      http://www.am-impact.nl
  */
 
 namespace amimpact\command\services;
@@ -69,7 +68,7 @@ class Entries extends Component
                 // We have to get the entries for this section first
                 $commands[] = [
                     'name'    => $type . ': ' . $section->name,
-                    'info'    => Craft::t('command', 'Total entries in this section: {total}', array('total' => $totalEntries)),
+                    'info'    => Craft::t('command', 'Total entries in this section: {total}', ['total' => $totalEntries]),
                     'more'    => true,
                     'call'    => 'editEntry',
                     'service' => 'entries',
@@ -171,7 +170,7 @@ class Entries extends Component
                 if ($totalEntries > 0) {
                     $commands[] = [
                         'name'    => $section->name,
-                        'info'    => Craft::t('command', 'Total entries in this section: {total}', array('total' => $totalEntries)),
+                        'info'    => Craft::t('command', 'Total entries in this section: {total}', ['total' => $totalEntries]),
                         'warn'    => $deleteAll,
                         'more'    => !$deleteAll,
                         'call'    => 'deleteEntriesFromSection',

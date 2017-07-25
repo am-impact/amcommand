@@ -1,13 +1,9 @@
 /**
- * Command plugin for Craft CMS
- *
- * Command CSS
+ * Command palette for Craft.
  *
  * @author    a&m impact
  * @copyright Copyright (c) 2017 a&m impact
  * @link      http://www.am-impact.nl
- * @package   Command
- * @since     2.0.0
  */
 
 .command {
@@ -26,14 +22,8 @@
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
 }
 
-.command__execute {
-    float: right;
-    margin: 6px 15px 0 0;
-}
-
 .command__tabs {
     padding: 12px 15px 10px;
-    border-radius: 5px 5px 0 0;
     color: #29323d;
     cursor: default;
     font-size: 15px;
@@ -48,6 +38,10 @@
     padding: 15px;
 }
 
+.command__search {
+    position: relative;
+}
+
 
 /**
  * Input
@@ -56,7 +50,7 @@
     width: 100%;
     border: 0;
     background: rgba(238, 238, 238, 0.72);
-    padding: 8px 10px 10px;
+    padding: 8px 46px 10px 10px;
     border-radius: 0;
     font-size: 28px;
     line-height: 1;
@@ -66,46 +60,69 @@
     box-shadow: none;
 }
 
-.command__search--hasButton {
-    overflow: hidden;
-}
-
-.command__search--hasButton input[type=text] {
-    float: left;
-    width: 88%;
-}
-
-.command__search--hasButton input[type=button] {
-    float: right;
-    width: 10%;
-    height: 52px;
-    outline: none;
-    font-size: 25px;
-}
-
 
 /**
  * Loaders
  */
+.command__loader,
+.command__loader:after {
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+}
 .command__loader {
-    left: 46%;
-    position: relative;
-    margin-top: 10px;
+    position: absolute;
+    top: 12px;
+    right: 10px;
+    border-top: 3px solid rgba(218,90,71, 0.2);
+    border-right: 3px solid rgba(218,90,71, 0.2);
+    border-bottom: 3px solid rgba(218,90,71, 0.2);
+    border-left: 3px solid #da5a47;
+    -webkit-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-animation: load8 1.1s infinite linear;
+    animation: load8 1.1s infinite linear;
+}
+@-webkit-keyframes load8 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+@keyframes load8 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
 }
 
 
 /**
  * Commands
  */
-.command__commands > ul {
+.command__commands ul {
     max-height: 400px;
     margin-top: 15px;
     overflow: auto;
 }
 .command__commands li {
+    display: flex;
     border-top: 1px dotted rgba(115, 127, 140, 0.15);
     font-size: 18px;
     padding: 10px 10px;
+}
+
+.command__content {
+    flex: 1;
 }
 
 .command__commands li:hover {
@@ -124,21 +141,55 @@
     color: inherit;
 }
 
-.command__commands--name {
+.command__name {
     color: rgba(0, 0, 0, 0.82);
     display: block;
     font-size: 100%;
 }
 
-.command__commands li.focus .command__commands--name {
+.command__commands li.focus .command__name {
     color: rgba(0, 0, 0, 0.90);
 }
 
-.command__commands--info {
+.command__info {
     color: #b9bfc6;
     display: block;
     font-size: 80%;
     margin-top: 5px;
+}
+
+.command__shortcut {
+    flex: 0 0 35px;
+    padding: 0 0 0 5px;
+}
+
+.command__commands li.focus .command__shortcut {
+    color: rgba(0, 0, 0, 0.90);
+}
+
+.command__icon {
+    flex: 0 0 33px;
+    padding: 0 5px 4px 0;
+    font-size: 28px;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.82);
+}
+
+.command__commands li.focus .command__icon {
+    color: rgba(0, 0, 0, 0.90);
+}
+
+.command__icon svg {
+    width: 33px;
+    max-height: 33px;
+}
+
+.command__icon svg path {
+    fill: rgba(0, 0, 0, 0.82);
+}
+
+.command__commands li.focus .command__icon svg path {
+    fill: rgba(0, 0, 0, 0.90);;
 }
 
 
@@ -149,12 +200,4 @@
 .command__notice {
     font-weight: bold;
     padding-right: 10px;
-}
-
-
-/**
- * Icon
- */
-.visuallyhidden {
-    display: none;
 }

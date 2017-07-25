@@ -1,20 +1,44 @@
 {% import "_includes/forms" as forms %}
 
-<h1>{{ 'Enabled commands'|t('command') }}</h1>
-<p>
-    {{ 'By default, the command palette will only allow users to see and use commands they have permissions for.'|t('command') }}
-    <br>
-    {{ 'E.g.: Users that do not have permission to edit entries within a specific section, that section won’t even show for them.'|t('command') }}
-</p>
-<p>{{ 'You can disable commands you do not wish to use, by unchecking the checkboxes below.'|t('command') }}</p>
-<hr>
+{{ forms.selectField({
+    label: "Theme"|t('command'),
+    instructions: "Which theme do you want to use?"|t('command'),
+    id: 'theme',
+    name: 'theme',
+    options: themes,
+    value: settings.theme,
+    first: true
+}) }}
 
-{% for commandSetting, command in commands %}
-    {{ forms.lightswitchField({
-        id:           commandSetting,
-        name:         commandSetting,
-        label:        command.name,
-        on:           attribute(settings, commandSetting),
-        instructions: command.info
-    }) }}
-{% endfor %}
+{% set elementTypesInput %}
+    <table class="data fullwidth">
+        <thead>
+            <tr>
+                <th scope="col" style="width: 50%;">{{ 'Element Type'|t('command') }}</th>
+                <th scope="col">{{ 'Enabled'|t('command') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for refHandle, row in elementSearchElementTypes %}
+            <tr>
+                <td>
+                    {{ row.elementType }}
+                    <input type="hidden" name="elementSearchElementTypes[{{ refHandle }}][elementType]" value="{{ row.elementType }}">
+                </td>
+                <td>
+                    {{ forms.lightswitchField({
+                        first: loop.first,
+                        id: 'enabled-' ~ refHandle,
+                        name: 'elementSearchElementTypes['~ refHandle ~'][enabled]',
+                        on: row.enabled
+                    }) }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endset %}
+{{ forms.field({
+    label: 'Element search Element Types'|t('command'),
+    instructions: 'Which Element Types you want to support for direct search.'|t('command'),
+}, elementTypesInput) }}

@@ -1,38 +1,42 @@
 /**
- * Command plugin for Craft CMS
- *
- * Command JS
+ * Command palette for Craft.
  *
  * @author    a&m impact
  * @copyright Copyright (c) 2017 a&m impact
  * @link      http://www.am-impact.nl
- * @package   Command
- * @since     2.0.0
  */
 
 (function($) {
 
 Craft.Command = Garnish.Base.extend(
 {
-    $searchField:        $('.command__search input[type=text]'),
-    $container:          $('.command'),
-    $tabsContainer:      $('.command__tabs'),
-    $searchContainer:    $('.command__search'),
-    $commandsContainer:  $('.command__commands ul'),
-    $loader:             $('.command__loader'),
-    $commands:           $('.command__commands li'),
-    $button:             $('#nav-command'),
-    $buttonExecute:      $('.command__search input[type=button]'),
-    ignoreSearchKeys:    [Garnish.UP_KEY, Garnish.DOWN_KEY, Garnish.LEFT_KEY, Garnish.RIGHT_KEY, Garnish.RETURN_KEY, Garnish.ESC_KEY],
-    fuzzyOptions:        {
+    // DOM elements
+    $searchField:       $('.command__search input[type=text]'),
+    $container:         $('.command'),
+    $tabsContainer:     $('.command__tabs'),
+    $searchContainer:   $('.command__search'),
+    $commandsContainer: $('.command__commands ul'),
+    $loader:            $('.command__loader'),
+    $commands:          $('.command__commands li'),
+    $button:            $('#nav-command'),
+
+    // Keys
+    P_KEY:            80,
+    NUM_KEYS:         [49, 50, 51, 52, 53, 54, 55, 56, 57],
+    ignoreSearchKeys: [Garnish.UP_KEY, Garnish.DOWN_KEY, Garnish.LEFT_KEY, Garnish.RIGHT_KEY, Garnish.RETURN_KEY, Garnish.ESC_KEY, Garnish.CMD_KEY, Garnish.CTRL_KEY],
+
+    // Palette options & commands
+    fuzzyOptions: {
         pre: "<strong>",
         post: "</strong>",
         extract: function(element) {
             return element.name;
         }
     },
-    commandsArray:       [],
-    rememberPalette:     {
+    commandsArray: [],
+    elementCommandsArray: [],
+    combinedCommandsArray: [],
+    rememberPalette: {
         currentSet: 0,
         paletteStyle: [],
         commandNames: [],
@@ -40,16 +44,20 @@ Craft.Command = Garnish.Base.extend(
         searchKeywords: [],
         actions: []
     },
-    isOpen:              false,
-    isHtml:              false,
-    isAction:            false,
-    isActionAsync:       true,
-    isActionRealtime:    false,
-    actionData:          [],
-    actionTimer:         false,
-    loading:             false,
-    loadingCommand:      '',
-    P_KEY:               80,
+
+    // Palette status
+    isOpen:             false,
+    isHtml:             false,
+    isAction:           false,
+    isActionAsync:      true,
+    isActionRealtime:   false,
+    actionData:         [],
+    actionTimer:        false,
+    loadingCommand:     '',
+    loadingRequest:     false,
+    loadingElements:    false,
+    allowElementSearch: true,
+    elementSearchTimer: false,
 
     /**
      * Initiate command palette.
@@ -61,9 +69,7 @@ Craft.Command = Garnish.Base.extend(
 
         // Set commands for fuzzy search
         self.commandsArray = commands;
-
-        // Display commands
-        self.search(undefined, true); // Override event
+        self.combinedCommandsArray = commands;
 
         // Add event listeners
         self.bindEvents();
@@ -75,16 +81,41 @@ Craft.Command = Garnish.Base.extend(
     bindEvents: function() {
         var self = this;
 
-        self.addListener(self.$button, 'click', function(ev) {
-            ev.preventDefault();
-            self.openPalette(ev);
-        });
+        self.addListener(self.$button, 'click', 'openPalette');
 
-        self.addListener(self.$searchField, 'keyup', 'search');
+        self.addListener(self.$searchField, 'keyup', function(ev) {
+            // Make sure we don't trigger ignored keys
+            if (self.ignoreSearchKeys.indexOf(ev.keyCode) < 0) {
+                self.search(ev, false, false);
+
+                // Allow element searches when we no commands triggered
+                if (self.isOpen && self.allowElementSearch && self.$searchField.val().length) {
+                    if (self.elementSearchTimer) {
+                        clearTimeout(self.elementSearchTimer);
+                    }
+                    self.elementSearchTimer = setTimeout($.proxy(function() {
+                        // Trigger element search
+                        var variables = {
+                            'option': 'DirectElements',
+                            'searchText': self.$searchField.val()
+                        };
+                        self.triggerCallback('searchOn', 'search', variables, true);
+                    }, this), 600);
+                }
+            }
+        });
 
         self.addListener(window, 'keydown', function(ev) {
             if ((ev.metaKey || ev.ctrlKey) && ev.shiftKey && ev.keyCode == self.P_KEY) {
-                self.openPalette(ev);
+                if (! self.isOpen) {
+                    self.openPalette(ev);
+                }
+                else {
+                    self.closePalette(ev);
+                }
+            }
+            else if ((ev.metaKey || ev.ctrlKey) && self.NUM_KEYS.indexOf(ev.keyCode) > -1) {
+                self.triggerCommand(ev, false);
             }
             else if (ev.keyCode == Garnish.UP_KEY) {
                 self.moveCommandFocus(ev, 'up');
@@ -98,13 +129,12 @@ Craft.Command = Garnish.Base.extend(
             else if (ev.keyCode == Garnish.ESC_KEY) {
                 if (self.rememberPalette.currentSet > 0) {
                     self.restoreCommands();
-                } else {
+                }
+                else {
                     self.closePalette(ev);
                 }
             }
         });
-
-        self.addListener(self.$buttonExecute, 'click', 'triggerCommand');
 
         self.addListener(document.body, 'click', 'closePalette');
 
@@ -126,6 +156,7 @@ Craft.Command = Garnish.Base.extend(
             self.$container.fadeIn(1, function() {
                 self.isOpen = true;
                 self.$searchField.focus();
+                self.$commandsContainer.addClass('hidden');
             });
             ev.preventDefault();
         }
@@ -141,12 +172,10 @@ Craft.Command = Garnish.Base.extend(
 
         if (self.isOpen) {
             self.$container.fadeOut(1, function() {
-                // Hide execute button
-                self.$buttonExecute.addClass('hidden');
-                self.$searchContainer.removeClass('command__search--hasButton');
                 // Reset search keywords and executed command
                 self.$searchField.val('');
                 self.$tabsContainer.addClass('hidden');
+
                 // If we have any new commands, reset back to first set of commands
                 if (self.rememberPalette.currentSet > 0) {
                     self.isAction = false;
@@ -156,9 +185,14 @@ Craft.Command = Garnish.Base.extend(
                     self.rememberPalette.currentSet = 0;
                     self.commandsArray = self.rememberPalette.commandsArray[1];
                 }
-                self.search(undefined, true);
+                self.search(ev, false, false);
                 self.isOpen = false;
-                self.loading = false; // Reset loading if the user cancels the page request
+                if (self.loadingRequest) {
+                    self.loadingRequest.abort();
+                    self.$loader.addClass('hidden');
+                }
+                self.loadingRequest = false;
+                self.loadingElements = false;
             });
             if (ev !== undefined) {
                 ev.preventDefault();
@@ -183,42 +217,61 @@ Craft.Command = Garnish.Base.extend(
     /**
      * Search the available commands.
      *
-     * @param object ev          The triggered event.
-     * @param bool   allowSearch Override for command palette init.
-     * @param bool   realtime    Whether the search was triggered by a realtime action.
+     * @param object ev              The triggered event.
+     * @param bool   isRealtime      Whether the search was triggered by a realtime action.
+     * @param bool   isElementSearch Whether the search was triggered by an element search.
      */
-    search: function(ev, allowSearch, realtime) {
+    search: function(ev, isRealtime, isElementSearch) {
         var self = this;
 
-        if (! allowSearch && self.isOpen && ! self.loading) {
-            // Make sure we don't trigger ignored keys
-            if (self.ignoreSearchKeys.indexOf(ev.keyCode) < 0) {
-                allowSearch = true;
+        if ((! self.isAction || isRealtime) && (! self.loadingRequest || self.loadingElements)) {
+            var commandsArray = self.allowElementSearch ? self.combinedCommandsArray : self.commandsArray,
+                searchValue = isRealtime ? '' : self.$searchField.val(),
+                filtered = fuzzy.filter(searchValue, commandsArray, self.fuzzyOptions),
+                totalResults = filtered.length,
+                performUpdate = true;
+
+            if (! self.allowElementSearch || (searchValue.length && self.allowElementSearch)) {
+                // Find matches
+                var results = filtered.map(function(el, i) {
+                    var icon = ('icon' in el.original) ? '<span class="command__icon"' + (el.original.icon.type == 'font' ? ' data-icon="' + el.original.icon.content + '"' : '') + '>' + (el.original.icon.type != 'font' ? el.original.icon.content : '') + '</span>' : '';
+                    var shortcut = (i < 9) ? '<span class="command__shortcut">&#8984;' + (i + 1) + '</span>' : '';
+                    var name = '<span class="command__name' + ('more' in el.original && el.original.more ? ' go' : '') + '">' + el.string + '</span>';
+                    var info = ('info' in el.original) ? '<span class="command__info">' + el.original.info + '</span>' : '';
+                    return '<li data-id="' + el.index + '">' + icon + '<div class="command__content">' + name + info + '</div>' + shortcut + '</li>';
+                });
+
+                // Element search deliver anything new?
+                if (isElementSearch) {
+                    var currentMatches = self.$commands.length;
+                    if (currentMatches == results.length) {
+                        performUpdate = false;
+                    }
+                }
+
+                // Update palettte
+                if (performUpdate) {
+                    self.$commandsContainer.removeClass('hidden');
+                    self.$commandsContainer.html(results.join(''));
+                    if (! results.length) {
+                        self.$commandsContainer.addClass('hidden');
+                    }
+                    self.resetPalette();
+                }
+            }
+            else {
+                // Hide commands
+                self.$commandsContainer.html('');
+                self.$commandsContainer.addClass('hidden');
             }
         }
-        if (allowSearch) {
-            if (! self.isAction || realtime) {
-                var searchValue = realtime ? '' : self.$searchField.val(),
-                    filtered = fuzzy.filter(searchValue, self.commandsArray, self.fuzzyOptions),
-                    totalResults = filtered.length;
-
-                // Find matches
-                var results = filtered.map(function(el) {
-                    var name = '<span class="command__commands--name' + ('more' in el.original && el.original.more ? ' go' : '') + '">' + el.string + '</span>';
-                    var info = ('info' in el.original) ? '<span class="command__commands--info">' + el.original.info + '</span>' : '';
-                    return '<li data-id="' + el.index + '">' + name + info + '</li>';
-                });
-                self.$commandsContainer.html(results.join(''));
-                self.resetPalette();
+        else if (self.isAction && self.isActionRealtime) {
+            if (self.actionTimer) {
+                clearTimeout(self.actionTimer);
             }
-            else if (self.isAction && self.isActionRealtime) {
-                if (self.actionTimer) {
-                    clearTimeout(self.actionTimer);
-                }
-                self.actionTimer = setTimeout($.proxy(function() {
-                    self.triggerRealtimeAction();
-                }, this), 600);
-            }
+            self.actionTimer = setTimeout($.proxy(function() {
+                self.triggerRealtimeAction();
+            }, this), 600);
         }
     },
 
@@ -269,12 +322,12 @@ Craft.Command = Garnish.Base.extend(
             containerScroll = self.$commandsContainer.scrollTop(),
             containerHeight = self.$commandsContainer.height();
 
-        // Down
         if ((currentTop + currentHeight) > (containerHeight + containerTop)) {
+            // Down
             self.$commandsContainer.scrollTop((currentTop - containerTop - containerHeight) + currentHeight + containerScroll);
         }
-        // Up
         else if (currentTop < containerTop) {
+            // Up
             self.$commandsContainer.scrollTop((containerScroll - containerTop) + currentTop);
         }
     },
@@ -290,10 +343,12 @@ Craft.Command = Garnish.Base.extend(
         if (success) {
             if (customMessage !== false) {
                 Craft.cp.displayNotice(customMessage);
-            } else {
+            }
+            else {
                 Craft.cp.displayNotice('<span class="command__notice">' + Craft.t('command', 'Command executed') + ' &raquo;</span>' + executedCommand);
             }
-        } else {
+        }
+        else {
             Craft.cp.displayError(customMessage);
         }
     },
@@ -310,6 +365,7 @@ Craft.Command = Garnish.Base.extend(
                 actionData: self.actionData
             };
 
+        // Store current commands
         self.rememberPalette.currentSet++;
         self.rememberPalette.paletteStyle[ self.rememberPalette.currentSet ] = {
             width: self.$container.width()
@@ -324,8 +380,11 @@ Craft.Command = Garnish.Base.extend(
             self.isAction = false;
             self.isActionAsync = true;
             self.actionData = [];
-            self.$buttonExecute.addClass('hidden');
-            self.$searchContainer.removeClass('command__search--hasButton');
+        }
+
+        // Diable element search?
+        if (self.rememberPalette.currentSet > 0) {
+            self.allowElementSearch = false;
         }
     },
 
@@ -342,41 +401,56 @@ Craft.Command = Garnish.Base.extend(
             self.$searchContainer.removeClass('hidden');
             self.$container.velocity(self.rememberPalette.paletteStyle[ self.rememberPalette.currentSet ], 400);
         }
+
         // Reset action if set
         if (self.isAction) {
             self.isAction = false;
             self.isActionAsync = true;
             self.isActionRealtime = false;
             self.actionData = [];
-            self.$buttonExecute.addClass('hidden');
-            self.$searchContainer.removeClass('command__search--hasButton');
         }
+
+        // Stop request if set
+        if (self.loadingRequest) {
+            self.loadingRequest.abort();
+            self.$loader.addClass('hidden');
+        }
+        self.loadingRequest = false;
+        self.loadingElements = false;
+
         // Restore commands
         self.commandsArray = self.rememberPalette.commandsArray[ self.rememberPalette.currentSet ];
+
         // Reset focus and search keywords
         self.$searchField.val(self.rememberPalette.searchKeywords[ self.rememberPalette.currentSet ]);
         self.$searchField.focus();
-        // Display the commands
-        self.search(undefined, true);
+
         // Lower current set
         self.rememberPalette.currentSet--;
+
+        // Enable element search?
+        if (self.rememberPalette.currentSet == 0) {
+            self.allowElementSearch = true;
+            self.combinedCommandsArray = self.commandsArray.concat(self.elementCommandsArray);
+        }
+
+        // Display the commands
+        self.search(undefined, false, false);
+
         // Reset executed command
         if (self.rememberPalette.currentSet > 0) {
             self.$tabsContainer.text(self.rememberPalette.commandNames[ self.rememberPalette.currentSet ]);
-        } else {
+        }
+        else {
             self.$tabsContainer.addClass('hidden');
         }
+
         // Restore action
         if (restoreAction.isAction) {
             self.isAction = true;
             self.isActionAsync = restoreAction.isActionAsync;
             self.isActionRealtime = restoreAction.isActionRealtime;
             self.actionData = restoreAction.actionData;
-            // Only display the execute button next to search field when it's not realtime
-            if (! self.isActionRealtime) {
-                self.$buttonExecute.removeClass('hidden');
-                self.$searchContainer.addClass('command__search--hasButton');
-            }
         }
     },
 
@@ -396,9 +470,9 @@ Craft.Command = Garnish.Base.extend(
         // Set action data
         var variables = self.actionData.vars;
         variables['searchText'] = self.$searchField.val();
+
         // Trigger action
-        self.loading = true;
-        self.triggerCallback(self.actionData.call, self.actionData.plugin, self.actionData.service, variables);
+        self.triggerCallback(self.actionData.call, self.actionData.service, variables, false);
     },
 
     /**
@@ -410,40 +484,48 @@ Craft.Command = Garnish.Base.extend(
     triggerCommand: function(ev, ctrlPressed) {
         var self = this;
 
-        if (self.isOpen && ! self.loading) {
+        if (self.isOpen) {
             if (self.isAction && ! self.isActionRealtime) {
                 var variables = self.actionData.vars;
                 variables['searchText'] = self.$searchField.val();
+
                 // Trigger action
-                self.loading = true;
-                self.triggerCallback(self.actionData.call, self.actionData.plugin, self.actionData.service, variables);
-            } else {
+                self.triggerCallback(self.actionData.call, self.actionData.service, variables, false);
+            }
+            else {
                 if (ev.type == 'click') {
                     if (ev.ctrlKey || ev.metaKey) {
                         ctrlPressed = true;
                     }
                     var $current = $(ev.currentTarget);
+
                     // Remove focus from all, and focus the clicked command
                     self.$commands.removeClass('focus');
                     $current.addClass('focus');
-                } else {
+                }
+                else if (ev.type == 'keydown' && self.NUM_KEYS.indexOf(ev.keyCode) > -1) {
+                    var commandNumber = self.NUM_KEYS.indexOf(ev.keyCode);
+                    var $current = self.$commands.filter(':eq(' + commandNumber + ')');
+                }
+                else {
                     var $current = self.$commands.filter('.focus');
                 }
                 if ($current.length) {
-                    var commandId = $current.data('id');
+                    var commandId = $current.data('id'),
+                        commandsArray = self.allowElementSearch ? self.combinedCommandsArray : self.commandsArray;
 
-                    if(commandId in self.commandsArray) {
+                    if (commandId in commandsArray) {
                         var confirmed       = true,
-                            commandData     = self.commandsArray[commandId],
+                            commandData     = commandsArray[commandId],
                             warn            = ('warn' in commandData) ? commandData.warn : false,
                             url             = ('url' in commandData) ? commandData.url : false,
                             callback        = ('call' in commandData) ? commandData.call : false,
-                            callbackPlugin  = ('plugin' in commandData) ? commandData.plugin : false,
                             callbackService = ('service' in commandData) ? commandData.service : false,
                             callbackVars    = ('vars' in commandData) ? commandData.vars : false;
 
                         // Remember command for when a new set is loaded
                         self.loadingCommand = commandData.name;
+
                         // Do we have to show a warning?
                         if (warn) {
                             var confirmation = confirm(Craft.t('command', 'Are you sure you want to execute this command?'));
@@ -453,15 +535,15 @@ Craft.Command = Garnish.Base.extend(
                         }
                         // Can we execute the command?
                         if (confirmed) {
-                            self.loading = true;
                             if (callback) {
-                                self.triggerCallback(callback, callbackPlugin, callbackService, callbackVars);
+                                self.triggerCallback(callback, callbackService, callbackVars, false);
                             }
                             else if (url) {
                                 // Open the URL in a new window if the CTRL or Command key was pressed
                                 if (ctrlPressed) {
                                     window.open(url);
-                                } else {
+                                }
+                                else {
                                     window.location = url;
                                 }
                                 self.displayMessage(true, false, commandData.name);
@@ -478,146 +560,200 @@ Craft.Command = Garnish.Base.extend(
     /**
      * Trigger a command callback function rather than navigating to it.
      *
-     * @param string name    Callback function.
-     * @param string plugin  Which plugin should be used.
-     * @param string service Which service should be used.
-     * @param string vars    JSON string with optional variables.
+     * @param string name            Callback function.
+     * @param string service         Which service should be triggered.
+     * @param string vars            JSON string with optional variables.
+     * @param bool   isElementSearch Whether this is a element search call.
      */
-    triggerCallback: function(name, plugin, service, vars) {
+    triggerCallback: function(name, service, vars, isElementSearch) {
         var self = this,
+            allowRequest = false,
             displayDefaultMessage = false,
             $current = self.$commands.filter('.focus');
 
-        // Hide current commands and display a loader
-        self.$commands.hide();
-        self.$loader.removeClass('hidden');
+        if (! self.loadingRequest) {
+            allowRequest = true;
+        }
+        else if (self.loadingElements) {
+            allowRequest = true;
 
-        Craft.postActionRequest('command/commands/trigger-command', {command: name, plugin: plugin, service: service, vars: vars}, $.proxy(function(response, textStatus) {
-            if (textStatus == 'success') {
-                self.loading = false;
-                self.$loader.addClass('hidden');
-                if (response.success) {
-                    // Was there a custom title set?
-                    if (response.title) {
-                        self.loadingCommand = response.title;
-                    }
+            if (self.loadingRequest) {
+                self.loadingElements = false;
+                self.loadingRequest.abort();
+            }
+        }
 
-                    // What result do we have? HTML, an action, new command set or just a result message?
-                    if (response.isHtml) {
-                        // It is a command that shows HTML, but did we get any?
-                        if (response.result == '') {
-                            self.$commands.show(); // Show current commands again
-                        } else {
-                            // Remember current commands
-                            self.rememberCommands();
-                            self.isHtml = true;
-                            // Display executed command above search field
-                            self.$tabsContainer.text(self.loadingCommand);
-                            self.$tabsContainer.removeClass('hidden');
-                            // Adjust palette
-                            self.$searchContainer.addClass('hidden');
-                            self.$container.velocity({ width: '80%' }, 400);
-                            // Show HTML
-                            self.$commandsContainer.html(response.result);
-                            Craft.appendHeadHtml(response.headHtml);
-                            Craft.appendFootHtml(response.footHtml);
-                            Craft.initUiElements(self.$commandsContainer);
+        if (allowRequest) {
+            // Hide current commands and display a loader
+            if (! isElementSearch) {
+                self.$commands.hide();
+            }
+            self.$loader.removeClass('hidden');
+
+            // Are we going to load elements?
+            if (isElementSearch) {
+                self.loadingElements = true;
+            }
+
+            self.loadingRequest = Craft.postActionRequest('command/commands/trigger-command', { command: name, service: service, vars: vars }, $.proxy(function (response, textStatus) {
+                self.loadingRequest = false;
+                if (textStatus == 'success') {
+                    self.$loader.addClass('hidden');
+
+                    if (response.success) {
+                        // Was there a custom title set?
+                        if (response.title) {
+                            self.loadingCommand = response.title;
                         }
-                    }
-                    else if (self.isAction && self.isActionRealtime && response.isNewSet) {
-                        self.commandsArray = response.result;
-                        self.search(undefined, true, true);
-                    }
-                    else if (response.isAction) {
-                        // Executed function
-                        self.loadingCommand = response.isAction.tabs;
-                        // Remember current commands and action information
-                        self.rememberCommands();
-                        self.isAction = true;
-                        self.isActionAsync = response.isAction.async;
-                        self.isActionRealtime = response.isAction.realtime;
-                        self.actionData = response.isAction;
-                        // Display text
-                        self.$tabsContainer.text(response.isAction.tabs);
-                        self.$tabsContainer.removeClass('hidden');
-                        // Only display the execute button next to search field when it's not realtime
-                        if (! response.isAction.realtime) {
-                            self.$buttonExecute.removeClass('hidden');
-                            self.$searchContainer.addClass('command__search--hasButton');
+
+                        // What result do we have? HTML, an action, new command set or just a result message?
+                        if (response.isHtml) {
+                            // It is a command that shows HTML, but did we get any?
+                            if (response.result == '') {
+                                self.$commands.show(); // Show current commands again
+                            }
+                            else {
+                                // Remember current commands
+                                self.rememberCommands();
+                                self.isHtml = true;
+
+                                // Display executed command above search field
+                                self.$tabsContainer.text(self.loadingCommand);
+                                self.$tabsContainer.removeClass('hidden');
+
+                                // Adjust palette
+                                self.$searchContainer.addClass('hidden');
+                                self.$container.velocity({ width: '80%' }, 400);
+
+                                // Show HTML
+                                self.$commandsContainer.html(response.result);
+                                Craft.appendHeadHtml(response.headHtml);
+                                Craft.appendFootHtml(response.footHtml);
+                                Craft.initUiElements(self.$commandsContainer);
+                            }
                         }
-                        // Reset palette
-                        self.commandsArray = [];
-                        self.$commandsContainer.html('');
-                        // Display text in search field
-                        self.$searchField.val(response.isAction.searchText);
-                        self.$searchField.focus();
-                    }
-                    else if (response.isNewSet) {
-                        // It is a command that loads a new set of commands, but did we get any?
-                        if (response.result == '') {
-                            self.$commands.show(); // Show current commands again
-                        } else {
-                            // Remember current commands
+                        else if (isElementSearch && response.isNewSet) {
+                            // Display combined commands
+                            self.loadingElements = false;
+                            self.elementCommandsArray = response.result;
+                            self.combinedCommandsArray = self.commandsArray.concat(self.elementCommandsArray);
+                            self.search(undefined, false, true);
+                        }
+                        else if (self.isAction && self.isActionRealtime && response.isNewSet) {
+                            // Display new commands
+                            self.commandsArray = response.result;
+                            self.search(undefined, true, false);
+                        }
+                        else if (response.isAction) {
+                            // Executed function
+                            self.loadingCommand = response.isAction.tabs;
+
+                            // Remember current commands and action information
                             self.rememberCommands();
-                            // Display executed command above search field
-                            self.$tabsContainer.text(self.loadingCommand);
+                            self.isAction = true;
+                            self.isActionAsync = response.isAction.async;
+                            self.isActionRealtime = response.isAction.realtime;
+                            self.actionData = response.isAction;
+
+                            // Display text
+                            self.$tabsContainer.text(response.isAction.tabs);
                             self.$tabsContainer.removeClass('hidden');
+
+                            // Reset palette
+                            self.commandsArray = [];
+                            self.$commandsContainer.html('');
+                            self.$commandsContainer.addClass('hidden');
+
+                            // Display text in search field
+                            self.$searchField.val(response.isAction.searchText);
+                            self.$searchField.focus();
+                        }
+                        else if (response.isNewSet) {
+                            // It is a command that loads a new set of commands, but did we get any?
+                            if (response.result == '') {
+                                self.$commands.show(); // Show current commands again
+                            }
+                            else {
+                                // Remember current commands
+                                self.rememberCommands();
+
+                                // Display executed command above search field
+                                self.$tabsContainer.text(self.loadingCommand);
+                                self.$tabsContainer.removeClass('hidden');
+
+                                // Reset focus
+                                self.$searchField.val('');
+                                self.$searchField.focus();
+
+                                // Display new commands
+                                self.commandsArray = response.result;
+                                self.search(undefined, false, false);
+                            }
+                        }
+                        else if (response.deleteCommand) {
                             // Reset focus
                             self.$searchField.val('');
                             self.$searchField.focus();
-                            // Display new commands
-                            self.commandsArray = response.result;
-                            self.search(undefined, true);
+                            self.$commands.removeClass('focus');
+
+                            // We delete the current command, and keep the command palette open
+                            self.deleteCommand($current.data('id'));
+                            self.search(undefined, true, false);
+                            self.$commands.show();
+
+                            // Close the command palette if all commands are hidden
+                            if (self.commandsArray.length <= 0) {
+                                self.displayMessage(false, Craft.t('command', 'There are no more commands available.'), false);
+                                self.closePalette();
+                            }
                         }
-                    }
-                    else if (response.deleteCommand)
-                    {
-                        // Reset focus
-                        self.$searchField.val('');
-                        self.$searchField.focus();
-                        self.$commands.removeClass('focus');
-                        // We delete the current command, and keep the command palette open
-                        self.deleteCommand($current.data('id'));
-                        self.search(undefined, true);
-                        self.$commands.show();
-                        // Close the command palette if all commands are hidden
-                        if (self.commandsArray.length <= 0) {
-                            self.displayMessage(false, Craft.t('command', 'There are no more commands available.'), false);
+                        else {
+                            // Command was executed, nothing special happened afterwards
+                            displayDefaultMessage = true;
                             self.closePalette();
                         }
-                    } else {
-                        // Command was executed, nothing special happened afterwards
-                        displayDefaultMessage = true;
-                        self.closePalette();
-                    }
-                    // Show message
-                    if (response.message) {
-                        self.displayMessage((response.result != ''), response.message, false);
-                    }
-                    else if (displayDefaultMessage) {
-                        self.displayMessage(true, false, $current.children('.command__commands--name').text());
-                    }
-                    // Redirect?
-                    if (response.redirect) {
-                        if (response.redirect.newWindow) {
-                            window.open(response.redirect.url);
-                        } else {
-                            window.location = response.redirect.url;
+
+                        // Show message
+                        if (response.message) {
+                            self.displayMessage((response.result != ''), response.message, false);
+                        }
+                        else if (displayDefaultMessage) {
+                            self.displayMessage(true, false, $current.children('.command__commands--name').text());
+                        }
+
+                        // Redirect?
+                        if (response.redirect) {
+                            if (response.redirect.newWindow) {
+                                window.open(response.redirect.url);
+                            }
+                            else {
+                                window.location = response.redirect.url;
+                            }
                         }
                     }
-                } else {
-                    // Delete current commands if realtime action
-                    if (self.isAction && self.isActionRealtime) {
-                        self.commandsArray = [];
-                        self.$commandsContainer.html('');
+                    else {
+                        // Delete current commands if realtime action
+                        if (self.isAction && self.isActionRealtime) {
+                            self.commandsArray = [];
+                            self.$commandsContainer.html('');
+                            self.$commandsContainer.addClass('hidden');
+                        }
+
+                        // Show current commands again and display a message
+                        self.$commands.show();
+                        self.$searchField.focus();
+                        if (! isElementSearch) {
+                            self.displayMessage(false, response.message, false);
+                        }
                     }
-                    // Show current commands again and display a message
-                    self.$commands.show();
-                    self.$searchField.focus();
-                    self.displayMessage(false, response.message, false);
                 }
-            }
-        }, self), {async: self.isActionAsync});
+            }, self), {
+                async: self.isActionAsync,
+                complete: function(jqXHR, textStatus) {
+                    // Overwrite complete in craft.js
+                }
+            });
+        }
     },
 
     /**
@@ -629,7 +765,7 @@ Craft.Command = Garnish.Base.extend(
         var self = this,
             len = self.commandsArray.length;
 
-        if (!len) {
+        if (! len) {
             return;
         }
         while (index < len) {

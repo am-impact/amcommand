@@ -1,11 +1,10 @@
 <?php
 /**
- * Command plugin for Craft CMS 3.x
+ * Command palette for Craft.
  *
- * Command palette in Craft; Because you can
- *
- * @link      http://www.am-impact.nl
+ * @author    a&m impact
  * @copyright Copyright (c) 2017 a&m impact
+ * @link      http://www.am-impact.nl
  */
 
 namespace amimpact\command\services;
@@ -14,6 +13,7 @@ use amimpact\command\Command;
 
 use Craft;
 use craft\base\Component;
+use craft\helpers\App;
 
 class Utilities extends Component
 {
@@ -44,8 +44,11 @@ class Utilities extends Component
     public function clearCaches()
     {
         // Max power please!
-        Craft::$app->getConfig()->maxPowerCaptain();
+        App::maxPowerCaptain();
 
-        return Craft::$app->getTemplateCaches()->deleteAllCaches();
+        // Delete cache!
+        Craft::$app->getTemplateCaches()->deleteAllCaches();
+
+        return true;
     }
 }

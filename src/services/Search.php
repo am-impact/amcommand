@@ -1,11 +1,10 @@
 <?php
 /**
- * Command plugin for Craft CMS 3.x
+ * Command palette for Craft.
  *
- * Command palette in Craft; Because you can
- *
- * @link      http://www.am-impact.nl
+ * @author    a&m impact
  * @copyright Copyright (c) 2017 a&m impact
+ * @link      http://www.am-impact.nl
  */
 
 namespace amimpact\command\services;
@@ -14,9 +13,10 @@ use amimpact\command\Command;
 
 use Craft;
 use craft\base\Component;
-use craft\elements\Category;
-use craft\elements\Entry;
 use craft\elements\User;
+use craft\elements\Entry;
+use craft\elements\Category;
+use craft\elements\GlobalSet;
 
 class Search extends Component
 {
@@ -41,33 +41,20 @@ class Search extends Component
     }
 
     /**
-     * Get the search option action for Craft Categories.
+     * Get the search option action for an Element Type.
+     *
+     * @param array $variables
      *
      * @return bool
      */
-    public function searchOptionCategories()
+    public function searchOptionElementType($variables)
     {
-        return $this->_setRealtimeAction('Categories');
-    }
+        // Do we have the required information?
+        if (! isset($variables['elementType'])) {
+            return false;
+        }
 
-    /**
-     * Get the search option action for Craft Entries.
-     *
-     * @return bool
-     */
-    public function searchOptionEntries()
-    {
-        return $this->_setRealtimeAction('Entries');
-    }
-
-    /**
-     * Get the search option action for Craft Users.
-     *
-     * @return bool
-     */
-    public function searchOptionUsers()
-    {
-        return $this->_setRealtimeAction('Users');
+        return $this->_setRealtimeAction($variables['elementType']);
     }
 
     /**
@@ -80,7 +67,7 @@ class Search extends Component
     public function searchOn($variables)
     {
         // Do we have the required information?
-        if (! isset($variables['searchText'])) {
+        if (! isset($variables['searchText']) || ! isset($variables['option'])) {
             return false;
         }
 
@@ -96,20 +83,33 @@ class Search extends Component
             case 'Craft':
                 Command::$plugin->general->setReturnUrl('https://craftcms.com/search?q=' . $searchCriteria, true);
                 break;
+
             case 'StackExchange':
                 Command::$plugin->general->setReturnUrl('http://craftcms.stackexchange.com/search?q=' . $searchCriteria, true);
                 break;
-            case 'Categories':
-                return $this->_searchForElement(Category::class, $searchCriteria);
+
+            case 'DirectElements':
+                // Gather elements
+                $elements = [];
+
+                // Start element searches
+                $plugin = Craft::$app->plugins->getPlugin('command');
+                if ($plugin) {
+                    $pluginSettings = $plugin->getSettings();
+                    if (is_array($pluginSettings->elementSearchElementTypes)) {
+                        foreach ($pluginSettings->elementSearchElementTypes as $elementType => $submittedInfo) {
+                            if (isset($submittedInfo['enabled']) && $submittedInfo['enabled'] === '1') {
+                                $elements = array_merge($elements, $this->_searchForElementType($elementType, $searchCriteria, true));
+                            }
+                        }
+                    }
+                }
+
+                return $elements;
                 break;
-            case 'Entries':
-                return $this->_searchForElement(Entry::class, $searchCriteria);
-                break;
-            case 'Users':
-                return $this->_searchForElement(User::class, $searchCriteria);
-                break;
+
             default:
-                return false;
+                return $this->_searchForElementType($variables['option'], $searchCriteria);
                 break;
         }
 
@@ -125,11 +125,13 @@ class Search extends Component
      */
     private function _setAction($searchOption)
     {
+        // Start action
         $variables = [
             'option' => $searchOption
         ];
+        Command::$plugin->general->setReturnAction(Craft::t('command', 'Search on {option}', ['option' => Craft::t('app', $searchOption)]), '', 'searchOn', 'search', $variables, false);
 
-        return Command::$plugin->general->setReturnAction(Craft::t('command', 'Search on {option}', ['option' => Craft::t('app', $searchOption)]), '', 'searchOn', 'search', $variables, false);
+        return true;
     }
 
     /**
@@ -141,11 +143,16 @@ class Search extends Component
      */
     private function _setRealtimeAction($searchOption)
     {
+        // Get the element type info
+        $actualElementType = Craft::$app->elements->getElementTypeByRefHandle($searchOption);
+
+        // Start action
         $variables = [
             'option' => $searchOption
         ];
+        Command::$plugin->general->setReturnAction(Craft::t('command', 'Search for {option}', ['option' => $actualElementType->displayName()]), '', 'searchOn', 'search', $variables, true, true);
 
-        return Command::$plugin->general->setReturnAction(Craft::t('command', 'Search for {option}', ['option' => Craft::t('app', $searchOption)]), '', 'searchOn', 'search', $variables, true, true);
+        return true;
     }
 
     /**
@@ -153,48 +160,98 @@ class Search extends Component
      *
      * @param string $elementType
      * @param string $searchCriteria
+     * @param bool   $addElementTypeInfo [Optional] Whether to display the element type.
      *
      * @return array
      */
-    private function _searchForElement($elementType, $searchCriteria)
+    private function _searchForElementType($elementType, $searchCriteria, $addElementTypeInfo = false)
     {
+        // Gather commands
+        $commands = [];
+
+        // Optional icons
+        $elementTypeIcons = [
+            User::class => [
+                'type' => 'font',
+                'content' => 'users',
+            ],
+            Entry::class => [
+                'type' => 'font',
+                'content' => 'section',
+            ],
+            Category::class => [
+                'type' => 'font',
+                'content' => 'categories',
+            ],
+            GlobalSet::class => [
+                'type' => 'font',
+                'content' => 'globe',
+            ],
+        ];
+        $elementTypeParts = explode('_', $elementType);
+        if (isset($elementTypeParts[0])) {
+            // TODO: Fix!
+            // // Do we have a plugin for this Element Type?
+            // $lcHandle = StringHelper::toLowerCase($elementTypeParts[0]);
+            // $plugin = Craft::$app->plugins->getPlugin($lcHandle);
+            // if ($plugin) {
+            // Try getPluginIconSvg from plugin service
+            // }
+        }
+
         // Get elements
-        $elements = $elementType::find()
+        $actualElementType = Craft::$app->elements->getElementTypeByRefHandle($elementType);
+        $elements = $actualElementType::find()
             ->search('*' . $searchCriteria . '*')
             ->status(null)
             ->orderBy('score')
             ->limit(null);
 
-        // Gather commands based on the element type
-        $commands = [];
         foreach ($elements as $element) {
             switch ($elementType) {
-                case User::class:
+                case User::refHandle():
                     $userInfo = [];
-                    if ($element->firstName) {
-                        $userInfo[] = $element->firstName;
-                    }
-                    if ($element->lastName) {
-                        $userInfo[] = $element->lastName;
+                    if (($fullName = $element->getFullName()) !== '') {
+                        $userInfo[] = $fullName;
                     }
                     $userInfo[] = $element->email;
 
-                    $commands[] = [
+                    $command = [
                         'name' => $element->username,
-                        'info' => implode(' - ', $userInfo),
-                        'url'  => $element->getCpEditUrl()
+                        'info' => ($addElementTypeInfo ? $actualElementType::displayName() . ' | ' : '') . implode(' - ', $userInfo),
+                        'url'  => $element->getCpEditUrl(),
                     ];
                     break;
 
                 default:
-                    $commands[] = [
-                        'name' => $element->title,
-                        'info' => Craft::t('app', 'URI') . ': ' . $element->uri,
-                        'url'  => $element->getCpEditUrl()
+                    $command = [
+                        'name' => $element->__toString(),
+                        'info' => ($addElementTypeInfo ? $actualElementType::displayName() . ' | ' : '') . Craft::t('app', 'URI') . ': ' . $element->uri,
+                        'url'  => $element->getCpEditUrl(),
                     ];
                     break;
             }
+
+            // Is there an icon available?
+            if (isset($elementTypeIcons[$elementType])) {
+                $command['icon'] = $elementTypeIcons[$elementType];
+            }
+
+            // Are the keywords available in the command?
+            $addSearchCriteria = false;
+            foreach (str_split($searchCriteria) as $char) {
+                if (stripos($command['name'], $char) === false) {
+                    $addSearchCriteria = true;
+                    break;
+                }
+            }
+            if ($addSearchCriteria) {
+                $command['name'] .= ' {' . $searchCriteria . '}';
+            }
+
+            $commands[] = $command;
         }
+
         return $commands;
     }
 }

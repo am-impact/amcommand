@@ -1,11 +1,10 @@
 <?php
 /**
- * Command plugin for Craft CMS 3.x
+ * Command palette for Craft.
  *
- * Command palette in Craft; Because you can
- *
- * @link      http://www.am-impact.nl
+ * @author    a&m impact
  * @copyright Copyright (c) 2017 a&m impact
+ * @link      http://www.am-impact.nl
  */
 
 namespace amimpact\command\services;
@@ -81,6 +80,30 @@ class Settings extends Component
                 'name' => $group->name,
                 'url'  => UrlHelper::cpUrl('settings/fields/new?groupId=' . $group->id)
             ];
+        }
+
+        return $commands;
+    }
+
+    /**
+     * Get fields to edit.
+     *
+     * @return array
+     */
+    public function editFields()
+    {
+        // Gather commands
+        $commands = [];
+
+        // Find fields
+        $fields = Craft::$app->fields->getAllFields();
+        if ($fields) {
+            foreach ($fields as $field) {
+                $commands[] = [
+                    'name' => $field->name,
+                    'url'  => UrlHelper::cpUrl('settings/fields/edit/' . $field->id),
+                ];
+            }
         }
 
         return $commands;
