@@ -53,7 +53,7 @@ class Command extends Plugin
         ]);
 
         // We only want to see the command palette in the backend, and want to initiate it once
-        if (Craft::$app->getRequest()->getIsCpRequest() && ! Craft::$app->getUser()->getIsGuest() && ! Craft::$app->getRequest()->getAcceptsJson()) {
+        if (! Craft::$app->getRequest()->getIsConsoleRequest() && Craft::$app->getRequest()->getIsCpRequest() && ! Craft::$app->getUser()->getIsGuest() && ! Craft::$app->getRequest()->getAcceptsJson()) {
             // Load resources
             Craft::$app->view->registerAssetBundle(CommandBundle::class);
             Craft::$app->view->registerTranslations('command', [
