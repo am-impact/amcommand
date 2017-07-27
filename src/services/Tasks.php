@@ -82,7 +82,7 @@ class Tasks extends Component
         $commands = [];
 
         // Find tasks
-        $tasks = Craft::$app->tasks->getAllTasks();
+        $tasks = Craft::$app->getTasks()->getAllTasks();
         if (! $tasks) {
             Command::$plugin->general->setReturnMessage(Craft::t('command', 'There are no tasks at the moment.'));
         }
@@ -115,7 +115,7 @@ class Tasks extends Component
 
         // Find task types
         $taskTypes = [];
-        $tasks = Craft::$app->tasks->getAllTasks();
+        $tasks = Craft::$app->getTasks()->getAllTasks();
         if (! $tasks) {
             Command::$plugin->general->setReturnMessage(Craft::t('command', 'There are no tasks at the moment.'));
         }
@@ -154,7 +154,7 @@ class Tasks extends Component
         }
 
         // Delete task!
-        $result = Craft::$app->tasks->deleteTaskById($variables['taskId']);
+        $result = Craft::$app->getTasks()->deleteTaskById($variables['taskId']);
         if ($result === true) {
             Command::$plugin->general->deleteCurrentCommand();
             Command::$plugin->general->setReturnMessage(Craft::t('command', 'Task deleted.'));
@@ -173,10 +173,11 @@ class Tasks extends Component
      */
     public function deleteAllTasks()
     {
-        $tasks = Craft::$app->tasks->getAllTasks();
+        $tasksService = Craft::$app->getTasks();
+        $tasks = $tasksService->getAllTasks();
         if ($tasks) {
             foreach ($tasks as $task) {
-                Craft::$app->tasks->deleteTaskById($task->id);
+                $tasksService->deleteTaskById($task->id);
             }
         }
 
@@ -197,8 +198,9 @@ class Tasks extends Component
             ->all();
 
         if ($tasks) {
+            $tasksService = Craft::$app->getTasks();
             foreach ($tasks as $task) {
-                Craft::$app->tasks->deleteTaskById($task['id']);
+                $tasksService->deleteTaskById($task['id']);
             }
         }
 
@@ -227,8 +229,9 @@ class Tasks extends Component
             ->all();
 
         if ($tasks) {
+            $tasksService = Craft::$app->getTasks();
             foreach ($tasks as $task) {
-                Craft::$app->tasks->deleteTaskById($task['id']);
+                $tasksService->deleteTaskById($task['id']);
             }
         }
 
@@ -242,10 +245,11 @@ class Tasks extends Component
      */
     public function deletePendingTasks()
     {
-        $tasks = Craft::$app->tasks->getPendingTasks();
+        $tasksService = Craft::$app->getTasks();
+        $tasks = $tasksService->getPendingTasks();
         if ($tasks) {
             foreach ($tasks as $task) {
-                Craft::$app->tasks->deleteTaskById($task->id);
+                $tasksService->deleteTaskById($task->id);
             }
         }
 
@@ -259,12 +263,12 @@ class Tasks extends Component
      */
     public function deleteRunningTask()
     {
-        $task = Craft::$app->tasks->getRunningTask();
+        $task = Craft::$app->getTasks()->getRunningTask();
         if (! $task) {
             Command::$plugin->general->setReturnMessage(Craft::t('command', 'There is no running task at the moment.'));
         }
         else {
-            if (Craft::$app->tasks->deleteTaskById($task->id) === true) {
+            if (Craft::$app->getTasks()->deleteTaskById($task->id) === true) {
                 return true;
             }
         }
@@ -279,11 +283,12 @@ class Tasks extends Component
      */
     public function restartFailedTasks()
     {
-        $tasks = Craft::$app->tasks->getAllTasks();
+        $tasksService = Craft::$app->getTasks();
+        $tasks = $tasksService->getAllTasks();
         if ($tasks) {
             foreach ($tasks as $task) {
                 if ($task->status == Task::STATUS_ERROR) {
-                    Craft::$app->tasks->rerunTaskById($task->id);
+                    $tasksService->rerunTaskById($task->id);
                 }
             }
         }

@@ -25,11 +25,15 @@ class CommandsController extends Controller
         $this->requirePostRequest();
         $this->requireAcceptsJson();
 
+        // Get services
+        $viewService = Craft::$app->getView();
+        $requestService = Craft::$app->getRequest();
+
         // Get POST data and trigger the command
-        $command  = Craft::$app->request->getBodyParam('command', false);
-        $plugin   = Craft::$app->request->getBodyParam('plugin', false);
-        $service  = Craft::$app->request->getBodyParam('service', false);
-        $vars     = Craft::$app->request->getBodyParam('vars', false);
+        $command  = $requestService->getBodyParam('command', false);
+        $plugin   = $requestService->getBodyParam('plugin', false);
+        $service  = $requestService->getBodyParam('service', false);
+        $vars     = $requestService->getBodyParam('vars', false);
         $result   = Command::$plugin->general->triggerCommand($command, $plugin, $service, $vars);
         $title    = Command::$plugin->general->getReturnTitle();
         $message  = Command::$plugin->general->getReturnMessage();
@@ -60,8 +64,8 @@ class CommandsController extends Controller
                 'isNewSet'      => !is_bool($result),
                 'isAction'      => $action,
                 'isHtml'        => Command::$plugin->general->getReturnHtml(),
-                'headHtml'      => Craft::$app->view->getHeadHtml(),
-                'footHtml'      => Craft::$app->view->getBodyHtml(),
+                'headHtml'      => $viewService->getHeadHtml(),
+                'footHtml'      => $viewService->getBodyHtml(),
                 'deleteCommand' => $delete
             ]);
         }

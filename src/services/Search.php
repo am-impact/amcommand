@@ -93,7 +93,7 @@ class Search extends Component
                 $elements = [];
 
                 // Start element searches
-                $plugin = Craft::$app->plugins->getPlugin('command');
+                $plugin = Craft::$app->getPlugins()->getPlugin('command');
                 if ($plugin) {
                     $pluginSettings = $plugin->getSettings();
                     if (is_array($pluginSettings->elementSearchElementTypes)) {
@@ -144,7 +144,7 @@ class Search extends Component
     private function _setRealtimeAction($searchOption)
     {
         // Get the element type info
-        $actualElementType = Craft::$app->elements->getElementTypeByRefHandle($searchOption);
+        $actualElementType = Craft::$app->getElements()->getElementTypeByRefHandle($searchOption);
 
         // Start action
         $variables = [
@@ -193,14 +193,14 @@ class Search extends Component
             // TODO: Fix!
             // // Do we have a plugin for this Element Type?
             // $lcHandle = StringHelper::toLowerCase($elementTypeParts[0]);
-            // $plugin = Craft::$app->plugins->getPlugin($lcHandle);
+            // $plugin = Craft::$app->getPlugins()->getPlugin($lcHandle);
             // if ($plugin) {
             // Try getPluginIconSvg from plugin service
             // }
         }
 
         // Get elements
-        $actualElementType = Craft::$app->elements->getElementTypeByRefHandle($elementType);
+        $actualElementType = Craft::$app->getElements()->getElementTypeByRefHandle($elementType);
         $elements = $actualElementType::find()
             ->search('*' . $searchCriteria . '*')
             ->status(null)

@@ -114,7 +114,7 @@ class Settings extends Model
         }
 
         // Find supported element types for element search, based on all element types
-        $elementTypes = Craft::$app->elements->getAllElementTypes();
+        $elementTypes = Craft::$app->getElements()->getAllElementTypes();
         foreach ($elementTypes as $elementType) {
             $refHandle = $elementType::refHandle();
             if (! isset($elementSearchElementTypes[$refHandle])) {

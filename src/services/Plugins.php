@@ -28,7 +28,7 @@ class Plugins extends Component
         $commands = [];
 
         // Get plugins with their settings URL
-        $enabledPlugins = Craft::$app->plugins->getAllPlugins();
+        $enabledPlugins = Craft::$app->getPlugins()->getAllPlugins();
         if ($enabledPlugins) {
             foreach ($enabledPlugins as $enabledPlugin) {
                 if ($enabledPlugin->hasCpSettings) {

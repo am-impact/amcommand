@@ -53,18 +53,20 @@ class Command extends Plugin
         ]);
 
         // We only want to see the command palette in the backend, and want to initiate it once
-        if (! Craft::$app->getRequest()->getIsConsoleRequest() && Craft::$app->getRequest()->getIsCpRequest() && ! Craft::$app->getUser()->getIsGuest() && ! Craft::$app->getRequest()->getAcceptsJson()) {
+        $requestService = Craft::$app->getRequest();
+        if (! $requestService->getIsConsoleRequest() && $requestService->getIsCpRequest() && ! $requestService->getAcceptsJson() && ! Craft::$app->getUser()->getIsGuest()) {
             // Load resources
-            Craft::$app->view->registerAssetBundle(CommandBundle::class);
-            Craft::$app->view->registerTranslations('command', [
+            $viewService = Craft::$app->getView();
+            $viewService->registerAssetBundle(CommandBundle::class);
+            $viewService->registerTranslations('command', [
                 'Command executed',
                 'Are you sure you want to execute this command?',
                 'There are no more commands available.'
             ]);
 
             // Load palette
-            Event::on(View::class, View::EVENT_END_BODY, function(Event $event) {
-                echo Craft::$app->view->renderTemplate('command/palette', [
+            Event::on(View::class, View::EVENT_END_BODY, function(Event $event) use ($viewService) {
+                echo $viewService->renderTemplate('command/palette', [
                     'commands' => Command::$plugin->general->getCommands($this->getSettings()),
                 ]);
             });
@@ -92,7 +94,7 @@ class Command extends Plugin
         // Settings
         $settings = $this->getSettings();
 
-        return Craft::$app->view->renderTemplate('command/settings', [
+        return Craft::$app->getView()->renderTemplate('command/settings', [
             'settings' => $settings,
             'themes' => $settings->getThemes(),
             'elementSearchElementTypes' => $settings->getElementSearchElementTypes(),

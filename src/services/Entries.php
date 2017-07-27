@@ -30,7 +30,7 @@ class Entries extends Component
         $commands = [];
 
         // Find available sections
-        $availableSections = Craft::$app->sections->getEditableSections();
+        $availableSections = Craft::$app->getSections()->getEditableSections();
         foreach ($availableSections as $section) {
             if ($section->type != Section::TYPE_SINGLE) {
                 $commands[] = [
@@ -54,7 +54,7 @@ class Entries extends Component
         $commands = [];
 
         // Find available sections
-        $availableSections = Craft::$app->sections->getEditableSections();
+        $availableSections = Craft::$app->getSections()->getEditableSections();
         foreach ($availableSections as $section) {
             $type = ucfirst(Craft::t('app', ucfirst($section->type)));
             if ($section->type != Section::TYPE_SINGLE) {
@@ -156,7 +156,7 @@ class Entries extends Component
 
         // Create new list of commands
         $commands = [];
-        $availableSections = Craft::$app->sections->getEditableSections();
+        $availableSections = Craft::$app->getSections()->getEditableSections();
         foreach ($availableSections as $section) {
             if ($section->type != Section::TYPE_SINGLE) {
                 // Get total entries
@@ -218,8 +218,9 @@ class Entries extends Component
         if ($deleteAll) {
             // Delete all entries
             $success = false;
+            $elementsService = Craft::$app->getElements();
             foreach ($entries as $entry) {
-                if (Craft::$app->elements->deleteElementById($entry->id)) {
+                if ($elementsService->deleteElementById($entry->id)) {
                     $success = true;
                 }
             }
@@ -272,7 +273,7 @@ class Entries extends Component
         }
 
         // Delete entry!
-        $success = Craft::$app->elements->deleteElementById($variables['entryId']);
+        $success = Craft::$app->getElements()->deleteElementById($variables['entryId']);
         if ($success) {
             Command::$plugin->general->deleteCurrentCommand();
             Command::$plugin->general->setReturnMessage(Craft::t('app', 'Entry deleted.'));

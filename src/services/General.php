@@ -77,7 +77,7 @@ class General extends Component
         // Trigger a callback?
         if ($pluginHandle !== false && $pluginHandle !== 'false' && $service !== false && $pluginHandle != 'command') {
             // Trigger a plugin's callback
-            $actualPlugin = Craft::$app->plugins->getPlugin($pluginHandle);
+            $actualPlugin = Craft::$app->getPlugins()->getPlugin($pluginHandle);
             if (! $actualPlugin) {
                 return false;
             }
@@ -310,7 +310,7 @@ class General extends Component
     private function _getContentCommands($currentCommands)
     {
         // New, edit and delete commands
-        if (Craft::$app->getUser()->getIsAdmin() || Craft::$app->sections->getTotalEditableSections() > 0) {
+        if (Craft::$app->getUser()->getIsAdmin() || Craft::$app->getSections()->getTotalEditableSections() > 0) {
             $currentCommands[] = [
                 'name'    => Craft::t('app', 'Content') . ': ' . Craft::t('app', 'New entry'),
                 'info'    => Craft::t('command', 'Create a new entry in one of the available sections.'),
@@ -376,7 +376,7 @@ class General extends Component
      */
     private function _getGlobalCommands($currentCommands)
     {
-        if (Craft::$app->getUser()->getIsAdmin() || Craft::$app->globals->getTotalEditableSets() > 0) {
+        if (Craft::$app->getUser()->getIsAdmin() || Craft::$app->getGlobals()->getTotalEditableSets() > 0) {
             $currentCommands[] = [
                 'name'    => Craft::t('app', 'Globals') . ': ' . Craft::t('app', 'Edit'),
                 'more'    => true,
@@ -503,7 +503,7 @@ class General extends Component
         if (is_array($this->_settings->elementSearchElementTypes)) {
             foreach ($this->_settings->elementSearchElementTypes as $elementType => $submittedInfo) {
                 if (isset($submittedInfo['enabled']) && $submittedInfo['enabled'] === '1') {
-                    $actualElementType = Craft::$app->elements->getElementTypeByRefHandle($elementType);
+                    $actualElementType = Craft::$app->getElements()->getElementTypeByRefHandle($elementType);
                     $currentCommands[] = [
                         'name'    => Craft::t('command', 'Search for {option}', ['option' => $actualElementType::displayName()]),
                         'more'    => true,

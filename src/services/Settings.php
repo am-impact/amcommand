@@ -74,7 +74,7 @@ class Settings extends Component
         $commands = [];
 
         // Find available field groups
-        $groups = Craft::$app->fields->getAllGroups();
+        $groups = Craft::$app->getFields()->getAllGroups();
         foreach ($groups as $group) {
             $commands[] = [
                 'name' => $group->name,
@@ -96,7 +96,7 @@ class Settings extends Component
         $commands = [];
 
         // Find fields
-        $fields = Craft::$app->fields->getAllFields();
+        $fields = Craft::$app->getFields()->getAllFields();
         if ($fields) {
             foreach ($fields as $field) {
                 $commands[] = [
@@ -120,7 +120,7 @@ class Settings extends Component
         $commands = [];
 
         // Find available sections
-        $sections = Craft::$app->sections->getAllSections();
+        $sections = Craft::$app->getSections()->getAllSections();
         foreach ($sections as $section) {
             $commands[] = [
                 'name' => $section->name,
@@ -142,7 +142,7 @@ class Settings extends Component
         $commands = [];
 
         // Find available sections
-        $sections = Craft::$app->sections->getAllSections();
+        $sections = Craft::$app->getSections()->getAllSections();
         foreach ($sections as $section) {
             $entryTypes      = $section->getEntryTypes();
             $totalEntryTypes = count($entryTypes);

@@ -105,7 +105,7 @@ class Users extends Component
         }
 
         // Delete user!
-        $success = Craft::$app->elements->deleteElementById($variables['userId']);
+        $success = Craft::$app->getElements()->deleteElementById($variables['userId']);
         if ($success) {
             Command::$plugin->general->deleteCurrentCommand();
             Command::$plugin->general->setReturnMessage(Craft::t('app', 'User deleted.'));
