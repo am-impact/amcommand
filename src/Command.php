@@ -67,7 +67,7 @@ class Command extends Plugin
             // Load palette
             Event::on(View::class, View::EVENT_END_BODY, function(Event $event) use ($viewService) {
                 echo $viewService->renderTemplate('command/palette', [
-                    'commands' => Command::$plugin->general->getCommands($this->getSettings()),
+                    'commands' => $this->general->getCommands($this->getSettings()),
                 ]);
             });
         }
