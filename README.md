@@ -73,24 +73,26 @@ use yii\base\Event;
 
 Add this to the init function of your main plugin file:
 ```php
-Event::on(General::class, General::EVENT_REGISTER_COMMANDS, function(RegisterCommandsEvent $event) {
-    $event->commands[] = [
-        'name' => 'Search on Google',
-        'type' => 'Custom',
-        'url'  => 'http://www.google.nl',
-        'icon' => [
-            'type' => 'font',
-            'content' => 'plugin'
-        ]
-    ];
-    $event->commands[] = [
-        'name' => 'My own plugin function in a service',
-        'type' => 'Custom',
-        'call' => 'yourPluginFunctionName',
-        'plugin' => 'your-plugin-handle',
-        'service' => 'yourPluginServiceName'
-    ];
-});
+if (class_exists(General::class)) {
+    Event::on(General::class, General::EVENT_REGISTER_COMMANDS, function(RegisterCommandsEvent $event) {
+        $event->commands[] = [
+            'name' => 'Search on Google',
+            'type' => 'Custom',
+            'url'  => 'http://www.google.nl',
+            'icon' => [
+                'type' => 'font',
+                'content' => 'plugin'
+            ]
+        ];
+        $event->commands[] = [
+            'name' => 'My own plugin function in a service',
+            'type' => 'Custom',
+            'call' => 'yourPluginFunctionName',
+            'plugin' => 'your-plugin-handle',
+            'service' => 'yourPluginServiceName'
+        ];
+    });
+}
 ```
 
 That's it! The command palette will add these two commands.
