@@ -18,7 +18,7 @@ Craft.Palette = Garnish.Base.extend(
     $commandsContainer: $('.palette__commands ul'),
     $loader:            $('.palette__loader'),
     $commands:          $('.palette__commands li'),
-    $button:            $('#nav-command'),
+    $button:            $('#nav-command-palette'),
 
     // Keys
     P_KEY:            80,
