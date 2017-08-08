@@ -2,6 +2,24 @@
 
 _Command palette in Craft._
 
+## Requirements
+
+This plugin requires Craft CMS 3.0.0-beta.20 or later.
+
+## Installation
+
+To install the plugin, follow these instructions.
+
+1. Open your terminal and go to your Craft project:
+
+        cd /path/to/project
+
+2. Then tell Composer to load the plugin:
+
+        composer require am-impact/amcommand dev-craft3
+
+3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Command Palette.
+
 ## Functionality
 
 If you have ever used Alfred, you know you'll be zipping through the control panel in no time!
