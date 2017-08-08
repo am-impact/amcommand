@@ -99,7 +99,7 @@ Craft.Palette = Garnish.Base.extend(
                             'option': 'DirectElements',
                             'searchText': self.$searchField.val()
                         };
-                        self.triggerCallback('searchOn', 'search', variables, true);
+                        self.triggerCallback('searchOn', 'command-palette', 'search', variables, true);
                     }, this), 600);
                 }
             }
@@ -472,7 +472,7 @@ Craft.Palette = Garnish.Base.extend(
         variables['searchText'] = self.$searchField.val();
 
         // Trigger action
-        self.triggerCallback(self.actionData.call, self.actionData.service, variables, false);
+        self.triggerCallback(self.actionData.call, self.actionData.plugin, self.actionData.service, variables, false);
     },
 
     /**
@@ -490,7 +490,7 @@ Craft.Palette = Garnish.Base.extend(
                 variables['searchText'] = self.$searchField.val();
 
                 // Trigger action
-                self.triggerCallback(self.actionData.call, self.actionData.service, variables, false);
+                self.triggerCallback(self.actionData.call, self.actionData.plugin, self.actionData.service, variables, false);
             }
             else {
                 if (ev.type == 'click') {
@@ -520,6 +520,7 @@ Craft.Palette = Garnish.Base.extend(
                             warn            = ('warn' in commandData) ? commandData.warn : false,
                             url             = ('url' in commandData) ? commandData.url : false,
                             callback        = ('call' in commandData) ? commandData.call : false,
+                            callbackPlugin  = ('plugin' in commandData) ? commandData.plugin : false,
                             callbackService = ('service' in commandData) ? commandData.service : false,
                             callbackVars    = ('vars' in commandData) ? commandData.vars : false;
 
@@ -536,7 +537,7 @@ Craft.Palette = Garnish.Base.extend(
                         // Can we execute the command?
                         if (confirmed) {
                             if (callback) {
-                                self.triggerCallback(callback, callbackService, callbackVars, false);
+                                self.triggerCallback(callback, callbackPlugin, callbackService, callbackVars, false);
                             }
                             else if (url) {
                                 // Open the URL in a new window if the CTRL or Command key was pressed
@@ -561,11 +562,12 @@ Craft.Palette = Garnish.Base.extend(
      * Trigger a command callback function rather than navigating to it.
      *
      * @param string name            Callback function.
+     * @param string plugin          Which plugin should be used.
      * @param string service         Which service should be triggered.
      * @param string vars            JSON string with optional variables.
      * @param bool   isElementSearch Whether this is a element search call.
      */
-    triggerCallback: function(name, service, vars, isElementSearch) {
+    triggerCallback: function(name, plugin, service, vars, isElementSearch) {
         var self = this,
             allowRequest = false,
             displayDefaultMessage = false,
@@ -595,7 +597,7 @@ Craft.Palette = Garnish.Base.extend(
                 self.loadingElements = true;
             }
 
-            self.loadingRequest = Craft.postActionRequest('command-palette/commands/trigger-command', { command: name, service: service, vars: vars }, $.proxy(function (response, textStatus) {
+            self.loadingRequest = Craft.postActionRequest('command-palette/commands/trigger-command', { command: name, plugin: plugin, service: service, vars: vars }, $.proxy(function (response, textStatus) {
                 self.loadingRequest = false;
                 if (textStatus == 'success') {
                     self.$loader.addClass('hidden');
