@@ -35,6 +35,7 @@
         "developer": "a&m impact",
         "developerUrl": "http://www.am-impact.nl",
         "description": "Command palette in Craft.",
+        "changelogUrl": "https://raw.githubusercontent.com/am-impact/amcommand/craft3/CHANGELOG.md",
         "documentationUrl": "https://github.com/am-impact/amcommand/blob/master/README.md",
         "components": {
             "entries": "amimpact\\commandpalette\\services\\Entries",
