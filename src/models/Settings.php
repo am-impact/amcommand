@@ -23,6 +23,7 @@ class Settings extends Model
     /**
      * Define settings.
      */
+    public $pluginName = '';
     public $theme = '';
     public $elementSearchElementTypes = [];
 
@@ -36,7 +37,7 @@ class Settings extends Model
     public function rules()
     {
         return [
-            ['theme', 'string'],
+            [['pluginName', 'theme'], 'string'],
         ];
     }
 

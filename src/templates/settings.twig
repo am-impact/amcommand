@@ -1,15 +1,24 @@
 {% import "_includes/forms" as forms %}
 
+{{ forms.textField({
+    label: "Plugin name"|t('command'),
+    instructions: "Plugin name for the end user."|t('command'),
+    placeholder: "Command Palette"|t('command'),
+    id: 'pluginName',
+    name: 'pluginName',
+    value: settings.pluginName,
+    first: true
+}) }}
+<hr>
 {{ forms.selectField({
     label: "Theme"|t('command'),
     instructions: "Which theme do you want to use?"|t('command'),
     id: 'theme',
     name: 'theme',
     options: themes,
-    value: settings.theme,
-    first: true
+    value: settings.theme
 }) }}
-
+<hr>
 {% set elementTypesInput %}
     <table class="data fullwidth">
         <thead>

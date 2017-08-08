@@ -40,37 +40,14 @@ class Command extends Plugin
         parent::init();
         self::$plugin = $this;
 
-        $this->setComponents([
-            'entries' => \amimpact\command\services\Entries::class,
-            'general' => \amimpact\command\services\General::class,
-            'globals' => \amimpact\command\services\Globals::class,
-            'plugins' => \amimpact\command\services\Plugins::class,
-            'search' => \amimpact\command\services\Search::class,
-            'settings' => \amimpact\command\services\Settings::class,
-            'tasks' => \amimpact\command\services\Tasks::class,
-            'utilities' => \amimpact\command\services\Utilities::class,
-            'users' => \amimpact\command\services\Users::class,
-        ]);
-
-        // We only want to see the command palette in the backend, and want to initiate it once
-        $requestService = Craft::$app->getRequest();
-        if (! $requestService->getIsConsoleRequest() && $requestService->getIsCpRequest() && ! $requestService->getAcceptsJson() && ! Craft::$app->getUser()->getIsGuest()) {
-            // Load resources
-            $viewService = Craft::$app->getView();
-            $viewService->registerAssetBundle(CommandBundle::class);
-            $viewService->registerTranslations('command', [
-                'Command executed',
-                'Are you sure you want to execute this command?',
-                'There are no more commands available.'
-            ]);
-
-            // Load palette
-            Event::on(View::class, View::EVENT_END_BODY, function(Event $event) use ($viewService) {
-                echo $viewService->renderTemplate('command/palette', [
-                    'commands' => $this->general->getCommands($this->getSettings()),
-                ]);
-            });
+        // Adjust plugin name?
+        if (! empty($this->getSettings()->pluginName)) {
+            $this->name = $this->getSettings()->pluginName;
         }
+
+        // Register stuff
+        $this->_registerServices();
+        $this->_registerPalette();
     }
 
     /**
@@ -99,5 +76,53 @@ class Command extends Plugin
             'themes' => $settings->getThemes(),
             'elementSearchElementTypes' => $settings->getElementSearchElementTypes(),
         ]);
+    }
+
+    /**
+     * Register our plugin's services.
+     *
+     * @return void
+     */
+    private function _registerServices()
+    {
+        $this->setComponents([
+            'entries' => \amimpact\command\services\Entries::class,
+            'general' => \amimpact\command\services\General::class,
+            'globals' => \amimpact\command\services\Globals::class,
+            'plugins' => \amimpact\command\services\Plugins::class,
+            'search' => \amimpact\command\services\Search::class,
+            'settings' => \amimpact\command\services\Settings::class,
+            'tasks' => \amimpact\command\services\Tasks::class,
+            'utilities' => \amimpact\command\services\Utilities::class,
+            'users' => \amimpact\command\services\Users::class,
+        ]);
+    }
+
+    /**
+     * Register the palette.
+     *
+     * @return void
+     */
+    private function _registerPalette()
+    {
+        // We only want to see the command palette in the backend, and want to initiate it once
+        $requestService = Craft::$app->getRequest();
+        if (! $requestService->getIsConsoleRequest() && $requestService->getIsCpRequest() && ! $requestService->getAcceptsJson() && ! Craft::$app->getUser()->getIsGuest()) {
+            // Load resources
+            $viewService = Craft::$app->getView();
+            $viewService->registerAssetBundle(CommandBundle::class);
+            $viewService->registerTranslations('command', [
+                'Command executed',
+                'Are you sure you want to execute this command?',
+                'There are no more commands available.'
+            ]);
+
+            // Load palette
+            Event::on(View::class, View::EVENT_END_BODY, function(Event $event) use ($viewService) {
+                echo $viewService->renderTemplate('command/palette', [
+                    'commands' => $this->general->getCommands($this->getSettings()),
+                ]);
+            });
+        }
     }
 }

@@ -56,6 +56,8 @@ return [
     'Name of the overview section?' => 'Naam van de overzicht sectie?',
     'New' => 'Nieuw',
     'No entries in this section exist yet.' => 'Er bestaat nog geen inhoud in deze sectie.',
+    'Plugin name' => 'Plugin naam',
+    'Plugin name for the end user.' => 'Plugin naam voor de eind gebruiker.',
     'Plugin settings' => 'Plugin instellingen',
     'Restart failed tasks' => 'Herstart gefaalde taken',
     'Search criteria isn’t set.' => 'Zoekcriteria is niet ingesteld.',
