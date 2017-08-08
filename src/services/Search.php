@@ -150,7 +150,7 @@ class Search extends Component
         $variables = [
             'option' => $searchOption
         ];
-        CommandPalette::$plugin->general->setReturnAction(Craft::t('command-palette', 'Search for {option}', ['option' => $actualElementType->displayName()]), '', 'searchOn', 'search', $variables, true, true);
+        CommandPalette::$plugin->general->setReturnAction(Craft::t('command-palette', 'Search for {option}', ['option' => $actualElementType::displayName()]), '', 'searchOn', 'search', $variables, true, true);
 
         return true;
     }
