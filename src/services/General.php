@@ -10,6 +10,7 @@
 namespace amimpact\commandpalette\services;
 
 use amimpact\commandpalette\CommandPalette;
+use amimpact\commandpalette\events\RegisterCommandsEvent;
 
 use Craft;
 use craft\base\Component;
@@ -17,6 +18,11 @@ use craft\helpers\UrlHelper;
 
 class General extends Component
 {
+    /**
+     * @event RegisterCommandsEvent The event that is triggered to register more commands.
+     */
+    const EVENT_REGISTER_COMMANDS = 'registerCommands';
+
     private $_settings;
     private $_returnTitle;
     private $_returnMessage;
@@ -39,25 +45,23 @@ class General extends Component
     {
         $this->_settings = $settings;
 
+        // Gather commands
         $commands = [];
-        // Add content commands
+
+        // Add general commands
         $commands = $this->_getContentCommands($commands);
-        // Add global commands
         $commands = $this->_getGlobalCommands($commands);
-        // Add user commands
         $commands = $this->_getUserCommands($commands);
-        // Add search commands
         $commands = $this->_getSearchCommands($commands);
-        // Add settings commands
         $commands = $this->_getSettingCommands($commands);
-        // Add other plugin's commands
-        // TODO:
-        // $pluginCommands = $namespace::getInstance()->plugins->call('addCommands');
-        // foreach ($pluginCommands as $pluginCommand) {
-        //     foreach ($pluginCommand as $command) {
-        //         $commands[] = $command;
-        //     }
-        // }
+
+        // Give plugins a chance to add their own
+        $event = new RegisterCommandsEvent([
+            'commands' => $commands
+        ]);
+        $this->trigger(self::EVENT_REGISTER_COMMANDS, $event);
+        $commands = $event->commands;
+
         // Return the commands nicely sorted
         return json_encode($this->_sortCommands($commands));
     }

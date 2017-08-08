@@ -1,4 +1,4 @@
-# a&m command
+# Command Palette
 
 _Command palette in Craft._
 
@@ -62,35 +62,37 @@ Use (command key for Apple users) CTRL + RETURN (or click) to fire the command i
 
 ## Adding your own commands
 
-If you'd like to add commands for a plugin you're developing, you can use the __addCommands__ hook!
+If you'd like to add commands for a plugin you're developing, register the commands through an event.
 
-### Example
-
-Add this to your main plugin file:
-```
-public function addCommands() {
-    $commands = array(
-        array(
-            'name' => 'Search on Google',
-            'type' => 'Custom',
-            'url'  => 'http://www.google.nl'
-        ),
-        array(
-            'name' => 'My own plugin function in a service',
-            'type' => 'Custom',
-            'call' => 'yourPluginFunctionName',
-            'service' => 'yourPluginServiceName'
-        )
-    );
-    return $commands;
-}
+Add this at the top of your main plugin file:
+```php
+use craft\commandpalette\events\RegisterCommandsEvent;
+use craft\commandpalette\services\General;
+use yii\base\Event;
 ```
 
-That's it! a&m Command Palette will add these two commands.
+Add this to the init function of your main plugin file:
+```php
+Event::on(General::class, General::EVENT_REGISTER_COMMANDS, function(RegisterCommandsEvent $event) {
+    $event->commands[] = [
+        'name' => 'Search on Google',
+        'type' => 'Custom',
+        'url'  => 'http://www.google.nl'
+    ];
+    $event->commands[] = [
+        'name' => 'My own plugin function in a service',
+        'type' => 'Custom',
+        'call' => 'yourPluginFunctionName',
+        'service' => 'yourPluginServiceName'
+    ];
+});
+```
+
+That's it! The command palette will add these two commands.
 
 If you look at the second example, you see a call and service key. These can be used to load a new set of commands.
 
-In your plugin's service __yourPluginServiceName__ (e.g.: amCommand or amCommand_command), you'll create a new function called __yourPluginFunctionName__. In here you could do the same thing as you see in the example, and just return the new set of commands.
+In your plugin's service __yourPluginServiceName__ (e.g.: command or command_entries), you'll create a new function called __yourPluginFunctionName__. In here you could do the same thing as you see in the example, and just return the new set of commands.
 
 ## Contact
 
