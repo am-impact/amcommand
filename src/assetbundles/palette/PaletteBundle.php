@@ -32,7 +32,7 @@ class PaletteBundle extends AssetBundle
 
         // Gather resources
         $this->js = [
-            'js/Palette.js',
+            'js/Palette.min.js',
             'js/fuzzy-min.js',
         ];
 
