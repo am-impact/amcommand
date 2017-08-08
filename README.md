@@ -66,8 +66,8 @@ If you'd like to add commands for a plugin you're developing, register the comma
 
 Add this at the top of your main plugin file:
 ```php
-use craft\commandpalette\events\RegisterCommandsEvent;
-use craft\commandpalette\services\General;
+use amimpact\commandpalette\events\RegisterCommandsEvent;
+use amimpact\commandpalette\services\General;
 use yii\base\Event;
 ```
 
@@ -77,12 +77,17 @@ Event::on(General::class, General::EVENT_REGISTER_COMMANDS, function(RegisterCom
     $event->commands[] = [
         'name' => 'Search on Google',
         'type' => 'Custom',
-        'url'  => 'http://www.google.nl'
+        'url'  => 'http://www.google.nl',
+        'icon' => [
+            'type' => 'font',
+            'content' => 'plugin'
+        ]
     ];
     $event->commands[] = [
         'name' => 'My own plugin function in a service',
         'type' => 'Custom',
         'call' => 'yourPluginFunctionName',
+        'plugin' => 'your-plugin-handle',
         'service' => 'yourPluginServiceName'
     ];
 });
@@ -90,9 +95,9 @@ Event::on(General::class, General::EVENT_REGISTER_COMMANDS, function(RegisterCom
 
 That's it! The command palette will add these two commands.
 
-If you look at the second example, you see a call and service key. These can be used to load a new set of commands.
+If you look at the second example, you see a call, plugin and service key. These can be used to load a new set of commands.
 
-In your plugin's service __yourPluginServiceName__ (e.g.: command or command_entries), you'll create a new function called __yourPluginFunctionName__. In here you could do the same thing as you see in the example, and just return the new set of commands.
+In your plugin's service __yourPluginServiceName__ (e.g.: general), you'll create a new function called __yourPluginFunctionName__. In here you could do the same thing as you see in the example, and just return the new set of commands.
 
 ## Contact
 
