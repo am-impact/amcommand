@@ -6,11 +6,11 @@
  * @link      http://www.am-impact.nl
  */
 
-.command {
+.palette {
     background: #333f4d;
 }
 
-.command__tabs {
+.palette__tabs {
     background: #333f4d;
     color: #fff;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -20,7 +20,7 @@
 /**
  * Input
  */
-.command__search input[type=text] {
+.palette__search input[type=text] {
     background: #333f4d;
     border: 1px solid #fafafa;
     color: #fff;
@@ -30,7 +30,7 @@
 /**
  * Loaders
  */
-.command__loader {
+.palette__loader {
     border-top: 3px solid rgba(255,255,255, 0.2);
     border-right: 3px solid rgba(255,255,255, 0.2);
     border-bottom: 3px solid rgba(255,255,255, 0.2);
@@ -41,46 +41,46 @@
 /**
  * Commands
  */
-.command__commands li:hover {
+.palette__commands li:hover {
     background: rgba(255, 255, 255, 0.05);
 }
 
-.command__commands li.focus {
+.palette__commands li.focus {
     background: rgba(255, 255, 255, 0.1);
 }
 
-.command__name {
+.palette__command__name {
     color: #d7d9db;
 }
 
-.command__commands li.focus .command__name {
+.palette__commands li.focus .palette__command__name {
     color: #fff;
 }
 
-.command__info {
+.palette__command__info {
     color: #b9bfc6;
 }
 
-.command__shortcut {
+.palette__command__shortcut {
     color: #d7d9db;
 }
 
-.command__commands li.focus .command__shortcut {
+.palette__commands li.focus .palette__command__shortcut {
     color: #fff;
 }
 
-.command__icon {
+.palette__command__icon {
     color: #d7d9db;
 }
 
-.command__commands li.focus .command__icon {
+.palette__commands li.focus .palette__command__icon {
     color: #fff;
 }
 
-.command__icon svg path {
+.palette__command__icon svg path {
     fill: #d7d9db;
 }
 
-.command__commands li.focus .command__icon svg path {
+.palette__commands li.focus .palette__command__icon svg path {
     fill: #fff;
 }

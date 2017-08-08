@@ -7,9 +7,9 @@
  * @link      http://www.am-impact.nl
  */
 
-namespace amimpact\command\services;
+namespace amimpact\commandpalette\services;
 
-use amimpact\command\Command;
+use amimpact\commandpalette\CommandPalette;
 
 use Craft;
 use craft\base\Component;
@@ -49,7 +49,7 @@ class Users extends Component
             }
         }
         if (! count($commands)) {
-            Command::$plugin->general->setReturnMessage(Craft::t('command', 'Besides your account, no other account could be found.'));
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'Besides your account, no other account could be found.'));
         }
 
         return $commands;
@@ -84,7 +84,7 @@ class Users extends Component
             }
         }
         if (! count($commands)) {
-            Command::$plugin->general->setReturnMessage(Craft::t('command', 'Besides your account, no other account could be found.'));
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'Besides your account, no other account could be found.'));
         }
 
         return $commands;
@@ -107,11 +107,11 @@ class Users extends Component
         // Delete user!
         $success = Craft::$app->getElements()->deleteElementById($variables['userId']);
         if ($success) {
-            Command::$plugin->general->deleteCurrentCommand();
-            Command::$plugin->general->setReturnMessage(Craft::t('app', 'User deleted.'));
+            CommandPalette::$plugin->general->deleteCurrentCommand();
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('app', 'User deleted.'));
         }
         else {
-            Command::$plugin->general->setReturnMessage(Craft::t('app', 'Couldn’t delete “{name}”.', ['name', $user->username]));
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('app', 'Couldn’t delete “{name}”.', ['name', $user->username]));
         }
 
         return $success;
@@ -146,7 +146,7 @@ class Users extends Component
             }
         }
         if (! count($commands)) {
-            Command::$plugin->general->setReturnMessage(Craft::t('app', 'Besides your account, no other account could be found.'));
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('app', 'Besides your account, no other account could be found.'));
         }
 
         return $commands;
@@ -169,21 +169,21 @@ class Users extends Component
         // Login by user
         if (Craft::$app->getUser()->loginByUserId($variables['userId'])) {
             Craft::$app->getSession()->setNotice(Craft::t('app', 'Logged in.'));
-            Command::$plugin->general->setReturnMessage(Craft::t('command', 'Login as user'));
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'Login as user'));
 
             // Redirect
             if (Craft::$app->getUser()->can('accessCp')) {
-                Command::$plugin->general->setReturnUrl(UrlHelper::cpUrl('dashboard'));
+                CommandPalette::$plugin->general->setReturnUrl(UrlHelper::cpUrl('dashboard'));
             }
             else {
-                Command::$plugin->general->setReturnUrl(UrlHelper::siteUrl(''));
+                CommandPalette::$plugin->general->setReturnUrl(UrlHelper::siteUrl(''));
             }
 
             return true;
         }
 
         // Login failed
-        Command::$plugin->general->setReturnMessage(Craft::t('app', 'There was a problem impersonating this user.'));
+        CommandPalette::$plugin->general->setReturnMessage(Craft::t('app', 'There was a problem impersonating this user.'));
         Craft::info($this->_currentUser->username . ' tried to log in using userId: '.$variables['userId'].' but something went wrong.', __METHOD__);
 
         return false;

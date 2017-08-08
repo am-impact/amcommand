@@ -7,9 +7,9 @@
  * @link      http://www.am-impact.nl
  */
 
-namespace amimpact\command\models;
+namespace amimpact\commandpalette\models;
 
-use amimpact\command\Command;
+use amimpact\commandpalette\CommandPalette;
 
 use Craft;
 use craft\base\Model;
@@ -49,12 +49,12 @@ class Settings extends Model
     public function getSelectedTheme()
     {
         // Did we select one?
-        if (empty($this->theme) || $this->theme == 'Command.css') {
+        if (empty($this->theme) || $this->theme == 'Palette.css') {
             return false;
         }
 
         // Find theme
-        $path = Command::$plugin->getBasePath().'/assetbundles/command/dist/css/';
+        $path = CommandPalette::$plugin->getBasePath().'/assetbundles/palette/dist/css/';
         if (file_exists($path . $this->theme)) {
             return $this->theme;
         }
@@ -71,7 +71,7 @@ class Settings extends Model
     {
         // Gather themes
         $themes = [];
-        $path = Command::$plugin->getBasePath().'/assetbundles/command/dist/css/';
+        $path = CommandPalette::$plugin->getBasePath().'/assetbundles/palette/dist/css/';
         if (is_dir($path)) {
             $themeFiles = FileHelper::findFiles($path, [
                 'only' => ['*.css'],
@@ -81,7 +81,7 @@ class Settings extends Model
             if (is_array($themeFiles)) {
                 foreach ($themeFiles as $file) {
                     $fileName = pathinfo($file, PATHINFO_BASENAME);
-                    if ($fileName == 'Command.css') {
+                    if ($fileName == 'Palette.css') {
                         continue; // Skip default
                     }
                     $themes[$fileName] = pathinfo($file, PATHINFO_FILENAME);
@@ -90,7 +90,7 @@ class Settings extends Model
         }
         natsort($themes);
 
-        return array_merge(['' => Craft::t('command', 'Default')], $themes);
+        return array_merge(['' => Craft::t('command-palette', 'Default')], $themes);
     }
 
     /**

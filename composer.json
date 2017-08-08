@@ -1,5 +1,5 @@
 {
-    "name": "amimpact/command",
+    "name": "amimpact/command-palette",
     "description": "Command palette in Craft.",
     "type": "craft-plugin",
     "version": "3.0.0",
@@ -22,12 +22,12 @@
     },
     "autoload": {
         "psr-4": {
-          "amimpact\\command\\": "src/"
+          "amimpact\\commandpalette\\": "src/"
         }
     },
     "extra": {
-        "name": "Command",
-        "handle": "command",
+        "name": "Command Palette",
+        "handle": "command-palette",
         "version": "3.0.0",
         "schemaVersion": "3.0.0",
         "hasSettings": true,
@@ -37,16 +37,16 @@
         "description": "Command palette in Craft.",
         "documentationUrl": "https://github.com/am-impact/amcommand/blob/master/README.md",
         "components": {
-            "entries": "amimpact\\command\\services\\Entries",
-            "general": "amimpact\\command\\services\\General",
-            "globals": "amimpact\\command\\services\\Globals",
-            "plugins": "amimpact\\command\\services\\Plugins",
-            "search": "amimpact\\command\\services\\Search",
-            "settings": "amimpact\\command\\services\\Settings",
-            "tasks": "amimpact\\command\\services\\Tasks",
-            "utilities": "amimpact\\command\\services\\Utilities",
-            "users": "amimpact\\command\\services\\Users"
+            "entries": "amimpact\\commandpalette\\services\\Entries",
+            "general": "amimpact\\commandpalette\\services\\General",
+            "globals": "amimpact\\commandpalette\\services\\Globals",
+            "plugins": "amimpact\\commandpalette\\services\\Plugins",
+            "search": "amimpact\\commandpalette\\services\\Search",
+            "settings": "amimpact\\commandpalette\\services\\Settings",
+            "tasks": "amimpact\\commandpalette\\services\\Tasks",
+            "utilities": "amimpact\\commandpalette\\services\\Utilities",
+            "users": "amimpact\\commandpalette\\services\\Users"
         },
-        "class": "amimpact\\command\\Command"
+        "class": "amimpact\\commandpalette\\CommandPalette"
     }
 }

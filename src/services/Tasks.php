@@ -7,9 +7,9 @@
  * @link      http://www.am-impact.nl
  */
 
-namespace amimpact\command\services;
+namespace amimpact\commandpalette\services;
 
-use amimpact\command\Command;
+use amimpact\commandpalette\CommandPalette;
 
 use Craft;
 use craft\base\Component;
@@ -26,43 +26,43 @@ class Tasks extends Component
     {
         $commands = [
             [
-                'name'    => Craft::t('command', 'Delete a task'),
+                'name'    => Craft::t('command-palette', 'Delete a task'),
                 'more'    => true,
                 'call'    => 'listTasks',
                 'service' => 'tasks'
             ],
             [
-                'name'    => Craft::t('command', 'Delete all tasks'),
+                'name'    => Craft::t('command-palette', 'Delete all tasks'),
                 'warn'    => true,
                 'call'    => 'deleteAllTasks',
                 'service' => 'tasks'
             ],
             [
-                'name'    => Craft::t('command', 'Delete all failed tasks'),
+                'name'    => Craft::t('command-palette', 'Delete all failed tasks'),
                 'warn'    => true,
                 'call'    => 'deleteAllFailedTasks',
                 'service' => 'tasks'
             ],
             [
-                'name'    => Craft::t('command', 'Delete all tasks by type'),
+                'name'    => Craft::t('command-palette', 'Delete all tasks by type'),
                 'more'    => true,
                 'call'    => 'listTaskTypes',
                 'service' => 'tasks'
             ],
             [
-                'name'    => Craft::t('command', 'Delete pending tasks'),
+                'name'    => Craft::t('command-palette', 'Delete pending tasks'),
                 'warn'    => true,
                 'call'    => 'deletePendingTasks',
                 'service' => 'tasks'
             ],
             [
-                'name'    => Craft::t('command', 'Delete running task'),
+                'name'    => Craft::t('command-palette', 'Delete running task'),
                 'warn'    => true,
                 'call'    => 'deleteRunningTask',
                 'service' => 'tasks'
             ],
             [
-                'name'    => Craft::t('command', 'Restart failed tasks'),
+                'name'    => Craft::t('command-palette', 'Restart failed tasks'),
                 'warn'    => true,
                 'call'    => 'restartFailedTasks',
                 'service' => 'tasks'
@@ -84,7 +84,7 @@ class Tasks extends Component
         // Find tasks
         $tasks = Craft::$app->getTasks()->getAllTasks();
         if (! $tasks) {
-            Command::$plugin->general->setReturnMessage(Craft::t('command', 'There are no tasks at the moment.'));
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'There are no tasks at the moment.'));
         }
         else {
             foreach ($tasks as $task) {
@@ -117,7 +117,7 @@ class Tasks extends Component
         $taskTypes = [];
         $tasks = Craft::$app->getTasks()->getAllTasks();
         if (! $tasks) {
-            Command::$plugin->general->setReturnMessage(Craft::t('command', 'There are no tasks at the moment.'));
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'There are no tasks at the moment.'));
         }
         else {
             foreach ($tasks as $task) {
@@ -156,11 +156,11 @@ class Tasks extends Component
         // Delete task!
         $result = Craft::$app->getTasks()->deleteTaskById($variables['taskId']);
         if ($result === true) {
-            Command::$plugin->general->deleteCurrentCommand();
-            Command::$plugin->general->setReturnMessage(Craft::t('command', 'Task deleted.'));
+            CommandPalette::$plugin->general->deleteCurrentCommand();
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'Task deleted.'));
         }
         else {
-            Command::$plugin->general->setReturnMessage(Craft::t('command', 'Couldn’t delete task.'));
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'Couldn’t delete task.'));
         }
 
         return $result ? true : false;
@@ -265,7 +265,7 @@ class Tasks extends Component
     {
         $task = Craft::$app->getTasks()->getRunningTask();
         if (! $task) {
-            Command::$plugin->general->setReturnMessage(Craft::t('command', 'There is no running task at the moment.'));
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'There is no running task at the moment.'));
         }
         else {
             if (Craft::$app->getTasks()->deleteTaskById($task->id) === true) {

@@ -7,9 +7,9 @@
  * @link      http://www.am-impact.nl
  */
 
-namespace amimpact\command\controllers;
+namespace amimpact\commandpalette\controllers;
 
-use amimpact\command\Command;
+use amimpact\commandpalette\CommandPalette;
 
 use Craft;
 use craft\web\Controller;
@@ -34,13 +34,13 @@ class CommandsController extends Controller
         $plugin   = $requestService->getBodyParam('plugin', false);
         $service  = $requestService->getBodyParam('service', false);
         $vars     = $requestService->getBodyParam('vars', false);
-        $result   = Command::$plugin->general->triggerCommand($command, $plugin, $service, $vars);
-        $title    = Command::$plugin->general->getReturnTitle();
-        $message  = Command::$plugin->general->getReturnMessage();
-        $redirect = Command::$plugin->general->getReturnUrl();
-        $action   = Command::$plugin->general->getReturnAction();
-        $commands = Command::$plugin->general->getReturnCommands();
-        $delete   = Command::$plugin->general->getDeleteStatus();
+        $result   = CommandPalette::$plugin->general->triggerCommand($command, $plugin, $service, $vars);
+        $title    = CommandPalette::$plugin->general->getReturnTitle();
+        $message  = CommandPalette::$plugin->general->getReturnMessage();
+        $redirect = CommandPalette::$plugin->general->getReturnUrl();
+        $action   = CommandPalette::$plugin->general->getReturnAction();
+        $commands = CommandPalette::$plugin->general->getReturnCommands();
+        $delete   = CommandPalette::$plugin->general->getDeleteStatus();
 
         // Overwrite result with overwritten commands?
         if ($commands) {
@@ -51,7 +51,7 @@ class CommandsController extends Controller
         if ($result === false) {
             return $this->asJson([
                 'success' => false,
-                'message' => $message ? $message : Craft::t('command', 'Couldn’t trigger the command.')
+                'message' => $message ? $message : Craft::t('command-palette', 'Couldn’t trigger the command.')
             ]);
         }
         else {
@@ -63,7 +63,7 @@ class CommandsController extends Controller
                 'redirect'      => $redirect,
                 'isNewSet'      => !is_bool($result),
                 'isAction'      => $action,
-                'isHtml'        => Command::$plugin->general->getReturnHtml(),
+                'isHtml'        => CommandPalette::$plugin->general->getReturnHtml(),
                 'headHtml'      => $viewService->getHeadHtml(),
                 'footHtml'      => $viewService->getBodyHtml(),
                 'deleteCommand' => $delete

@@ -1,9 +1,9 @@
 {% import "_includes/forms" as forms %}
 
 {{ forms.textField({
-    label: "Plugin name"|t('command'),
-    instructions: "Plugin name for the end user."|t('command'),
-    placeholder: "Command Palette"|t('command'),
+    label: "Plugin name"|t('command-palette'),
+    instructions: "Plugin name for the end user."|t('command-palette'),
+    placeholder: "Command Palette"|t('command-palette'),
     id: 'pluginName',
     name: 'pluginName',
     value: settings.pluginName,
@@ -11,8 +11,8 @@
 }) }}
 <hr>
 {{ forms.selectField({
-    label: "Theme"|t('command'),
-    instructions: "Which theme do you want to use?"|t('command'),
+    label: "Theme"|t('command-palette'),
+    instructions: "Which theme do you want to use?"|t('command-palette'),
     id: 'theme',
     name: 'theme',
     options: themes,
@@ -23,8 +23,8 @@
     <table class="data fullwidth">
         <thead>
             <tr>
-                <th scope="col" style="width: 50%;">{{ 'Element Type'|t('command') }}</th>
-                <th scope="col">{{ 'Enabled'|t('command') }}</th>
+                <th scope="col" style="width: 50%;">{{ 'Element Type'|t('command-palette') }}</th>
+                <th scope="col">{{ 'Enabled'|t('command-palette') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -48,6 +48,6 @@
     </table>
 {% endset %}
 {{ forms.field({
-    label: 'Element search Element Types'|t('command'),
-    instructions: 'Which Element Types you want to support for direct search.'|t('command'),
+    label: 'Element search Element Types'|t('command-palette'),
+    instructions: 'Which Element Types you want to support for direct search.'|t('command-palette'),
 }, elementTypesInput) }}

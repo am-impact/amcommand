@@ -7,9 +7,9 @@
  * @link      http://www.am-impact.nl
  */
 
-namespace amimpact\command\services;
+namespace amimpact\commandpalette\services;
 
-use amimpact\command\Command;
+use amimpact\commandpalette\CommandPalette;
 
 use Craft;
 use craft\base\Component;
@@ -40,7 +40,7 @@ class Plugins extends Component
             }
         }
         if (! count($commands)) {
-            Command::$plugin->general->setReturnMessage(Craft::t('command', 'There are no enabled plugins with settings.'));
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'There are no enabled plugins with settings.'));
         }
 
         return $commands;

@@ -7,15 +7,15 @@
  * @link      http://www.am-impact.nl
  */
 
-namespace amimpact\command\assetbundles\Command;
+namespace amimpact\commandpalette\assetbundles\Palette;
 
-use amimpact\command\Command;
+use amimpact\commandpalette\CommandPalette;
 
 use Craft;
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
 
-class CommandBundle extends AssetBundle
+class PaletteBundle extends AssetBundle
 {
     /**
      * Initializes the bundle.
@@ -23,7 +23,7 @@ class CommandBundle extends AssetBundle
     public function init()
     {
         // Define the path that your publishable resources live
-        $this->sourcePath = "@amimpact/command/assetbundles/command/dist";
+        $this->sourcePath = "@amimpact/commandpalette/assetbundles/palette/dist";
 
         // Define the dependencies
         $this->depends = [
@@ -32,16 +32,16 @@ class CommandBundle extends AssetBundle
 
         // Gather resources
         $this->js = [
-            'js/Command.js',
+            'js/Palette.js',
             'js/fuzzy-min.js',
         ];
 
         $this->css = [
-            'css/Command.css',
+            'css/Palette.css',
         ];
 
         // Did we select a different theme?
-        $settings = Command::$plugin->getSettings();
+        $settings = CommandPalette::$plugin->getSettings();
         $themeFile = $settings->getSelectedTheme();
         if ($themeFile) {
             $this->css[] = 'css/' . $themeFile;

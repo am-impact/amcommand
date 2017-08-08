@@ -8,16 +8,16 @@
 
 (function($) {
 
-Craft.Command = Garnish.Base.extend(
+Craft.Palette = Garnish.Base.extend(
 {
     // DOM elements
-    $searchField:       $('.command__search input[type=text]'),
-    $container:         $('.command'),
-    $tabsContainer:     $('.command__tabs'),
-    $searchContainer:   $('.command__search'),
-    $commandsContainer: $('.command__commands ul'),
-    $loader:            $('.command__loader'),
-    $commands:          $('.command__commands li'),
+    $searchField:       $('.palette__search input[type=text]'),
+    $container:         $('.palette'),
+    $tabsContainer:     $('.palette__tabs'),
+    $searchContainer:   $('.palette__search'),
+    $commandsContainer: $('.palette__commands ul'),
+    $loader:            $('.palette__loader'),
+    $commands:          $('.palette__commands li'),
     $button:            $('#nav-command'),
 
     // Keys
@@ -207,7 +207,7 @@ Craft.Command = Garnish.Base.extend(
         var self = this;
 
         // Reset clicking event
-        self.$commands = $('.command__commands li');
+        self.$commands = $('.palette__commands li');
         self.addListener(self.$commands, 'click', 'triggerCommand');
 
         // Focus first
@@ -234,11 +234,11 @@ Craft.Command = Garnish.Base.extend(
             if (! self.allowElementSearch || (searchValue.length && self.allowElementSearch)) {
                 // Find matches
                 var results = filtered.map(function(el, i) {
-                    var icon = ('icon' in el.original) ? '<span class="command__icon"' + (el.original.icon.type == 'font' ? ' data-icon="' + el.original.icon.content + '"' : '') + '>' + (el.original.icon.type != 'font' ? el.original.icon.content : '') + '</span>' : '';
-                    var shortcut = (i < 9) ? '<span class="command__shortcut">&#8984;' + (i + 1) + '</span>' : '';
-                    var name = '<span class="command__name' + ('more' in el.original && el.original.more ? ' go' : '') + '">' + el.string + '</span>';
-                    var info = ('info' in el.original) ? '<span class="command__info">' + el.original.info + '</span>' : '';
-                    return '<li data-id="' + el.index + '">' + icon + '<div class="command__content">' + name + info + '</div>' + shortcut + '</li>';
+                    var icon = ('icon' in el.original) ? '<span class="palette__command__icon"' + (el.original.icon.type == 'font' ? ' data-icon="' + el.original.icon.content + '"' : '') + '>' + (el.original.icon.type != 'font' ? el.original.icon.content : '') + '</span>' : '';
+                    var shortcut = (i < 9) ? '<span class="palette__command__shortcut">&#8984;' + (i + 1) + '</span>' : '';
+                    var name = '<span class="palette__command__name' + ('more' in el.original && el.original.more ? ' go' : '') + '">' + el.string + '</span>';
+                    var info = ('info' in el.original) ? '<span class="palette__command__info">' + el.original.info + '</span>' : '';
+                    return '<li data-id="' + el.index + '">' + icon + '<div class="palette__command__content">' + name + info + '</div>' + shortcut + '</li>';
                 });
 
                 // Element search deliver anything new?
@@ -345,7 +345,7 @@ Craft.Command = Garnish.Base.extend(
                 Craft.cp.displayNotice(customMessage);
             }
             else {
-                Craft.cp.displayNotice('<span class="command__notice">' + Craft.t('command', 'Command executed') + ' &raquo;</span>' + executedCommand);
+                Craft.cp.displayNotice('<span class="palette__notice">' + Craft.t('command-palette', 'Command executed') + ' &raquo;</span>' + executedCommand);
             }
         }
         else {
@@ -528,7 +528,7 @@ Craft.Command = Garnish.Base.extend(
 
                         // Do we have to show a warning?
                         if (warn) {
-                            var confirmation = confirm(Craft.t('command', 'Are you sure you want to execute this command?'));
+                            var confirmation = confirm(Craft.t('command-palette', 'Are you sure you want to execute this command?'));
                             if (! confirmation) {
                                 confirmed = false;
                             }
@@ -595,7 +595,7 @@ Craft.Command = Garnish.Base.extend(
                 self.loadingElements = true;
             }
 
-            self.loadingRequest = Craft.postActionRequest('command/commands/trigger-command', { command: name, service: service, vars: vars }, $.proxy(function (response, textStatus) {
+            self.loadingRequest = Craft.postActionRequest('command-palette/commands/trigger-command', { command: name, service: service, vars: vars }, $.proxy(function (response, textStatus) {
                 self.loadingRequest = false;
                 if (textStatus == 'success') {
                     self.$loader.addClass('hidden');
@@ -703,7 +703,7 @@ Craft.Command = Garnish.Base.extend(
 
                             // Close the command palette if all commands are hidden
                             if (self.commandsArray.length <= 0) {
-                                self.displayMessage(false, Craft.t('command', 'There are no more commands available.'), false);
+                                self.displayMessage(false, Craft.t('command-palette', 'There are no more commands available.'), false);
                                 self.closePalette();
                             }
                         }
@@ -718,7 +718,7 @@ Craft.Command = Garnish.Base.extend(
                             self.displayMessage((response.result != ''), response.message, false);
                         }
                         else if (displayDefaultMessage) {
-                            self.displayMessage(true, false, $current.children('.command__commands--name').text());
+                            self.displayMessage(true, false, $current.children('.palette__command__name').text());
                         }
 
                         // Redirect?

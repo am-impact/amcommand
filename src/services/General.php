@@ -7,9 +7,9 @@
  * @link      http://www.am-impact.nl
  */
 
-namespace amimpact\command\services;
+namespace amimpact\commandpalette\services;
 
-use amimpact\command\Command;
+use amimpact\commandpalette\CommandPalette;
 
 use Craft;
 use craft\base\Component;
@@ -88,10 +88,10 @@ class General extends Component
         }
         elseif ($service !== false) {
             // Trigger a service from our plugin
-            if (! method_exists(Command::$plugin->$service, $command)) {
+            if (! method_exists(CommandPalette::$plugin->$service, $command)) {
                 return false;
             }
-            $commandResult = Command::$plugin->$service->$command($variables);
+            $commandResult = CommandPalette::$plugin->$service->$command($variables);
         }
         else {
             // Command should be here
@@ -313,7 +313,7 @@ class General extends Component
         if (Craft::$app->getUser()->getIsAdmin() || Craft::$app->getSections()->getTotalEditableSections() > 0) {
             $currentCommands[] = [
                 'name'    => Craft::t('app', 'Content') . ': ' . Craft::t('app', 'New entry'),
-                'info'    => Craft::t('command', 'Create a new entry in one of the available sections.'),
+                'info'    => Craft::t('command-palette', 'Create a new entry in one of the available sections.'),
                 'more'    => true,
                 'call'    => 'createEntry',
                 'service' => 'entries',
@@ -324,7 +324,7 @@ class General extends Component
             ];
             $currentCommands[] = [
                 'name'    => Craft::t('app', 'Content') . ': ' . Craft::t('app', 'Edit entries'),
-                'info'    => Craft::t('command', 'Edit an entry in one of the available sections.'),
+                'info'    => Craft::t('command-palette', 'Edit an entry in one of the available sections.'),
                 'more'    => true,
                 'call'    => 'editEntries',
                 'service' => 'entries',
@@ -335,7 +335,7 @@ class General extends Component
             ];
             $currentCommands[] = [
                 'name'    => Craft::t('app', 'Content') . ': ' . Craft::t('app', 'Delete entries'),
-                'info'    => Craft::t('command', 'Delete an entry in one of the available sections.'),
+                'info'    => Craft::t('command-palette', 'Delete an entry in one of the available sections.'),
                 'more'    => true,
                 'call'    => 'deleteEntries',
                 'service' => 'entries',
@@ -349,8 +349,8 @@ class General extends Component
             ];
             if (Craft::$app->getUser()->getIsAdmin()) {
                 $currentCommands[] = [
-                    'name'    => Craft::t('app', 'Content') . ': ' . Craft::t('command', 'Delete all entries'),
-                    'info'    => Craft::t('command', 'Delete all entries in one of the available sections.'),
+                    'name'    => Craft::t('app', 'Content') . ': ' . Craft::t('command-palette', 'Delete all entries'),
+                    'info'    => Craft::t('command-palette', 'Delete all entries in one of the available sections.'),
                     'more'    => true,
                     'call'    => 'deleteEntries',
                     'service' => 'entries',
@@ -410,7 +410,7 @@ class General extends Component
         ];
         $currentCommands[] = [
             'name' => Craft::t('app', 'Sign out'),
-            'info' => Craft::t('command', 'End current session.'),
+            'info' => Craft::t('command-palette', 'End current session.'),
             'url'  => UrlHelper::cpUrl('logout')
         ];
         $currentCommands[] = [
@@ -420,7 +420,7 @@ class General extends Component
         if (Craft::$app->getUser()->getIsAdmin() || Craft::$app->getUser()->getIdentity()->can('editUsers')) {
             $currentCommands[] = [
                 'name' => Craft::t('app', 'Users') . ': ' . Craft::t('app', 'New user'),
-                'info' => Craft::t('command', 'Create a user.'),
+                'info' => Craft::t('command-palette', 'Create a user.'),
                 'url'  => UrlHelper::cpUrl('users/new'),
                 'icon' => [
                     'type' => 'font',
@@ -429,7 +429,7 @@ class General extends Component
             ];
             $currentCommands[] = [
                 'name'    => Craft::t('app', 'Users') . ': ' . Craft::t('app', 'Edit users'),
-                'info'    => Craft::t('command', 'Edit a user.'),
+                'info'    => Craft::t('command-palette', 'Edit a user.'),
                 'more'    => true,
                 'call'    => 'editUsers',
                 'service' => 'users',
@@ -440,7 +440,7 @@ class General extends Component
             ];
             $currentCommands[] = [
                 'name'    => Craft::t('app', 'Users') . ': ' . Craft::t('app', 'Delete users'),
-                'info'    => Craft::t('command', 'Delete a user other than your own.'),
+                'info'    => Craft::t('command-palette', 'Delete a user other than your own.'),
                 'more'    => true,
                 'call'    => 'deleteUsers',
                 'service' => 'users',
@@ -451,8 +451,8 @@ class General extends Component
             ];
             if (Craft::$app->getUser()->getIsAdmin()) {
                 $currentCommands[] = [
-                    'name'    => Craft::t('app', 'Users') . ': ' . Craft::t('command', 'Login as user'),
-                    'info'    => Craft::t('command', 'Log in as a different user, and navigate to their dashboard.'),
+                    'name'    => Craft::t('app', 'Users') . ': ' . Craft::t('command-palette', 'Login as user'),
+                    'info'    => Craft::t('command-palette', 'Log in as a different user, and navigate to their dashboard.'),
                     'more'    => true,
                     'call'    => 'loginUsers',
                     'service' => 'users',
@@ -477,7 +477,7 @@ class General extends Component
     {
         // Site searches
         $currentCommands[] = [
-            'name'    => Craft::t('command', 'Search on {option}', ['option' => 'Craft']),
+            'name'    => Craft::t('command-palette', 'Search on {option}', ['option' => 'Craft']),
             'info'    => 'https://craftcms.com',
             'more'    => true,
             'call'    => 'searchOptionCraft',
@@ -488,7 +488,7 @@ class General extends Component
             ]
         ];
         $currentCommands[] = [
-            'name'    => Craft::t('command', 'Search on {option}', ['option' => 'StackExchange']),
+            'name'    => Craft::t('command-palette', 'Search on {option}', ['option' => 'StackExchange']),
             'info'    => 'http://craftcms.stackexchange.com',
             'more'    => true,
             'call'    => 'searchOptionStackExchange',
@@ -505,7 +505,7 @@ class General extends Component
                 if (isset($submittedInfo['enabled']) && $submittedInfo['enabled'] === '1') {
                     $actualElementType = Craft::$app->getElements()->getElementTypeByRefHandle($elementType);
                     $currentCommands[] = [
-                        'name'    => Craft::t('command', 'Search for {option}', ['option' => $actualElementType::displayName()]),
+                        'name'    => Craft::t('command-palette', 'Search for {option}', ['option' => $actualElementType::displayName()]),
                         'more'    => true,
                         'call'    => 'searchOptionElementType',
                         'service' => 'search',
@@ -537,8 +537,8 @@ class General extends Component
             return $currentCommands;
         }
         $currentCommands[] = [
-            'name'    => Craft::t('command', 'Tasks'),
-            'info'    => Craft::t('command', 'Manage Craft tasks.'),
+            'name'    => Craft::t('command-palette', 'Tasks'),
+            'info'    => Craft::t('command-palette', 'Manage Craft tasks.'),
             'more'    => true,
             'call'    => 'getTaskCommands',
             'service' => 'tasks',
@@ -549,7 +549,7 @@ class General extends Component
         ];
         $currentCommands[] = [
             'name'    => Craft::t('app', 'Utilities'),
-            'info'    => Craft::t('command', 'Use one of the most used utilities.'),
+            'info'    => Craft::t('command-palette', 'Use one of the most used utilities.'),
             'more'    => true,
             'call'    => 'getUtilities',
             'service' => 'utilities',
@@ -559,8 +559,8 @@ class General extends Component
             ]
         ];
         $currentCommands[] = [
-            'name'    => Craft::t('app', 'Settings') . ': ' . Craft::t('command', 'New') . '...',
-            'info'    => Craft::t('command', 'Add something new in the settings...'),
+            'name'    => Craft::t('app', 'Settings') . ': ' . Craft::t('command-palette', 'New') . '...',
+            'info'    => Craft::t('command-palette', 'Add something new in the settings...'),
             'more'    => true,
             'call'    => 'createNewSetting',
             'service' => 'settings',
@@ -682,7 +682,7 @@ class General extends Component
             ]
         ];
         $currentCommands[] = array(
-            'name'    => Craft::t('app', 'Settings') . ': ' . Craft::t('command', 'Plugin settings'),
+            'name'    => Craft::t('app', 'Settings') . ': ' . Craft::t('command-palette', 'Plugin settings'),
             'more'    => true,
             'call'    => 'getSettingsUrl',
             'service' => 'plugins',

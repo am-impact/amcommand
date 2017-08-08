@@ -7,10 +7,10 @@
  * @link      http://www.am-impact.nl
  */
 
-namespace amimpact\command;
+namespace amimpact\commandpalette;
 
-use amimpact\command\assetbundles\Command\CommandBundle;
-use amimpact\command\models\Settings;
+use amimpact\commandpalette\assetbundles\Palette\PaletteBundle;
+use amimpact\commandpalette\models\Settings;
 
 use Craft;
 use craft\base\Plugin;
@@ -18,7 +18,7 @@ use craft\web\View;
 
 use yii\base\Event;
 
-class Command extends Plugin
+class CommandPalette extends Plugin
 {
     public static $plugin;
 
@@ -71,7 +71,7 @@ class Command extends Plugin
         // Settings
         $settings = $this->getSettings();
 
-        return Craft::$app->getView()->renderTemplate('command/settings', [
+        return Craft::$app->getView()->renderTemplate('command-palette/settings', [
             'settings' => $settings,
             'themes' => $settings->getThemes(),
             'elementSearchElementTypes' => $settings->getElementSearchElementTypes(),
@@ -86,15 +86,15 @@ class Command extends Plugin
     private function _registerServices()
     {
         $this->setComponents([
-            'entries' => \amimpact\command\services\Entries::class,
-            'general' => \amimpact\command\services\General::class,
-            'globals' => \amimpact\command\services\Globals::class,
-            'plugins' => \amimpact\command\services\Plugins::class,
-            'search' => \amimpact\command\services\Search::class,
-            'settings' => \amimpact\command\services\Settings::class,
-            'tasks' => \amimpact\command\services\Tasks::class,
-            'utilities' => \amimpact\command\services\Utilities::class,
-            'users' => \amimpact\command\services\Users::class,
+            'entries' => \amimpact\commandpalette\services\Entries::class,
+            'general' => \amimpact\commandpalette\services\General::class,
+            'globals' => \amimpact\commandpalette\services\Globals::class,
+            'plugins' => \amimpact\commandpalette\services\Plugins::class,
+            'search' => \amimpact\commandpalette\services\Search::class,
+            'settings' => \amimpact\commandpalette\services\Settings::class,
+            'tasks' => \amimpact\commandpalette\services\Tasks::class,
+            'utilities' => \amimpact\commandpalette\services\Utilities::class,
+            'users' => \amimpact\commandpalette\services\Users::class,
         ]);
     }
 
@@ -110,8 +110,8 @@ class Command extends Plugin
         if (! $requestService->getIsConsoleRequest() && $requestService->getIsCpRequest() && ! $requestService->getAcceptsJson() && ! Craft::$app->getUser()->getIsGuest()) {
             // Load resources
             $viewService = Craft::$app->getView();
-            $viewService->registerAssetBundle(CommandBundle::class);
-            $viewService->registerTranslations('command', [
+            $viewService->registerAssetBundle(PaletteBundle::class);
+            $viewService->registerTranslations('command-palette', [
                 'Command executed',
                 'Are you sure you want to execute this command?',
                 'There are no more commands available.'
@@ -119,7 +119,7 @@ class Command extends Plugin
 
             // Load palette
             Event::on(View::class, View::EVENT_END_BODY, function(Event $event) use ($viewService) {
-                echo $viewService->renderTemplate('command/palette', [
+                echo $viewService->renderTemplate('command-palette/palette', [
                     'commands' => $this->general->getCommands($this->getSettings()),
                 ]);
             });

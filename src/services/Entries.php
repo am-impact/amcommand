@@ -7,9 +7,9 @@
  * @link      http://www.am-impact.nl
  */
 
-namespace amimpact\command\services;
+namespace amimpact\commandpalette\services;
 
-use amimpact\command\Command;
+use amimpact\commandpalette\CommandPalette;
 
 use Craft;
 use craft\base\Component;
@@ -68,7 +68,7 @@ class Entries extends Component
                 // We have to get the entries for this section first
                 $commands[] = [
                     'name'    => $type . ': ' . $section->name,
-                    'info'    => Craft::t('command', 'Total entries in this section: {total}', ['total' => $totalEntries]),
+                    'info'    => Craft::t('command-palette', 'Total entries in this section: {total}', ['total' => $totalEntries]),
                     'more'    => true,
                     'call'    => 'editEntry',
                     'service' => 'entries',
@@ -121,7 +121,7 @@ class Entries extends Component
             ->status(null)
             ->all();
         if (! $entries) {
-            Command::$plugin->general->setReturnMessage(Craft::t('command', 'No entries in this section exist yet.'));
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'No entries in this section exist yet.'));
         }
         else {
             foreach ($entries as $entry) {
@@ -170,7 +170,7 @@ class Entries extends Component
                 if ($totalEntries > 0) {
                     $commands[] = [
                         'name'    => $section->name,
-                        'info'    => Craft::t('command', 'Total entries in this section: {total}', ['total' => $totalEntries]),
+                        'info'    => Craft::t('command-palette', 'Total entries in this section: {total}', ['total' => $totalEntries]),
                         'warn'    => $deleteAll,
                         'more'    => !$deleteAll,
                         'call'    => 'deleteEntriesFromSection',
@@ -184,7 +184,7 @@ class Entries extends Component
             }
         }
         if (! count($commands)) {
-            Command::$plugin->general->setReturnMessage(Craft::t('command', 'There are no entries within the available sections.'));
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'There are no entries within the available sections.'));
         }
 
         return $commands;
@@ -227,11 +227,11 @@ class Entries extends Component
 
             // Did we delete some?
             if ($success) {
-                Command::$plugin->general->setReturnUrl(UrlHelper::cpUrl('entries/' . $variables['sectionHandle']));
-                Command::$plugin->general->setReturnMessage(Craft::t('command', 'Entries deleted.'));
+                CommandPalette::$plugin->general->setReturnUrl(UrlHelper::cpUrl('entries/' . $variables['sectionHandle']));
+                CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'Entries deleted.'));
             }
             else {
-                Command::$plugin->general->setReturnMessage(Craft::t('command', 'Couldn’t delete entries.'));
+                CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'Couldn’t delete entries.'));
             }
 
             return $success;
@@ -252,7 +252,7 @@ class Entries extends Component
             ];
         }
         if (! count($commands)) {
-            Command::$plugin->general->setReturnMessage(Craft::t('command', 'No entries in this section exist yet.'));
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'No entries in this section exist yet.'));
         }
 
         return $commands;
@@ -275,11 +275,11 @@ class Entries extends Component
         // Delete entry!
         $success = Craft::$app->getElements()->deleteElementById($variables['entryId']);
         if ($success) {
-            Command::$plugin->general->deleteCurrentCommand();
-            Command::$plugin->general->setReturnMessage(Craft::t('app', 'Entry deleted.'));
+            CommandPalette::$plugin->general->deleteCurrentCommand();
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('app', 'Entry deleted.'));
         }
         else {
-            Command::$plugin->general->setReturnMessage(Craft::t('app', 'Couldn’t delete entry.'));
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('app', 'Couldn’t delete entry.'));
         }
 
         return $success;

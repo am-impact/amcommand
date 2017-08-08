@@ -7,9 +7,9 @@
  * @link      http://www.am-impact.nl
  */
 
-namespace amimpact\command\services;
+namespace amimpact\commandpalette\services;
 
-use amimpact\command\Command;
+use amimpact\commandpalette\CommandPalette;
 
 use Craft;
 use craft\base\Component;
@@ -74,18 +74,18 @@ class Search extends Component
         // Do we have our search criteria?
         $searchCriteria = $variables['searchText'];
         if (empty($searchCriteria) || trim($searchCriteria) == '') {
-            Command::$plugin->general->setReturnMessage(Craft::t('command', 'Search criteria isn’t set.'));
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'Search criteria isn’t set.'));
             return false;
         }
 
         // What are we searching for?
         switch ($variables['option']) {
             case 'Craft':
-                Command::$plugin->general->setReturnUrl('https://craftcms.com/search?q=' . $searchCriteria, true);
+                CommandPalette::$plugin->general->setReturnUrl('https://craftcms.com/search?q=' . $searchCriteria, true);
                 break;
 
             case 'StackExchange':
-                Command::$plugin->general->setReturnUrl('http://craftcms.stackexchange.com/search?q=' . $searchCriteria, true);
+                CommandPalette::$plugin->general->setReturnUrl('http://craftcms.stackexchange.com/search?q=' . $searchCriteria, true);
                 break;
 
             case 'DirectElements':
@@ -129,7 +129,7 @@ class Search extends Component
         $variables = [
             'option' => $searchOption
         ];
-        Command::$plugin->general->setReturnAction(Craft::t('command', 'Search on {option}', ['option' => Craft::t('app', $searchOption)]), '', 'searchOn', 'search', $variables, false);
+        CommandPalette::$plugin->general->setReturnAction(Craft::t('command-palette', 'Search on {option}', ['option' => Craft::t('app', $searchOption)]), '', 'searchOn', 'search', $variables, false);
 
         return true;
     }
@@ -150,7 +150,7 @@ class Search extends Component
         $variables = [
             'option' => $searchOption
         ];
-        Command::$plugin->general->setReturnAction(Craft::t('command', 'Search for {option}', ['option' => $actualElementType->displayName()]), '', 'searchOn', 'search', $variables, true, true);
+        CommandPalette::$plugin->general->setReturnAction(Craft::t('command-palette', 'Search for {option}', ['option' => $actualElementType->displayName()]), '', 'searchOn', 'search', $variables, true, true);
 
         return true;
     }

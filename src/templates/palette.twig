@@ -1,16 +1,16 @@
-<div class="command">
-    <div class="command__tabs hidden"></div>
-    <div class="command__container">
-        <div class="command__search">
+<div class="palette">
+    <div class="palette__tabs hidden"></div>
+    <div class="palette__container">
+        <div class="palette__search">
             <input class="text" type="text" name="search" value="" autocomplete="off">
-            <span class="command__loader hidden"></span>
+            <span class="palette__loader hidden"></span>
         </div>
-        <div class="command__commands">
+        <div class="palette__commands">
             <ul></ul>
         </div>
     </div>
 </div>
 
 {% js %}
-    new Craft.Command({{ commands|raw }});
+    new Craft.Palette({{ commands|raw }});
 {% endjs %}

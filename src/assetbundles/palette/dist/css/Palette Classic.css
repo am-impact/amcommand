@@ -6,12 +6,12 @@
  * @link      http://www.am-impact.nl
  */
 
-.command {
+.palette {
     width: 400px;
     border-radius: 5px;
 }
 
-.command__tabs {
+.palette__tabs {
     padding: 8px 15px;
     font-size: 100%;
 }
@@ -20,7 +20,7 @@
 /**
  * Input
  */
-.command__search input[type=text] {
+.palette__search input[type=text] {
     background: initial;
     border-radius: initial;
     font-size: 100%;
@@ -33,7 +33,7 @@
     box-shadow: 0 0 5px rgba(51, 170, 255, 0);
 }
 
-.command__search input[type=text]:focus {
+.palette__search input[type=text]:focus {
     border-color: #7dafe8;
     outline: none;
     -webkit-box-shadow: 0 0 5px #80caff;
@@ -45,13 +45,13 @@
 /**
  * Loaders
  */
- .command__loader,
-.command__loader:after {
+ .palette__loader,
+.palette__loader:after {
     border-radius: 50%;
     width: 13px;
     height: 13px;
 }
-.command__loader {
+.palette__loader {
     top: 5px;
     right: 14px;
     border-top: 3px solid rgba(235,237,239, 0.4);
@@ -64,60 +64,60 @@
 /**
  * Commands
  */
-.command__commands li {
+.palette__commands li {
     padding: 5px;
     font-size: 100%;
     color: #0d78f2;
 }
 
-.command__commands .go:hover:after {
+.palette__commands .go:hover:after {
     color: inherit;
 }
-.command__commands li.focus .go:after {
-    color: inherit;
-}
-
-.command__name {
+.palette__commands li.focus .go:after {
     color: inherit;
 }
 
-.command__commands li.focus .command__name {
+.palette__command__name {
     color: inherit;
 }
 
-.command__info {
+.palette__commands li.focus .palette__command__name {
+    color: inherit;
+}
+
+.palette__command__info {
     color: #b9bfc6;
     margin: 0;
 }
 
-.command__shortcut {
+.palette__command__shortcut {
     flex: 0 0 35px;
     padding: 0 0 0 5px;
 }
 
-.command__commands li.focus .command__shortcut {
+.palette__commands li.focus .palette__command__shortcut {
     color: inherit;
 }
 
-.command__icon {
+.palette__command__icon {
     color: inherit;
     font-size: 18px;
 }
 
-.command__commands li.focus .command__icon {
+.palette__commands li.focus .palette__command__icon {
     color: inherit;
 }
 
-.command__icon svg {
+.palette__command__icon svg {
     width: 23px;
     max-height: 23px;
 }
 
-.command__icon svg path {
+.palette__command__icon svg path {
     fill: rgba(13, 120, 242, 0.82);
 }
 
-.command__commands li.focus .command__icon svg path {
+.palette__commands li.focus .palette__command__icon svg path {
     fill: rgba(13, 120, 242, 0.90);;
 }
 

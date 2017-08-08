@@ -6,21 +6,21 @@
  * @link      http://www.am-impact.nl
  */
 
-.command {
+.palette {
     background: rgba(51, 63, 77, 0.75);
     border-radius: 14px;
     padding: 6px;
 }
 
-.command__tabs {
+.palette__tabs {
     border-radius: 10px 10px 0 0;
 }
 
-.command__container {
+.palette__container {
     background: #ffffff;
     border-radius: 10px;
 }
 
-.command .command__tabs:not(.hidden) + .command__container {
+.palette .palette__tabs:not(.hidden) + .palette__container {
     border-radius: 0 0 10px 10px;
 }

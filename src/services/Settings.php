@@ -7,9 +7,9 @@
  * @link      http://www.am-impact.nl
  */
 
-namespace amimpact\command\services;
+namespace amimpact\commandpalette\services;
 
-use amimpact\command\Command;
+use amimpact\commandpalette\CommandPalette;
 
 use Craft;
 use craft\base\Component;
@@ -177,7 +177,7 @@ class Settings extends Component
             ];
         }
         if (! count($commands)) {
-            Command::$plugin->general->setReturnMessage(Craft::t('app', 'No global sets exist yet.'));
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('app', 'No global sets exist yet.'));
         }
 
         return $commands;

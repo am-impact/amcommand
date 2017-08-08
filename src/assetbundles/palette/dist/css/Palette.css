@@ -6,7 +6,7 @@
  * @link      http://www.am-impact.nl
  */
 
-.command {
+.palette {
     display: none;
     background: #ffffff;
     border-radius: 0;
@@ -22,7 +22,7 @@
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 5px 25px -5px rgba(0, 0, 0, 0.25);
 }
 
-.command__tabs {
+.palette__tabs {
     padding: 12px 15px 10px;
     color: #29323d;
     cursor: default;
@@ -34,11 +34,11 @@
     background-image: linear-gradient(#f7f7f8, #f4f5f6);
 }
 
-.command__container {
+.palette__container {
     padding: 15px;
 }
 
-.command__search {
+.palette__search {
     position: relative;
 }
 
@@ -46,7 +46,7 @@
 /**
  * Input
  */
-.command__search input[type=text] {
+.palette__search input[type=text] {
     width: 100%;
     border: 0;
     background: rgba(238, 238, 238, 0.72);
@@ -56,7 +56,7 @@
     line-height: 1;
 }
 
-.command__search input[type=text]:focus {
+.palette__search input[type=text]:focus {
     box-shadow: none;
 }
 
@@ -64,13 +64,13 @@
 /**
  * Loaders
  */
-.command__loader,
-.command__loader:after {
+.palette__loader,
+.palette__loader:after {
     border-radius: 50%;
     width: 22px;
     height: 22px;
 }
-.command__loader {
+.palette__loader {
     position: absolute;
     top: 12px;
     right: 10px;
@@ -109,65 +109,65 @@
 /**
  * Commands
  */
-.command__commands ul {
+.palette__commands ul {
     max-height: 400px;
     margin-top: 15px;
     overflow: auto;
 }
-.command__commands li {
+.palette__commands li {
     display: flex;
     border-top: 1px dotted rgba(115, 127, 140, 0.15);
     font-size: 18px;
     padding: 10px 10px;
 }
 
-.command__content {
+.palette__command__content {
     flex: 1;
 }
 
-.command__commands li:hover {
+.palette__commands li:hover {
     background: #f5f6f6;
     cursor: pointer;
 }
 
-.command__commands li.focus {
+.palette__commands li.focus {
     background: rgba(239, 240, 241, 0.43);
 }
 
-.command__commands .go:hover:after {
+.palette__commands .go:hover:after {
     color: inherit;
 }
-.command__commands li.focus .go:after {
+.palette__commands li.focus .go:after {
     color: inherit;
 }
 
-.command__name {
+.palette__command__name {
     color: rgba(0, 0, 0, 0.82);
     display: block;
     font-size: 100%;
 }
 
-.command__commands li.focus .command__name {
+.palette__commands li.focus .palette__command__name {
     color: rgba(0, 0, 0, 0.90);
 }
 
-.command__info {
+.palette__command__info {
     color: #b9bfc6;
     display: block;
     font-size: 80%;
     margin-top: 5px;
 }
 
-.command__shortcut {
+.palette__command__shortcut {
     flex: 0 0 35px;
     padding: 0 0 0 5px;
 }
 
-.command__commands li.focus .command__shortcut {
+.palette__commands li.focus .palette__command__shortcut {
     color: rgba(0, 0, 0, 0.90);
 }
 
-.command__icon {
+.palette__command__icon {
     flex: 0 0 33px;
     padding: 0 5px 4px 0;
     font-size: 28px;
@@ -175,20 +175,20 @@
     color: rgba(0, 0, 0, 0.82);
 }
 
-.command__commands li.focus .command__icon {
+.palette__commands li.focus .palette__command__icon {
     color: rgba(0, 0, 0, 0.90);
 }
 
-.command__icon svg {
+.palette__command__icon svg {
     width: 33px;
     max-height: 33px;
 }
 
-.command__icon svg path {
+.palette__command__icon svg path {
     fill: rgba(0, 0, 0, 0.82);
 }
 
-.command__commands li.focus .command__icon svg path {
+.palette__commands li.focus .palette__command__icon svg path {
     fill: rgba(0, 0, 0, 0.90);;
 }
 
@@ -197,7 +197,7 @@
  * Notices
  */
 
-.command__notice {
+.palette__notice {
     font-weight: bold;
     padding-right: 10px;
 }
