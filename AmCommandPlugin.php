@@ -11,7 +11,8 @@ class AmCommandPlugin extends BasePlugin
 {
     public function getName()
     {
-         return 'Command';
+        $pluginNameOverride = $this->getSettings()->getAttribute('pluginNameOverride');
+        return empty($pluginNameOverride) ? Craft::t('Command') : $pluginNameOverride;
     }
 
     public function getReleaseFeedUrl()
@@ -21,7 +22,7 @@ class AmCommandPlugin extends BasePlugin
 
     public function getVersion()
     {
-        return '2.1.1';
+        return '2.1.2';
     }
 
     public function getSchemaVersion()
@@ -104,6 +105,7 @@ class AmCommandPlugin extends BasePlugin
         return array(
             'theme'                     => array(AttributeType::String, 'default' => ''),
             'elementSearchElementTypes' => array(AttributeType::Mixed),
+            'pluginNameOverride'        => AttributeType::String,
         );
     }
 
