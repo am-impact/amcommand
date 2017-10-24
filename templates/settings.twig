@@ -1,5 +1,15 @@
 {% import "_includes/forms" as forms %}
 
+{{ forms.textField({
+    label: "Plugin Name"|t,
+    instructions: "The plugin name as you'd like it to be displayed in the control panel."|t,
+    id: 'pluginNameOverride',
+    name: 'pluginNameOverride',
+    value: settings.pluginNameOverride,
+    autofocus: true,
+    first: true,
+}) }}
+
 {{ forms.selectField({
     label: "Theme"|t,
     instructions: "Which theme do you want to use?"|t,
