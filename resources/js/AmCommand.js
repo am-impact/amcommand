@@ -18,16 +18,10 @@ Craft.AmCommand = Garnish.Base.extend(
     ignoreSearchKeys: [Garnish.UP_KEY, Garnish.DOWN_KEY, Garnish.LEFT_KEY, Garnish.RIGHT_KEY, Garnish.RETURN_KEY, Garnish.ESC_KEY, Garnish.CMD_KEY, Garnish.CTRL_KEY],
 
     // Palette options & commands
-    fuzzyOptions: {
-        pre: "<strong>",
-        post: "</strong>",
-        extract: function(element) {
-            return element.name;
-        }
-    },
     commandsArray: [],
     elementCommandsArray: [],
     combinedCommandsArray: [],
+    searchedCommandsArray: [],
     rememberPalette: {
         currentSet: 0,
         paletteStyle: [],
@@ -219,19 +213,21 @@ Craft.AmCommand = Garnish.Base.extend(
         if ((! self.isAction || isRealtime) && (! self.loadingRequest || self.loadingElements)) {
             var commandsArray = self.allowElementSearch ? self.combinedCommandsArray : self.commandsArray,
                 searchValue = isRealtime ? '' : self.$searchField.val(),
-                filtered = fuzzy.filter(searchValue, commandsArray, self.fuzzyOptions),
+                filtered = fuzzysort.go(searchValue, commandsArray, { key: 'name' }),
                 totalResults = filtered.length,
                 performUpdate = true;
 
+            // Reset searched commands
+            self.searchedCommandsArray = [];
+
+            // Render commands?
             if (! self.allowElementSearch || (searchValue.length && self.allowElementSearch)) {
                 // Find matches
-                var results = filtered.map(function(el, i) {
-                    var icon = ('icon' in el.original) ? '<span class="amcommand__icon"' + (el.original.icon.type == 'font' ? ' data-icon="' + el.original.icon.content + '"' : '') + '>' + (el.original.icon.type != 'font' ? el.original.icon.content : '') + '</span>' : '';
-                    var shortcut = (i < 9) ? '<span class="amcommand__shortcut">&#8984;' + (i + 1) + '</span>' : '';
-                    var name = '<span class="amcommand__name' + ('more' in el.original && el.original.more ? ' go' : '') + '">' + el.string + '</span>';
-                    var info = ('info' in el.original) ? '<span class="amcommand__info">' + el.original.info + '</span>' : '';
-                    return '<li data-id="' + el.index + '">' + icon + '<div class="amcommand__content">' + name + info + '</div>' + shortcut + '</li>';
-                });
+                var results = self.renderCommands(filtered);
+                if (! results.length && searchValue == '' && ! self.allowElementSearch) {
+                    // When a command was executed that displays a new list of commands, make sure they are shown
+                    results = self.renderCommands(commandsArray);
+                }
 
                 // Element search deliver anything new?
                 if (isElementSearch) {
@@ -265,6 +261,32 @@ Craft.AmCommand = Garnish.Base.extend(
                 self.triggerRealtimeAction();
             }, this), 600);
         }
+    },
+
+    /**
+     * Render the commands that will be showed.
+     *
+     * @param array commands
+     */
+    renderCommands: function(commands) {
+        var self = this;
+
+        var results = commands.map(function(el, i) {
+            // Add the object to our current searched commands
+            var object = ('obj' in el) ? el.obj : el;
+            self.searchedCommandsArray.push(object);
+
+            // Render command
+            var icon = ('icon' in object) ? '<span class="amcommand__icon"' + (object.icon.type == 'font' ? ' data-icon="' + object.icon.content + '"' : '') + '>' + (object.icon.type != 'font' ? object.icon.content : '') + '</span>' : '';
+            var shortcut = (i < 9) ? '<span class="amcommand__shortcut">&#8984;' + (i + 1) + '</span>' : '';
+            var name = ('obj' in el) ? fuzzysort.highlight(el) : object.name;
+            name = '<span class="amcommand__name' + ('more' in object && object.more ? ' go' : '') + '">' + name + '</span>';
+            var info = ('info' in object) ? '<span class="amcommand__info">' + object.info + '</span>' : '';
+
+            return '<li data-id="' + i + '">' + icon + '<div class="amcommand__content">' + name + info + '</div>' + shortcut + '</li>';
+        });
+
+        return results;
     },
 
     /**
@@ -503,12 +525,11 @@ Craft.AmCommand = Garnish.Base.extend(
                     var $current = self.$commands.filter('.focus');
                 }
                 if ($current.length) {
-                    var commandId = $current.data('id'),
-                        commandsArray = self.allowElementSearch ? self.combinedCommandsArray : self.commandsArray;
+                    var commandId = $current.data('id');
 
-                    if (commandId in commandsArray) {
+                    if (commandId in self.searchedCommandsArray) {
                         var confirmed       = true,
-                            commandData     = commandsArray[commandId],
+                            commandData     = self.searchedCommandsArray[commandId],
                             warn            = ('warn' in commandData) ? commandData.warn : false,
                             url             = ('url' in commandData) ? commandData.url : false,
                             callback        = ('call' in commandData) ? commandData.call : false,

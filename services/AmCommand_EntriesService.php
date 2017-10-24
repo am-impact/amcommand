@@ -455,7 +455,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             );
         }
 
-        // Let the palette knnow we are reversing the sorting
+        // Let the palette know we are reversing the sorting
         craft()->amCommand->setReverseSorting(true);
 
         return $commands;
@@ -487,7 +487,7 @@ class AmCommand_EntriesService extends BaseApplicationComponent
             return false;
         }
 
-        // Let the palette knnow we are returning HTML
+        // Let the palette know we are returning HTML
         craft()->amCommand->setReturnHtml(true);
 
         // Compare them!
