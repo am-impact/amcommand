@@ -28,7 +28,7 @@
     "extra": {
         "name": "Command Palette",
         "handle": "command-palette",
-        "version": "3.0.0",
+        "version": "3.1.0",
         "schemaVersion": "3.0.0",
         "hasSettings": true,
         "hasCpSection": true,
