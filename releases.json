@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.2.0",
+        "downloadUrl": "https://github.com/am-impact/amcommand/archive/master.zip",
+        "date": "2017-10-25T10:00:00+01:00",
+        "notes": [
+            "[Improved] Fuzzy search works on command descriptions as well.",
+            "[Improved] Updated fuzzy search engine.",
+            "[Improved] Option to rename the plugin in the settings."
+        ]
+    },
+    {
         "version": "2.1.1",
         "downloadUrl": "https://github.com/am-impact/amcommand/archive/master.zip",
         "date": "2017-07-13T10:00:00+01:00",
