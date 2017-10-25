@@ -213,7 +213,12 @@ Craft.AmCommand = Garnish.Base.extend(
         if ((! self.isAction || isRealtime) && (! self.loadingRequest || self.loadingElements)) {
             var commandsArray = self.allowElementSearch ? self.combinedCommandsArray : self.commandsArray,
                 searchValue = isRealtime ? '' : self.$searchField.val(),
-                filtered = fuzzysort.go(searchValue, commandsArray, { key: 'name' }),
+                filtered = fuzzysort.go(searchValue, commandsArray, {
+                    keys: ['name', 'info'],
+                    scoreFn: function(a) {
+                        return Math.max(a[0] ? a[0].score : -1000, a[1] ? a[1].score-100 : -1000)
+                    }
+                }),
                 totalResults = filtered.length,
                 performUpdate = true;
 
@@ -271,19 +276,50 @@ Craft.AmCommand = Garnish.Base.extend(
     renderCommands: function(commands) {
         var self = this;
 
-        var results = commands.map(function(el, i) {
+        var counter = -1,
+            results = commands.map(function(el) {
+            // Where is our command located?
+            var object = el;
+            var name = object.name;
+            var info = object.info;
+            if ('obj' in el) {
+                object = el.obj;
+                name = object.name;
+                info = object.info;
+
+                // Highlight our best result
+                if (el[0] !== null) {
+                    if (el[0].target == info) {
+                        info = fuzzysort.highlight(el[0]);
+                    }
+                    else {
+                        name = fuzzysort.highlight(el[0]);
+                    }
+                }
+                else if (el[1] !== null) {
+                    if (el[1].target == info) {
+                        info = fuzzysort.highlight(el[1]);
+                    }
+                    else {
+                        name = fuzzysort.highlight(el[1]);
+                    }
+                }
+                else {
+                    return '';
+                }
+            }
+
             // Add the object to our current searched commands
-            var object = ('obj' in el) ? el.obj : el;
             self.searchedCommandsArray.push(object);
 
             // Render command
+            counter ++;
             var icon = ('icon' in object) ? '<span class="amcommand__icon"' + (object.icon.type == 'font' ? ' data-icon="' + object.icon.content + '"' : '') + '>' + (object.icon.type != 'font' ? object.icon.content : '') + '</span>' : '';
-            var shortcut = (i < 9) ? '<span class="amcommand__shortcut">&#8984;' + (i + 1) + '</span>' : '';
-            var name = ('obj' in el) ? fuzzysort.highlight(el) : object.name;
+            var shortcut = (counter < 9) ? '<span class="amcommand__shortcut">&#8984;' + (counter + 1) + '</span>' : '';
             name = '<span class="amcommand__name' + ('more' in object && object.more ? ' go' : '') + '">' + name + '</span>';
-            var info = ('info' in object) ? '<span class="amcommand__info">' + object.info + '</span>' : '';
+            info = (info.length) ? '<span class="amcommand__info">' + info + '</span>' : '';
 
-            return '<li data-id="' + i + '">' + icon + '<div class="amcommand__content">' + name + info + '</div>' + shortcut + '</li>';
+            return '<li data-id="' + counter + '">' + icon + '<div class="amcommand__content">' + name + info + '</div>' + shortcut + '</li>';
         });
 
         return results;

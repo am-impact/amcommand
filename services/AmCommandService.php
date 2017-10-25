@@ -263,6 +263,13 @@ class AmCommandService extends BaseApplicationComponent
             return $reverseSorting ? strnatcmp($b['name'], $a['name']) : strnatcmp($a['name'], $b['name']);
         });
 
+        // Add necessary keys for fuzzy sort
+        foreach ($commands as &$command) {
+            if (! isset($command['info'])) {
+                $command['info'] = '';
+            }
+        }
+
         return $commands;
     }
 
