@@ -26,16 +26,10 @@ Craft.Palette = Garnish.Base.extend(
     ignoreSearchKeys: [Garnish.UP_KEY, Garnish.DOWN_KEY, Garnish.LEFT_KEY, Garnish.RIGHT_KEY, Garnish.RETURN_KEY, Garnish.ESC_KEY, Garnish.CMD_KEY, Garnish.CTRL_KEY],
 
     // Palette options & commands
-    fuzzyOptions: {
-        pre: "<strong>",
-        post: "</strong>",
-        extract: function(element) {
-            return element.name;
-        }
-    },
     commandsArray: [],
     elementCommandsArray: [],
     combinedCommandsArray: [],
+    searchedCommandsArray: [],
     rememberPalette: {
         currentSet: 0,
         paletteStyle: [],
@@ -227,19 +221,26 @@ Craft.Palette = Garnish.Base.extend(
         if ((! self.isAction || isRealtime) && (! self.loadingRequest || self.loadingElements)) {
             var commandsArray = self.allowElementSearch ? self.combinedCommandsArray : self.commandsArray,
                 searchValue = isRealtime ? '' : self.$searchField.val(),
-                filtered = fuzzy.filter(searchValue, commandsArray, self.fuzzyOptions),
+                filtered = fuzzysort.go(searchValue, commandsArray, {
+                    keys: ['name', 'info'],
+                    scoreFn: function(a) {
+                        return Math.max(a[0] ? a[0].score : -1000, a[1] ? a[1].score-100 : -1000)
+                    }
+                }),
                 totalResults = filtered.length,
                 performUpdate = true;
 
+            // Reset searched commands
+            self.searchedCommandsArray = [];
+
+            // Render commands?
             if (! self.allowElementSearch || (searchValue.length && self.allowElementSearch)) {
                 // Find matches
-                var results = filtered.map(function(el, i) {
-                    var icon = ('icon' in el.original) ? '<span class="palette__command__icon"' + (el.original.icon.type == 'font' ? ' data-icon="' + el.original.icon.content + '"' : '') + '>' + (el.original.icon.type != 'font' ? el.original.icon.content : '') + '</span>' : '';
-                    var shortcut = (i < 9) ? '<span class="palette__command__shortcut">&#8984;' + (i + 1) + '</span>' : '';
-                    var name = '<span class="palette__command__name' + ('more' in el.original && el.original.more ? ' go' : '') + '">' + el.string + '</span>';
-                    var info = ('info' in el.original) ? '<span class="palette__command__info">' + el.original.info + '</span>' : '';
-                    return '<li data-id="' + el.index + '">' + icon + '<div class="palette__command__content">' + name + info + '</div>' + shortcut + '</li>';
-                });
+                var results = self.renderCommands(filtered);
+                if (! results.length && searchValue == '' && ! self.allowElementSearch) {
+                    // When a command was executed that displays a new list of commands, make sure they are shown
+                    results = self.renderCommands(commandsArray);
+                }
 
                 // Element search deliver anything new?
                 if (isElementSearch) {
@@ -249,7 +250,7 @@ Craft.Palette = Garnish.Base.extend(
                     }
                 }
 
-                // Update palettte
+                // Update palette
                 if (performUpdate) {
                     self.$commandsContainer.removeClass('hidden');
                     self.$commandsContainer.html(results.join(''));
@@ -273,6 +274,63 @@ Craft.Palette = Garnish.Base.extend(
                 self.triggerRealtimeAction();
             }, this), 600);
         }
+    },
+
+    /**
+     * Render the commands that will be showed.
+     *
+     * @param array commands
+     */
+    renderCommands: function(commands) {
+        var self = this;
+
+        var counter = -1,
+            results = commands.map(function(el) {
+            // Where is our command located?
+            var object = el;
+            var name = object.name;
+            var info = object.info;
+            if ('obj' in el) {
+                object = el.obj;
+                name = object.name;
+                info = object.info;
+
+                // Highlight our best result
+                if (el[0] !== null) {
+                    if (el[0].target == info) {
+                        info = fuzzysort.highlight(el[0]);
+                    }
+                    else {
+                        name = fuzzysort.highlight(el[0]);
+                    }
+                }
+                else if (el[1] !== null) {
+                    if (el[1].target == info) {
+                        info = fuzzysort.highlight(el[1]);
+                    }
+                    else {
+                        name = fuzzysort.highlight(el[1]);
+                    }
+                }
+                else {
+                    return '';
+                }
+            }
+
+            // Add the object to our current searched commands
+            self.searchedCommandsArray.push(object);
+
+            // Render command
+            counter ++;
+            var icon = ('icon' in object) ? '<span class="palette__command__icon"' + (object.icon.type == 'font' ? ' data-icon="' + object.icon.content + '"' : '') + '>' + (object.icon.type != 'font' ? object.icon.content : '') + '</span>' : '';
+            var shortcut = (counter < 9) ? '<span class="palette__command__shortcut">&#8984;' + (counter + 1) + '</span>' : '';
+            name = '<span class="palette__command__name' + ('more' in object && object.more ? ' go' : '') + '">' + name + '</span>';
+            info = (info.length) ? '<span class="palette__command__info">' + info + '</span>' : '';
+
+            return '<li data-id="' + counter + '">' + icon + '<div class="palette__command__content">' + name + info + '</div>' + shortcut + '</li>';
+        });
+
+        return results;
     },
 
     /**
@@ -511,12 +569,11 @@ Craft.Palette = Garnish.Base.extend(
                     var $current = self.$commands.filter('.focus');
                 }
                 if ($current.length) {
-                    var commandId = $current.data('id'),
-                        commandsArray = self.allowElementSearch ? self.combinedCommandsArray : self.commandsArray;
+                    var commandId = $current.data('id');
 
-                    if (commandId in commandsArray) {
+                    if (commandId in self.searchedCommandsArray) {
                         var confirmed       = true,
-                            commandData     = commandsArray[commandId],
+                            commandData     = self.searchedCommandsArray[commandId],
                             warn            = ('warn' in commandData) ? commandData.warn : false,
                             url             = ('url' in commandData) ? commandData.url : false,
                             callback        = ('call' in commandData) ? commandData.call : false,
