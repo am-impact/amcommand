@@ -100,17 +100,29 @@ class Settings extends Model
      */
     public function getElementSearchElementTypes()
     {
+        // Gather element types
         $elementSearchElementTypes = [];
         $defaultEnabledElementTypes = [
-            User::refHandle(),
-            Category::refHandle(),
-            Entry::refHandle(),
+            new Category(),
+            new Entry(),
+            new User(),
         ];
 
         // Find supported element types for element search, based on the settings
         if (is_array($this->elementSearchElementTypes)) {
             foreach ($this->elementSearchElementTypes as $elementType => $submittedInfo) {
                 $elementSearchElementTypes[$elementType] = $submittedInfo;
+            }
+        }
+
+        // Find supported element types for element search, based on the defaults
+        foreach ($defaultEnabledElementTypes as $defaultEnabledElementType) {
+            $refHandle = $defaultEnabledElementType::refHandle();
+            if (! isset($elementSearchElementTypes[$refHandle])) {
+                $elementSearchElementTypes[$refHandle] = [
+                    'elementType' => $defaultEnabledElementType::displayName(),
+                    'enabled' => 1,
+                ];
             }
         }
 
@@ -121,7 +133,7 @@ class Settings extends Model
             if (! isset($elementSearchElementTypes[$refHandle])) {
                 $elementSearchElementTypes[$refHandle] = [
                     'elementType' => $elementType::displayName(),
-                    'enabled' => in_array($refHandle, $defaultEnabledElementTypes) ? 1 : 0,
+                    'enabled' => 0,
                 ];
             }
         }

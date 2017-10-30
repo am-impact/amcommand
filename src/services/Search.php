@@ -93,12 +93,10 @@ class Search extends Component
                 $elements = [];
 
                 // Start element searches
-                $pluginSettings = CommandPalette::$plugin->getSettings();
-                if (is_array($pluginSettings->elementSearchElementTypes)) {
-                    foreach ($pluginSettings->elementSearchElementTypes as $elementType => $submittedInfo) {
-                        if (isset($submittedInfo['enabled']) && $submittedInfo['enabled'] === '1') {
-                            $elements = array_merge($elements, $this->_searchForElementType($elementType, $searchCriteria, true));
-                        }
+                $elementSearchElementTypes = CommandPalette::$plugin->getSettings()->getElementSearchElementTypes();
+                foreach ($elementSearchElementTypes as $elementType => $submittedInfo) {
+                    if (isset($submittedInfo['enabled']) && ($submittedInfo['enabled'] === '1' || $submittedInfo['enabled'] === 1)) {
+                        $elements = array_merge($elements, $this->_searchForElementType($elementType, $searchCriteria, true));
                     }
                 }
 
