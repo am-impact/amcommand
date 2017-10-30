@@ -777,7 +777,7 @@ Craft.Palette = Garnish.Base.extend(
                             self.displayMessage((response.result != ''), response.message, false);
                         }
                         else if (displayDefaultMessage) {
-                            self.displayMessage(true, false, $current.children('.palette__command__name').text());
+                            self.displayMessage(true, false, self.loadingCommand);
                         }
 
                         // Redirect?
