@@ -200,7 +200,8 @@ class Search extends Component
             ->search('*' . $searchCriteria . '*')
             ->status(null)
             ->orderBy('score')
-            ->limit(null);
+            ->limit(null)
+            ->all();
 
         foreach ($elements as $element) {
             switch ($elementType) {
