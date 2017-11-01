@@ -692,16 +692,16 @@ class General extends Component
                 'content' => 'plugin',
             ]
         ];
-        $currentCommands[] = array(
+        $currentCommands[] = [
             'name'    => Craft::t('app', 'Settings') . ': ' . Craft::t('command-palette', 'Plugin settings'),
             'more'    => true,
             'call'    => 'getSettingsUrl',
             'service' => 'plugins',
-            'icon'    => array(
+            'icon'    => [
                 'type' => 'font',
                 'content' => 'plugin',
-            )
-        );
+            ]
+        ];
         return $currentCommands;
     }
 }
