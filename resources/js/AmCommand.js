@@ -686,7 +686,11 @@ Craft.AmCommand = Garnish.Base.extend(
                             self.loadingElements = false;
                             self.elementCommandsArray = response.result;
                             self.combinedCommandsArray = self.commandsArray.concat(self.elementCommandsArray);
-                            self.search(undefined, false, true);
+
+                            // Only sort our commands, when we received new ones
+                            if (response.result.length > 0) {
+                                self.search(undefined, false, true);
+                            }
                         }
                         else if (self.isAction && self.isActionRealtime && response.isNewSet) {
                             // Display new commands
