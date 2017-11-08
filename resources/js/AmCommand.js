@@ -767,7 +767,7 @@ Craft.AmCommand = Garnish.Base.extend(
                             self.displayMessage((response.result != ''), response.message, false);
                         }
                         else if (displayDefaultMessage) {
-                            self.displayMessage(true, false, $current.children('.amcommand__commands--name').text());
+                            self.displayMessage(true, false, self.loadingCommand);
                         }
 
                         // Redirect?
