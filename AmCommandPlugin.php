@@ -55,8 +55,8 @@ class AmCommandPlugin extends BasePlugin
 
         return craft()->templates->render('amcommand/settings', array(
             'settings' => $settings,
-            'themes' => $this->_getThemes(),
-            'elementSearchElementTypes' => $this->_getElementSearchElementTypes($settings),
+            'themes' => AmCommandModel::getThemes(),
+            'elementSearchElementTypes' => AmCommandModel::getElementSearchElementTypes(),
         ));
     }
 
@@ -88,7 +88,7 @@ class AmCommandPlugin extends BasePlugin
 
             // Load CSS
             craft()->templates->includeCssResource('amcommand/css/Command.css');
-            $themeFile = $this->_getSelectedTheme($settings);
+            $themeFile = AmCommandModel::getSelectedTheme();
             if ($themeFile) {
                 craft()->templates->includeCssResource('amcommand/css/' . $themeFile);
             }
@@ -107,95 +107,5 @@ class AmCommandPlugin extends BasePlugin
             'elementSearchElementTypes' => array(AttributeType::Mixed),
             'pluginNameOverride'        => AttributeType::String,
         );
-    }
-
-    /**
-     * Get available themes.
-     * @return type
-     */
-    private function _getThemes()
-    {
-        // Gather themes
-        $themes = array();
-        $path = craft()->path->getPluginsPath().'amcommand/resources/css/';
-        if (IOHelper::folderExists($path)) {
-            $themeFiles = IOHelper::getFolderContents($path, false, '\.css$');
-
-            if (is_array($themeFiles)) {
-                foreach ($themeFiles as $file) {
-                    $fileName = IOHelper::getFileName($file);
-                    if ($fileName == 'Command.css') {
-                        continue; // Skip default
-                    }
-                    $themes[$fileName] = IOHelper::getFileName($file, false);
-                }
-            }
-        }
-        natsort($themes);
-
-        return array_merge(array('' => Craft::t('Default')), $themes);
-    }
-
-    /**
-     * Get selected theme.
-     *
-     * @param array $settings
-     *
-     * @return false|string
-     */
-    private function _getSelectedTheme($settings)
-    {
-        // Did we select one?
-        if (empty($settings->theme) || $settings->theme == 'Command.css') {
-            return false;
-        }
-
-        // Find theme
-        $path = craft()->path->getPluginsPath().'amcommand/resources/css/';
-        if (IOHelper::fileExists($path . $settings->theme)) {
-            return $settings->theme;
-        }
-
-        return false;
-    }
-
-    /**
-     * Get available element types that can be used for direct element searching.
-     *
-     * @param array $settings
-     *
-     * @return array
-     */
-    private function _getElementSearchElementTypes($settings)
-    {
-        $elementSearchElementTypes = array();
-        $defaultEnabledElementTypes = array(
-            ElementType::Category,
-            ElementType::Entry,
-            ElementType::User,
-        );
-
-        // Find supported element types for element search, based on the settings
-        if (is_array($settings->elementSearchElementTypes)) {
-            foreach ($settings->elementSearchElementTypes as $elementType => $submittedInfo) {
-                $elementSearchElementTypes[$elementType] = $submittedInfo;
-            }
-        }
-
-        // Find supported element types for element search, based on all element types
-        $elementTypes = craft()->elements->getAllElementTypes();
-        foreach ($elementTypes as $elementType => $elementTypeInfo) {
-            if (! isset($elementSearchElementTypes[$elementType])) {
-                $elementSearchElementTypes[$elementType] = array(
-                    'elementType' => $elementType,
-                    'enabled' => in_array($elementType, $defaultEnabledElementTypes) ? 1 : 0,
-                );
-            }
-        }
-
-        // Sort by element type
-        ksort($elementSearchElementTypes);
-
-        return $elementSearchElementTypes;
     }
 }
