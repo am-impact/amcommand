@@ -10,7 +10,6 @@
 namespace amimpact\commandpalette\services;
 
 use amimpact\commandpalette\CommandPalette;
-
 use Craft;
 use craft\base\Component;
 use craft\queue\Queue;
@@ -23,9 +22,9 @@ class Tasks extends Component
      *
      * @return array
      */
-    public function getTaskCommands()
+    public function getTaskCommands(): array
     {
-        $commands = [
+        return [
             [
                 'name'    => Craft::t('command-palette', 'Delete a task'),
                 'more'    => true,
@@ -69,7 +68,6 @@ class Tasks extends Component
                 'service' => 'tasks'
             ]
         ];
-        return $commands;
     }
 
     /**
@@ -77,7 +75,7 @@ class Tasks extends Component
      *
      * @return array
      */
-    public function listTasks()
+    public function listTasks(): array
     {
         // Gather commands
         $commands = [];
@@ -109,7 +107,7 @@ class Tasks extends Component
      *
      * @return array
      */
-    public function listTaskTypes()
+    public function listTaskTypes(): array
     {
         // Gather commands
         $commands = [];
@@ -147,7 +145,7 @@ class Tasks extends Component
      *
      * @return bool
      */
-    public function deleteTask($variables)
+    public function deleteTask(array $variables = []): bool
     {
         // Do we have the required information?
         if (! isset($variables['taskId'])) {
@@ -155,7 +153,7 @@ class Tasks extends Component
         }
 
         // Delete task!
-        $result = Craft::$app->getQueue()->deleteTaskById($variables['taskId']);
+        $result = Craft::$app->getQueue()->release($variables['taskId']);
         if ($result === true) {
             CommandPalette::$plugin->general->deleteCurrentCommand();
             CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'Task deleted.'));
@@ -172,13 +170,13 @@ class Tasks extends Component
      *
      * @return bool
      */
-    public function deleteAllTasks()
+    public function deleteAllTasks(): bool
     {
         $tasksService = Craft::$app->getQueue();
         $tasks = $tasksService->getJobInfo();
         if ($tasks) {
             foreach ($tasks as $task) {
-                $tasksService->deleteTaskById($task['id']);
+                $tasksService->release($task['id']);
             }
         }
 
@@ -190,7 +188,7 @@ class Tasks extends Component
      *
      * @return bool
      */
-    public function deleteAllFailedTasks()
+    public function deleteAllFailedTasks(): bool
     {
         $tasks = (new Query())
             ->select('*')
@@ -201,7 +199,7 @@ class Tasks extends Component
         if ($tasks) {
             $tasksService = Craft::$app->getQueue();
             foreach ($tasks as $task) {
-                $tasksService->deleteTaskById($task['id']);
+                $tasksService->release($task['id']);
             }
         }
 
@@ -215,7 +213,7 @@ class Tasks extends Component
      *
      * @return bool
      */
-    public function deleteAllTasksByType($variables)
+    public function deleteAllTasksByType(array $variables = []): bool
     {
         // Do we have the required information?
         if (! isset($variables['taskType'])) {
@@ -232,7 +230,7 @@ class Tasks extends Component
         if ($tasks) {
             $tasksService = Craft::$app->getQueue();
             foreach ($tasks as $task) {
-                $tasksService->deleteTaskById($task['id']);
+                $tasksService->release($task['id']);
             }
         }
 
@@ -244,13 +242,20 @@ class Tasks extends Component
      *
      * @return bool
      */
-    public function deletePendingTasks()
+    public function deletePendingTasks(): bool
     {
         $tasksService = Craft::$app->getQueue();
-        $tasks = $tasksService->getPendingTasks();
+
+        // Delete all tasks!
+        $tasks = (new Query())
+            ->select('*')
+            ->from(['{{%queue}}'])
+            ->where(['fail' => false, 'timeUpdated' => null, 'delay' => 0])
+            ->all();
+
         if ($tasks) {
             foreach ($tasks as $task) {
-                $tasksService->deleteTaskById($task['id']);
+                $tasksService->release($task['id']);
             }
         }
 
@@ -262,14 +267,19 @@ class Tasks extends Component
      *
      * @return bool
      */
-    public function deleteRunningTask()
+    public function deleteRunningTask(): bool
     {
-        $task = Craft::$app->getQueue()->getRunningTask();
+        $task = (new Query())
+            ->select('*')
+            ->from(['{{%queue}}'])
+            ->orderBy(['priority' => SORT_ASC, 'id' => SORT_ASC])
+            ->limit(1)
+            ->one();
         if (! $task) {
             CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'There is no running task at the moment.'));
         }
         else {
-            if (Craft::$app->getQueue()->deleteTaskById($task['id']) === true) {
+            if (Craft::$app->getQueue()->release($task['id']) === true) {
                 return true;
             }
         }
@@ -282,14 +292,14 @@ class Tasks extends Component
      *
      * @return bool
      */
-    public function restartFailedTasks()
+    public function restartFailedTasks(): bool
     {
         $tasksService = Craft::$app->getQueue();
         $tasks = $tasksService->getJobInfo();
         if ($tasks) {
             foreach ($tasks as $task) {
-                if ($task['status'] == Queue::STATUS_FAILED) {
-                    $tasksService->rerunTaskById($task['id']);
+                if ($task['status'] === Queue::STATUS_FAILED) {
+                    $tasksService->retry($task['id']);
                 }
             }
         }

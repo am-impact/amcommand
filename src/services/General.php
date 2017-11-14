@@ -11,7 +11,6 @@ namespace amimpact\commandpalette\services;
 
 use amimpact\commandpalette\CommandPalette;
 use amimpact\commandpalette\events\RegisterCommandsEvent;
-
 use Craft;
 use craft\base\Component;
 use craft\helpers\UrlHelper;
@@ -23,7 +22,6 @@ class General extends Component
      */
     const EVENT_REGISTER_COMMANDS = 'registerCommands';
 
-    private $_settings;
     private $_returnTitle;
     private $_returnMessage;
     private $_returnUrl;
@@ -37,14 +35,10 @@ class General extends Component
     /**
      * Get all available commands.
      *
-     * @param array $settings
-     *
      * @return array
      */
-    public function getCommands($settings)
+    public function getCommands(): array
     {
-        $this->_settings = $settings;
-
         // Gather commands
         $commands = [];
 
@@ -63,7 +57,7 @@ class General extends Component
         $commands = $event->commands;
 
         // Return the commands nicely sorted
-        return json_encode($this->_sortCommands($commands));
+        return $this->_sortCommands($commands);
     }
 
     /**
@@ -74,18 +68,19 @@ class General extends Component
      * @param string $service      [Optional] Which service should be called instead.
      * @param array  $variables    [Optional] The optional variables.
      *
-     * @return mixed False on error otherwise JSON with commands.
+     * @return array|false
      */
-    public function triggerCommand($command, $pluginHandle, $service, $variables)
+    public function triggerCommand(string $command, string $pluginHandle, string $service, array $variables = [])
     {
         // Trigger a callback?
-        if ($pluginHandle !== false && $pluginHandle !== 'false' && $service !== false && $pluginHandle != 'command-palette') {
+        if ($pluginHandle !== false && $pluginHandle !== 'false' && $service !== false && $pluginHandle !== 'command-palette') {
             // Trigger a plugin's callback
             $actualPlugin = Craft::$app->getPlugins()->getPlugin($pluginHandle);
             if (! $actualPlugin) {
                 return false;
             }
-            elseif (! method_exists($actualPlugin->$service, $command)) {
+
+            if (! method_exists($actualPlugin->$service, $command)) {
                 return false;
             }
             $commandResult = $actualPlugin->$service->$command($variables);
@@ -107,14 +102,13 @@ class General extends Component
 
         // Treat the result as a new list of commands
         if (is_array($commandResult)) {
-            if ($service == 'search') {
+            if ($service === 'search') {
                 return $commandResult;
             }
             return $this->_sortCommands($commandResult);
         }
-        else {
-            return $commandResult;
-        }
+
+        return $commandResult;
     }
 
     /**
@@ -130,11 +124,11 @@ class General extends Component
     /**
      * Get the return title.
      *
-     * @return bool|string
+     * @return string|false
      */
     public function getReturnTitle()
     {
-        return isset($this->_returnTitle) ? $this->_returnTitle : false;
+        return $this->_returnTitle ?? false;
     }
 
     /**
@@ -150,11 +144,11 @@ class General extends Component
     /**
      * Get the return message.
      *
-     * @return int|string
+     * @return string|false
      */
     public function getReturnMessage()
     {
-        return isset($this->_returnMessage) ? $this->_returnMessage : false;
+        return $this->_returnMessage ?? false;
     }
 
     /**
@@ -163,7 +157,7 @@ class General extends Component
      * @param string $url
      * @param bool   $newWindow [Optional] Whether to redirect in a new window.
      */
-    public function setReturnUrl($url, $newWindow = false)
+    public function setReturnUrl(string $url, bool $newWindow = false)
     {
         $this->_returnUrl = $url;
         $this->_returnUrlWindow = $newWindow;
@@ -172,11 +166,11 @@ class General extends Component
     /**
      * Get the return URL.
      *
-     * @return int|string
+     * @return array|false
      */
     public function getReturnUrl()
     {
-        return isset($this->_returnUrl) ? ['url' => $this->_returnUrl, 'newWindow' => $this->_returnUrlWindow] : false;
+        return $this->_returnUrl !== null ? ['url' => $this->_returnUrl, 'newWindow' => $this->_returnUrlWindow] : false;
     }
 
     /**
@@ -189,10 +183,8 @@ class General extends Component
      * @param array  $variables    [Optional] Variables for the callback.
      * @param bool   $asynchronous [Optional] Whether the action should be submitted asynchronously.
      * @param bool   $realtime     [Optional] Whether this action should be submitted while the user types in the search field.
-     *
-     * @return bool
      */
-    public function setReturnAction($tabs, $searchText, $callback, $service, $variables = [], $asynchronous = true, $realtime = false)
+    public function setReturnAction(string $tabs, string $searchText, string $callback, string $service, array $variables = [], bool $asynchronous = true, bool $realtime = false)
     {
         $this->_returnAction = [
             'tabs'       => $tabs,
@@ -203,18 +195,16 @@ class General extends Component
             'async'      => $asynchronous,
             'realtime'   => $realtime
         ];
-
-        return true;
     }
 
     /**
      * Get the return action.
      *
-     * @return int|array
+     * @return array|false
      */
     public function getReturnAction()
     {
-        return isset($this->_returnAction) ? $this->_returnAction : false;
+        return $this->_returnAction ?? false;
     }
 
     /**
@@ -232,11 +222,11 @@ class General extends Component
     /**
      * Get the return commands.
      *
-     * @return bool|array
+     * @return array|false
      */
     public function getReturnCommands()
     {
-        return isset($this->_returnCommands) ? $this->_sortCommands($this->_returnCommands) : false;
+        return $this->_returnCommands !== null ? $this->_sortCommands($this->_returnCommands) : false;
     }
 
     /**
@@ -252,7 +242,7 @@ class General extends Component
      *
      * @return bool
      */
-    public function getDeleteStatus()
+    public function getDeleteStatus(): bool
     {
         return $this->_deleteCurrentCommand;
     }
@@ -282,7 +272,7 @@ class General extends Component
      *
      * @return bool
      */
-    public function getReturnHtml()
+    public function getReturnHtml(): bool
     {
         return is_bool($this->_returnHtml) ? $this->_returnHtml : false;
     }
@@ -294,7 +284,7 @@ class General extends Component
      *
      * @return array
      */
-    private function _sortCommands($commands)
+    private function _sortCommands(array $commands): array
     {
         $reverseSorting = $this->_reverseSorting;
         usort($commands, function($a, $b) use ($reverseSorting) {
@@ -318,10 +308,10 @@ class General extends Component
      *
      * @return array
      */
-    private function _getContentCommands($currentCommands)
+    private function _getContentCommands(array $currentCommands): array
     {
         // New, edit and delete commands
-        if (Craft::$app->getUser()->getIsAdmin() || Craft::$app->getSections()->getTotalEditableSections() > 0) {
+        if (Craft::$app->getSections()->getTotalEditableSections() > 0) {
             $currentCommands[] = [
                 'name'    => Craft::t('app', 'Content') . ': ' . Craft::t('app', 'New entry'),
                 'info'    => Craft::t('command-palette', 'Create a new entry in one of the available sections.'),
@@ -358,23 +348,24 @@ class General extends Component
                     'content' => 'section',
                 ]
             ];
-            if (Craft::$app->getUser()->getIsAdmin()) {
-                $currentCommands[] = [
-                    'name'    => Craft::t('app', 'Content') . ': ' . Craft::t('command-palette', 'Delete all entries'),
-                    'info'    => Craft::t('command-palette', 'Delete all entries in one of the available sections.'),
-                    'more'    => true,
-                    'call'    => 'deleteEntries',
-                    'service' => 'entries',
-                    'vars'    => [
-                        'deleteAll' => true
-                    ],
-                    'icon'    => [
-                        'type' => 'font',
-                        'content' => 'section',
-                    ]
-                ];
-            }
         }
+        if (Craft::$app->getUser()->getIsAdmin()) {
+            $currentCommands[] = [
+                'name'    => Craft::t('app', 'Content') . ': ' . Craft::t('command-palette', 'Delete all entries'),
+                'info'    => Craft::t('command-palette', 'Delete all entries in one of the available sections.'),
+                'more'    => true,
+                'call'    => 'deleteEntries',
+                'service' => 'entries',
+                'vars'    => [
+                    'deleteAll' => true
+                ],
+                'icon'    => [
+                    'type' => 'font',
+                    'content' => 'section',
+                ]
+            ];
+        }
+
         return $currentCommands;
     }
 
@@ -385,9 +376,9 @@ class General extends Component
      *
      * @return array
      */
-    private function _getGlobalCommands($currentCommands)
+    private function _getGlobalCommands(array $currentCommands): array
     {
-        if (Craft::$app->getUser()->getIsAdmin() || Craft::$app->getGlobals()->getTotalEditableSets() > 0) {
+        if (Craft::$app->getGlobals()->getTotalEditableSets() > 0) {
             $currentCommands[] = [
                 'name'    => Craft::t('app', 'Globals') . ': ' . Craft::t('app', 'Edit'),
                 'more'    => true,
@@ -399,6 +390,7 @@ class General extends Component
                 ]
             ];
         }
+
         return $currentCommands;
     }
 
@@ -409,7 +401,7 @@ class General extends Component
      *
      * @return array
      */
-    private function _getUserCommands($currentCommands)
+    private function _getUserCommands(array $currentCommands): array
     {
         $currentCommands[] = [
             'name' => Craft::t('app', 'Dashboard'),
@@ -428,7 +420,7 @@ class General extends Component
             'name' => Craft::t('app', 'My Account'),
             'url'  => UrlHelper::cpUrl('myaccount')
         ];
-        if (Craft::$app->getUser()->getIsAdmin() || Craft::$app->getUser()->getIdentity()->can('editUsers')) {
+        if (Craft::$app->getUser()->getIdentity()->can('editUsers')) {
             $currentCommands[] = [
                 'name' => Craft::t('app', 'Users') . ': ' . Craft::t('app', 'New user'),
                 'info' => Craft::t('command-palette', 'Create a user.'),
@@ -460,20 +452,21 @@ class General extends Component
                     'content' => 'users',
                 ]
             ];
-            if (Craft::$app->getUser()->getIsAdmin()) {
-                $currentCommands[] = [
-                    'name'    => Craft::t('app', 'Users') . ': ' . Craft::t('command-palette', 'Login as user'),
-                    'info'    => Craft::t('command-palette', 'Log in as a different user, and navigate to their dashboard.'),
-                    'more'    => true,
-                    'call'    => 'loginUsers',
-                    'service' => 'users',
-                    'icon' => [
-                        'type' => 'font',
-                        'content' => 'users',
-                    ]
-                ];
-            }
         }
+        if (Craft::$app->getUser()->getIsAdmin()) {
+            $currentCommands[] = [
+                'name'    => Craft::t('app', 'Users') . ': ' . Craft::t('command-palette', 'Login as user'),
+                'info'    => Craft::t('command-palette', 'Log in as a different user, and navigate to their dashboard.'),
+                'more'    => true,
+                'call'    => 'loginUsers',
+                'service' => 'users',
+                'icon' => [
+                    'type' => 'font',
+                    'content' => 'users',
+                ]
+            ];
+        }
+
         return $currentCommands;
     }
 
@@ -484,7 +477,7 @@ class General extends Component
      *
      * @return array
      */
-    private function _getSearchCommands($currentCommands)
+    private function _getSearchCommands(array $currentCommands): array
     {
         // Site searches
         $currentCommands[] = [
@@ -511,24 +504,23 @@ class General extends Component
         ];
 
         // Element searches
-        if (is_array($this->_settings->elementSearchElementTypes)) {
-            foreach ($this->_settings->elementSearchElementTypes as $elementType => $submittedInfo) {
-                if (isset($submittedInfo['enabled']) && $submittedInfo['enabled'] === '1') {
-                    $actualElementType = Craft::$app->getElements()->getElementTypeByRefHandle($elementType);
-                    $currentCommands[] = [
-                        'name'    => Craft::t('command-palette', 'Search for {option}', ['option' => $actualElementType::displayName()]),
-                        'more'    => true,
-                        'call'    => 'searchOptionElementType',
-                        'service' => 'search',
-                        'vars'    => [
-                            'elementType' => $elementType
-                        ],
-                        'icon'    => [
-                            'type' => 'font',
-                            'content' => 'search',
-                        ]
-                    ];
-                }
+        foreach (CommandPalette::$plugin->getSettings()->getElementSearchElementTypes() as $elementType => $submittedInfo) {
+            if (isset($submittedInfo['enabled']) && $submittedInfo['enabled'] === '1') {
+                /** @var $actualElementType craft\base\Element */
+                $actualElementType = Craft::$app->getElements()->getElementTypeByRefHandle($elementType);
+                $currentCommands[] = [
+                    'name'    => Craft::t('command-palette', 'Search for {option}', ['option' => $actualElementType::displayName()]),
+                    'more'    => true,
+                    'call'    => 'searchOptionElementType',
+                    'service' => 'search',
+                    'vars'    => [
+                        'elementType' => $elementType
+                    ],
+                    'icon'    => [
+                        'type' => 'font',
+                        'content' => 'search',
+                    ]
+                ];
             }
         }
 
@@ -542,11 +534,12 @@ class General extends Component
      *
      * @return array
      */
-    private function _getSettingCommands($currentCommands)
+    private function _getSettingCommands(array $currentCommands): array
     {
         if (! Craft::$app->getUser()->getIsAdmin()) {
             return $currentCommands;
         }
+
         $currentCommands[] = [
             'name'    => Craft::t('command-palette', 'Tasks'),
             'info'    => Craft::t('command-palette', 'Manage Craft tasks.'),
@@ -702,6 +695,7 @@ class General extends Component
                 'content' => 'plugin',
             ]
         ];
+
         return $currentCommands;
     }
 }

@@ -56,7 +56,7 @@ Craft.Palette = Garnish.Base.extend(
     /**
      * Initiate command palette.
      *
-     * @param json Commands.
+     * @param commands.
      */
     init: function(commands) {
         var self = this;
@@ -100,7 +100,7 @@ Craft.Palette = Garnish.Base.extend(
         });
 
         self.addListener(window, 'keydown', function(ev) {
-            if ((ev.metaKey || ev.ctrlKey) && ev.shiftKey && ev.keyCode == self.P_KEY) {
+            if ((ev.metaKey || ev.ctrlKey) && ev.shiftKey && ev.keyCode === self.P_KEY) {
                 if (! self.isOpen) {
                     self.openPalette(ev);
                 }
@@ -111,16 +111,16 @@ Craft.Palette = Garnish.Base.extend(
             else if ((ev.metaKey || ev.ctrlKey) && self.NUM_KEYS.indexOf(ev.keyCode) > -1) {
                 self.triggerCommand(ev, false);
             }
-            else if (ev.keyCode == Garnish.UP_KEY) {
+            else if (ev.keyCode === Garnish.UP_KEY) {
                 self.moveCommandFocus(ev, 'up');
             }
-            else if (ev.keyCode == Garnish.DOWN_KEY) {
+            else if (ev.keyCode === Garnish.DOWN_KEY) {
                 self.moveCommandFocus(ev, 'down');
             }
-            else if (ev.keyCode == Garnish.RETURN_KEY) {
+            else if (ev.keyCode === Garnish.RETURN_KEY) {
                 self.triggerCommand(ev, (ev.metaKey || ev.ctrlKey));
             }
-            else if (ev.keyCode == Garnish.ESC_KEY) {
+            else if (ev.keyCode === Garnish.ESC_KEY) {
                 if (self.rememberPalette.currentSet > 0) {
                     self.restoreCommands();
                 }
@@ -141,7 +141,7 @@ Craft.Palette = Garnish.Base.extend(
     /**
      * Open the command palette.
      *
-     * @param object ev The triggered event.
+     * @param ev The triggered event.
      */
     openPalette: function(ev) {
         var self = this;
@@ -159,7 +159,7 @@ Craft.Palette = Garnish.Base.extend(
     /**
      * Close the command palette.
      *
-     * @param object ev The triggered event.
+     * @param ev The triggered event.
      */
     closePalette: function(ev) {
         var self = this;
@@ -211,9 +211,9 @@ Craft.Palette = Garnish.Base.extend(
     /**
      * Search the available commands.
      *
-     * @param object ev              The triggered event.
-     * @param bool   isRealtime      Whether the search was triggered by a realtime action.
-     * @param bool   isElementSearch Whether the search was triggered by an element search.
+     * @param ev              The triggered event.
+     * @param isRealtime      Whether the search was triggered by a realtime action.
+     * @param isElementSearch Whether the search was triggered by an element search.
      */
     search: function(ev, isRealtime, isElementSearch) {
         var self = this;
@@ -227,7 +227,6 @@ Craft.Palette = Garnish.Base.extend(
                         return Math.max(a[0] ? a[0].score : -1000, a[1] ? a[1].score-100 : -1000)
                     }
                 }),
-                totalResults = filtered.length,
                 performUpdate = true;
 
             // Reset searched commands
@@ -237,7 +236,7 @@ Craft.Palette = Garnish.Base.extend(
             if (! self.allowElementSearch || (searchValue.length && self.allowElementSearch)) {
                 // Find matches
                 var results = self.renderCommands(filtered);
-                if (! results.length && searchValue == '' && ! self.allowElementSearch) {
+                if (! results.length && searchValue === '' && ! self.allowElementSearch) {
                     // When a command was executed that displays a new list of commands, make sure they are shown
                     results = self.renderCommands(commandsArray);
                 }
@@ -245,7 +244,7 @@ Craft.Palette = Garnish.Base.extend(
                 // Element search deliver anything new?
                 if (isElementSearch) {
                     var currentMatches = self.$commands.length;
-                    if (currentMatches == results.length) {
+                    if (currentMatches === results.length) {
                         performUpdate = false;
                     }
                 }
@@ -279,7 +278,7 @@ Craft.Palette = Garnish.Base.extend(
     /**
      * Render the commands that will be showed.
      *
-     * @param array commands
+     * @param commands
      */
     renderCommands: function(commands) {
         var self = this;
@@ -297,7 +296,7 @@ Craft.Palette = Garnish.Base.extend(
 
                 // Highlight our best result
                 if (el[0] !== null) {
-                    if (el[0].target == info) {
+                    if (el[0].target === info) {
                         info = fuzzysort.highlight(el[0]);
                     }
                     else {
@@ -305,7 +304,7 @@ Craft.Palette = Garnish.Base.extend(
                     }
                 }
                 else if (el[1] !== null) {
-                    if (el[1].target == info) {
+                    if (el[1].target === info) {
                         info = fuzzysort.highlight(el[1]);
                     }
                     else {
@@ -322,7 +321,7 @@ Craft.Palette = Garnish.Base.extend(
 
             // Render command
             counter ++;
-            var icon = ('icon' in object) ? '<span class="palette__command__icon"' + (object.icon.type == 'font' ? ' data-icon="' + object.icon.content + '"' : '') + '>' + (object.icon.type != 'font' ? object.icon.content : '') + '</span>' : '';
+            var icon = ('icon' in object) ? '<span class="palette__command__icon"' + (object.icon.type === 'font' ? ' data-icon="' + object.icon.content + '"' : '') + '>' + (object.icon.type !== 'font' ? object.icon.content : '') + '</span>' : '';
             var shortcut = (counter < 9) ? '<span class="palette__command__shortcut">&#8984;' + (counter + 1) + '</span>' : '';
             name = '<span class="palette__command__name' + ('more' in object && object.more ? ' go' : '') + '">' + name + '</span>';
             info = (info.length) ? '<span class="palette__command__info">' + info + '</span>' : '';
@@ -336,8 +335,8 @@ Craft.Palette = Garnish.Base.extend(
     /**
      * Move the focus to a different command.
      *
-     * @param object ev        The triggered event.
-     * @param string direction In which direction the focus should go to.
+     * @param ev        The triggered event.
+     * @param direction In which direction the focus should go to.
      */
     moveCommandFocus: function(ev, direction) {
         var self = this;
@@ -370,7 +369,7 @@ Craft.Palette = Garnish.Base.extend(
     /**
      * Scroll to make the current focused item visible when necessary.
      *
-     * @param object current Current focused item.
+     * @param current Current focused item.
      */
     keepCommandVisible: function(current) {
         var self = this,
@@ -393,9 +392,9 @@ Craft.Palette = Garnish.Base.extend(
     /**
      * Display a notification message.
      *
-     * @param bool  success         Whether the command was succesful.
-     * @param mixed customMessage   Whether the message was manually set.
-     * @param mixed executedCommand Which command was executed.
+     * @param success         Whether the command was succesful.
+     * @param customMessage   Whether the message was manually set.
+     * @param executedCommand Which command was executed.
      */
     displayMessage: function(success, customMessage, executedCommand) {
         if (success) {
@@ -487,7 +486,7 @@ Craft.Palette = Garnish.Base.extend(
         self.rememberPalette.currentSet--;
 
         // Enable element search?
-        if (self.rememberPalette.currentSet == 0) {
+        if (self.rememberPalette.currentSet === 0) {
             self.allowElementSearch = true;
             self.combinedCommandsArray = self.commandsArray.concat(self.elementCommandsArray);
         }
@@ -536,8 +535,8 @@ Craft.Palette = Garnish.Base.extend(
     /**
      * Navigate to the current focused command.
      *
-     * @param object ev          The triggered event.
-     * @param bool   ctrlPressed Whether the CTRL or Command key was pressed.
+     * @param ev          The triggered event.
+     * @param ctrlPressed Whether the CTRL or Command key was pressed.
      */
     triggerCommand: function(ev, ctrlPressed) {
         var self = this;
@@ -551,7 +550,7 @@ Craft.Palette = Garnish.Base.extend(
                 self.triggerCallback(self.actionData.call, self.actionData.plugin, self.actionData.service, variables, false);
             }
             else {
-                if (ev.type == 'click') {
+                if (ev.type === 'click') {
                     if (ev.ctrlKey || ev.metaKey) {
                         ctrlPressed = true;
                     }
@@ -561,7 +560,7 @@ Craft.Palette = Garnish.Base.extend(
                     self.$commands.removeClass('focus');
                     $current.addClass('focus');
                 }
-                else if (ev.type == 'keydown' && self.NUM_KEYS.indexOf(ev.keyCode) > -1) {
+                else if (ev.type === 'keydown' && self.NUM_KEYS.indexOf(ev.keyCode) > -1) {
                     var commandNumber = self.NUM_KEYS.indexOf(ev.keyCode);
                     var $current = self.$commands.filter(':eq(' + commandNumber + ')');
                 }
@@ -579,7 +578,7 @@ Craft.Palette = Garnish.Base.extend(
                             callback        = ('call' in commandData) ? commandData.call : false,
                             callbackPlugin  = ('plugin' in commandData) ? commandData.plugin : false,
                             callbackService = ('service' in commandData) ? commandData.service : false,
-                            callbackVars    = ('vars' in commandData) ? commandData.vars : false;
+                            callbackVars    = ('vars' in commandData) ? commandData.vars : [];
 
                         // Remember command for when a new set is loaded
                         self.loadingCommand = commandData.name;
@@ -618,11 +617,11 @@ Craft.Palette = Garnish.Base.extend(
     /**
      * Trigger a command callback function rather than navigating to it.
      *
-     * @param string name            Callback function.
-     * @param string plugin          Which plugin should be used.
-     * @param string service         Which service should be triggered.
-     * @param string vars            JSON string with optional variables.
-     * @param bool   isElementSearch Whether this is a element search call.
+     * @param name            Callback function.
+     * @param plugin          Which plugin should be used.
+     * @param service         Which service should be triggered.
+     * @param vars            JSON string with optional variables.
+     * @param isElementSearch Whether this is a element search call.
      */
     triggerCallback: function(name, plugin, service, vars, isElementSearch) {
         var self = this,
@@ -656,7 +655,7 @@ Craft.Palette = Garnish.Base.extend(
 
             self.loadingRequest = Craft.postActionRequest('command-palette/commands/trigger-command', { command: name, plugin: plugin, service: service, vars: vars }, $.proxy(function (response, textStatus) {
                 self.loadingRequest = false;
-                if (textStatus == 'success') {
+                if (textStatus === 'success') {
                     self.$loader.addClass('hidden');
 
                     if (response.success) {
@@ -668,7 +667,7 @@ Craft.Palette = Garnish.Base.extend(
                         // What result do we have? HTML, an action, new command set or just a result message?
                         if (response.isHtml) {
                             // It is a command that shows HTML, but did we get any?
-                            if (response.result == '') {
+                            if (response.result === '') {
                                 self.$commands.show(); // Show current commands again
                             }
                             else {
@@ -733,7 +732,7 @@ Craft.Palette = Garnish.Base.extend(
                         }
                         else if (response.isNewSet) {
                             // It is a command that loads a new set of commands, but did we get any?
-                            if (response.result == '') {
+                            if (response.result === '') {
                                 self.$commands.show(); // Show current commands again
                             }
                             else {
@@ -778,7 +777,7 @@ Craft.Palette = Garnish.Base.extend(
 
                         // Show message
                         if (response.message) {
-                            self.displayMessage((response.result != ''), response.message, false);
+                            self.displayMessage((response.result !== ''), response.message, false);
                         }
                         else if (displayDefaultMessage) {
                             self.displayMessage(true, false, self.loadingCommand);
@@ -822,7 +821,7 @@ Craft.Palette = Garnish.Base.extend(
     /**
      * Delete a command from the available commands array.
      *
-     * @param int index Command index.
+     * @param index Command index.
      */
     deleteCommand: function(index) {
         var self = this,

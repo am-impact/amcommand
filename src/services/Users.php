@@ -10,7 +10,6 @@
 namespace amimpact\commandpalette\services;
 
 use amimpact\commandpalette\CommandPalette;
-
 use Craft;
 use craft\base\Component;
 use craft\elements\User;
@@ -18,6 +17,9 @@ use craft\helpers\UrlHelper;
 
 class Users extends Component
 {
+    /**
+     * @var User
+     */
     private $_currentUser;
 
     public function init()
@@ -30,7 +32,7 @@ class Users extends Component
      *
      * @return array
      */
-    public function editUsers()
+    public function editUsers(): array
     {
         // Gather commands
         $commands = [];
@@ -60,7 +62,7 @@ class Users extends Component
      *
      * @return array
      */
-    public function deleteUsers()
+    public function deleteUsers(): array
     {
         // Gather commands
         $commands = [];
@@ -71,7 +73,7 @@ class Users extends Component
             ->status(null)
             ->all();
         foreach ($users as $user) {
-            if ($this->_currentUser && $this->_currentUser->id != $user->id) {
+            if ($this->_currentUser && $this->_currentUser->id !== $user->id) {
                 $commands[] = [
                     'name'    => trim($user->getFullName() . ' (' . $user->email . ')'),
                     'warn'    => true,
@@ -96,8 +98,9 @@ class Users extends Component
      * @param array $variables
      *
      * @return bool
+     * @throws \Throwable
      */
-    public function deleteUser($variables)
+    public function deleteUser(array $variables = []): bool
     {
         // Do we have the required information?
         if (! isset($variables['userId'])) {
@@ -111,7 +114,7 @@ class Users extends Component
             CommandPalette::$plugin->general->setReturnMessage(Craft::t('app', 'User deleted.'));
         }
         else {
-            CommandPalette::$plugin->general->setReturnMessage(Craft::t('app', 'Couldn’t delete “{name}”.', ['name', $user->username]));
+            CommandPalette::$plugin->general->setReturnMessage(Craft::t('app', 'Couldn’t delete “{name}”.', ['name', $variables['userId']]));
         }
 
         return $success;
@@ -122,7 +125,7 @@ class Users extends Component
      *
      * @return array
      */
-    public function loginUsers()
+    public function loginUsers(): array
     {
         // Gather commands
         $commands = [];
@@ -133,7 +136,7 @@ class Users extends Component
             ->status(null)
             ->all();
         foreach ($users as $user) {
-            if ($this->_currentUser && $this->_currentUser->id != $user->id) {
+            if ($this->_currentUser && $this->_currentUser->id !== $user->id) {
                 $commands[] = [
                     'name'    => trim($user->getFullName() . ' (' . $user->email . ')'),
                     'warn'    => true,
@@ -158,8 +161,9 @@ class Users extends Component
      * @param array $variables
      *
      * @return bool
+     * @throws \yii\base\Exception
      */
-    public function loginByUser($variables)
+    public function loginByUser(array $variables = []): bool
     {
         // Do we have the required information?
         if (! isset($variables['userId'])) {

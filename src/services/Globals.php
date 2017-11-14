@@ -10,7 +10,6 @@
 namespace amimpact\commandpalette\services;
 
 use amimpact\commandpalette\CommandPalette;
-
 use Craft;
 use craft\base\Component;
 use craft\elements\GlobalSet;
@@ -19,8 +18,10 @@ class Globals extends Component
 {
     /**
      * Get global sets that the current user is allowed to edit.
+     *
+     * @return array
      */
-    public function editGlobals()
+    public function editGlobals(): array
     {
         // Gather commands
         $commands = [];

@@ -10,7 +10,6 @@
 namespace amimpact\commandpalette\services;
 
 use amimpact\commandpalette\CommandPalette;
-
 use Craft;
 use craft\base\Component;
 use craft\elements\Entry;
@@ -24,7 +23,7 @@ class Entries extends Component
      *
      * @return array
      */
-    public function createEntry()
+    public function createEntry(): array
     {
         // Gather commands
         $commands = [];
@@ -32,7 +31,7 @@ class Entries extends Component
         // Find available sections
         $availableSections = Craft::$app->getSections()->getEditableSections();
         foreach ($availableSections as $section) {
-            if ($section->type != Section::TYPE_SINGLE) {
+            if ($section->type !== Section::TYPE_SINGLE) {
                 $commands[] = [
                     'name' => $section->name,
                     'url'  => UrlHelper::cpUrl('entries/' . $section->handle . '/new')
@@ -48,7 +47,7 @@ class Entries extends Component
      *
      * @return array
      */
-    public function editEntries()
+    public function editEntries(): array
     {
         // Gather commands
         $commands = [];
@@ -57,7 +56,7 @@ class Entries extends Component
         $availableSections = Craft::$app->getSections()->getEditableSections();
         foreach ($availableSections as $section) {
             $type = ucfirst(Craft::t('app', ucfirst($section->type)));
-            if ($section->type != Section::TYPE_SINGLE) {
+            if ($section->type !== Section::TYPE_SINGLE) {
                 // Get total entries
                 $totalEntries = Entry::find()
                     ->section($section->handle)
@@ -102,9 +101,9 @@ class Entries extends Component
      *
      * @param array $variables
      *
-     * @return array
+     * @return array|false
      */
-    public function editEntry($variables)
+    public function editEntry(array $variables = [])
     {
         // Do we have the required information?
         if (! isset($variables['sectionHandle'])) {
@@ -142,9 +141,9 @@ class Entries extends Component
      *
      * @param array $variables
      *
-     * @return array
+     * @return array|false
      */
-    public function deleteEntries($variables)
+    public function deleteEntries(array $variables = [])
     {
         // Do we have the required information?
         if (! isset($variables['deleteAll'])) {
@@ -152,13 +151,13 @@ class Entries extends Component
         }
 
         // Do we want to delete all entries or just one?
-        $deleteAll = $variables['deleteAll'] == 'true';
+        $deleteAll = $variables['deleteAll'] === 'true';
 
         // Create new list of commands
         $commands = [];
         $availableSections = Craft::$app->getSections()->getEditableSections();
         foreach ($availableSections as $section) {
-            if ($section->type != Section::TYPE_SINGLE) {
+            if ($section->type !== Section::TYPE_SINGLE) {
                 // Get total entries
                 $totalEntries = Entry::find()
                     ->section($section->handle)
@@ -195,17 +194,18 @@ class Entries extends Component
      *
      * @param array $variables
      *
-     * @return bool|array
+     * @return array|false
+     * @throws \Throwable
      */
-    public function deleteEntriesFromSection($variables)
+    public function deleteEntriesFromSection(array $variables = [])
     {
         // Do we have the required information?
-        if (! isset($variables['sectionHandle']) || ! isset($variables['deleteAll'])) {
+        if (! isset($variables['sectionHandle'], $variables['deleteAll'])) {
             return false;
         }
 
         // Delete them all?
-        $deleteAll = $variables['deleteAll'] == 'true';
+        $deleteAll = $variables['deleteAll'] === 'true';
 
         // Find entries
         $entries = Entry::find()
@@ -264,8 +264,9 @@ class Entries extends Component
      * @param array $variables
      *
      * @return bool
+     * @throws \Throwable
      */
-    public function deleteEntry($variables)
+    public function deleteEntry($variables): bool
     {
         // Do we have the required information?
         if (! isset($variables['entryId'])) {

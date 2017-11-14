@@ -9,8 +9,6 @@
 
 namespace amimpact\commandpalette\services;
 
-use amimpact\commandpalette\CommandPalette;
-
 use Craft;
 use craft\base\Component;
 use craft\helpers\App;
@@ -22,9 +20,9 @@ class Utilities extends Component
      *
      * @return array
      */
-    public function getUtilities()
+    public function getUtilities(): array
     {
-        $commands = [
+        return [
             [
                 'name'    => Craft::t('app', 'Clear Caches'),
                 'warn'    => true,
@@ -32,8 +30,6 @@ class Utilities extends Component
                 'service' => 'utilities',
             ],
         ];
-
-        return $commands;
     }
 
     /**
@@ -41,7 +37,7 @@ class Utilities extends Component
      *
      * @return bool
      */
-    public function clearCaches()
+    public function clearCaches(): bool
     {
         // Max power please!
         App::maxPowerCaptain();

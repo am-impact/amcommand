@@ -10,12 +10,11 @@
 namespace amimpact\commandpalette\models;
 
 use amimpact\commandpalette\CommandPalette;
-
 use Craft;
 use craft\base\Model;
-use craft\elements\User;
-use craft\elements\Entry;
 use craft\elements\Category;
+use craft\elements\Entry;
+use craft\elements\User;
 use craft\helpers\FileHelper;
 
 class Settings extends Model
@@ -34,7 +33,7 @@ class Settings extends Model
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['pluginName', 'theme'], 'string'],
@@ -49,7 +48,7 @@ class Settings extends Model
     public function getSelectedTheme()
     {
         // Did we select one?
-        if (empty($this->theme) || $this->theme == 'Palette.css') {
+        if (empty($this->theme) || $this->theme === 'Palette.css') {
             return false;
         }
 
@@ -66,8 +65,9 @@ class Settings extends Model
      * Get available themes.
      *
      * @return array
+     * @throws \yii\base\InvalidParamException
      */
-    public function getThemes()
+    public function getThemes(): array
     {
         // Gather themes
         $themes = [];
@@ -81,7 +81,7 @@ class Settings extends Model
             if (is_array($themeFiles)) {
                 foreach ($themeFiles as $file) {
                     $fileName = pathinfo($file, PATHINFO_BASENAME);
-                    if ($fileName == 'Palette.css') {
+                    if ($fileName === 'Palette.css') {
                         continue; // Skip default
                     }
                     $themes[$fileName] = pathinfo($file, PATHINFO_FILENAME);
@@ -98,7 +98,7 @@ class Settings extends Model
      *
      * @return array
      */
-    public function getElementSearchElementTypes()
+    public function getElementSearchElementTypes(): array
     {
         // Gather element types
         $elementSearchElementTypes = [];

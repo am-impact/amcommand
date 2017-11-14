@@ -10,7 +10,6 @@
 namespace amimpact\commandpalette\services;
 
 use amimpact\commandpalette\CommandPalette;
-
 use Craft;
 use craft\base\Component;
 use craft\helpers\UrlHelper;
@@ -22,7 +21,7 @@ class Plugins extends Component
      *
      * @return array
      */
-    public function getSettingsUrl()
+    public function getSettingsUrl(): array
     {
         // Gather commands
         $commands = [];
@@ -31,6 +30,7 @@ class Plugins extends Component
         $enabledPlugins = Craft::$app->getPlugins()->getAllPlugins();
         if ($enabledPlugins) {
             foreach ($enabledPlugins as $enabledPlugin) {
+                /** @var $enabledPlugin craft\base\Plugin */
                 if ($enabledPlugin->hasCpSettings) {
                     $commands[] = [
                         'name' => $enabledPlugin->name,

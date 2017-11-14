@@ -10,8 +10,6 @@
 namespace amimpact\commandpalette\assetbundles\Palette;
 
 use amimpact\commandpalette\CommandPalette;
-
-use Craft;
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
 
@@ -23,7 +21,7 @@ class PaletteBundle extends AssetBundle
     public function init()
     {
         // Define the path that your publishable resources live
-        $this->sourcePath = "@amimpact/commandpalette/assetbundles/palette/dist";
+        $this->sourcePath = '@amimpact/commandpalette/assetbundles/palette/dist';
 
         // Define the dependencies
         $this->depends = [

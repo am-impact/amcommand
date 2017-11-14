@@ -10,13 +10,12 @@
 namespace amimpact\commandpalette\services;
 
 use amimpact\commandpalette\CommandPalette;
-
 use Craft;
 use craft\base\Component;
-use craft\elements\User;
-use craft\elements\Entry;
 use craft\elements\Category;
+use craft\elements\Entry;
 use craft\elements\GlobalSet;
+use craft\elements\User;
 
 class Search extends Component
 {
@@ -25,7 +24,7 @@ class Search extends Component
      *
      * @return bool
      */
-    public function searchOptionCraft()
+    public function searchOptionCraft(): bool
     {
         return $this->_setAction('Craft');
     }
@@ -35,7 +34,7 @@ class Search extends Component
      *
      * @return bool
      */
-    public function searchOptionStackExchange()
+    public function searchOptionStackExchange(): bool
     {
         return $this->_setAction('StackExchange');
     }
@@ -47,7 +46,7 @@ class Search extends Component
      *
      * @return bool
      */
-    public function searchOptionElementType($variables)
+    public function searchOptionElementType(array $variables = []): bool
     {
         // Do we have the required information?
         if (! isset($variables['elementType'])) {
@@ -62,18 +61,18 @@ class Search extends Component
      *
      * @param array $variables
      *
-     * @return bool
+     * @return bool|array
      */
-    public function searchOn($variables)
+    public function searchOn(array $variables = [])
     {
         // Do we have the required information?
-        if (! isset($variables['searchText']) || ! isset($variables['option'])) {
+        if (! isset($variables['searchText'], $variables['option'])) {
             return false;
         }
 
         // Do we have our search criteria?
         $searchCriteria = $variables['searchText'];
-        if (empty($searchCriteria) || trim($searchCriteria) == '') {
+        if (empty($searchCriteria) || trim($searchCriteria) === '') {
             CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'Search criteria isn’t set.'));
             return false;
         }
@@ -118,7 +117,7 @@ class Search extends Component
      *
      * @return bool
      */
-    private function _setAction($searchOption)
+    private function _setAction($searchOption): bool
     {
         // Start action
         $variables = [
@@ -136,7 +135,7 @@ class Search extends Component
      *
      * @return bool
      */
-    private function _setRealtimeAction($searchOption)
+    private function _setRealtimeAction($searchOption): bool
     {
         // Get the element type info
         $actualElementType = Craft::$app->getElements()->getElementTypeByRefHandle($searchOption);
@@ -159,7 +158,7 @@ class Search extends Component
      *
      * @return array
      */
-    private function _searchForElementType($elementType, $searchCriteria, $addElementTypeInfo = false)
+    private function _searchForElementType(string $elementType, string $searchCriteria, $addElementTypeInfo = false): array
     {
         // Gather commands
         $commands = [];
@@ -195,6 +194,7 @@ class Search extends Component
         }
 
         // Get elements
+        /** @var $actualElementType craft\base\Element */
         $actualElementType = Craft::$app->getElements()->getElementTypeByRefHandle($elementType);
         $elements = $actualElementType::find()
             ->search('*' . $searchCriteria . '*')
@@ -204,28 +204,27 @@ class Search extends Component
             ->all();
 
         foreach ($elements as $element) {
-            switch ($elementType) {
-                case User::refHandle():
-                    $userInfo = [];
-                    if (($fullName = $element->getFullName()) !== '') {
-                        $userInfo[] = $fullName;
-                    }
-                    $userInfo[] = $element->email;
+            /** @var $element craft\base\Element */
+            if ($elementType === User::refHandle()) {
+                /** @var $element User */
+                $userInfo = [];
+                if (($fullName = $element->getFullName()) !== '') {
+                    $userInfo[] = $fullName;
+                }
+                $userInfo[] = $element->email;
 
-                    $command = [
-                        'name' => $element->username,
-                        'info' => ($addElementTypeInfo ? $actualElementType::displayName() . ' | ' : '') . implode(' - ', $userInfo),
-                        'url'  => $element->getCpEditUrl(),
-                    ];
-                    break;
-
-                default:
-                    $command = [
-                        'name' => $element->__toString(),
-                        'info' => ($addElementTypeInfo ? $actualElementType::displayName() . ' | ' : '') . Craft::t('app', 'URI') . ': ' . $element->uri,
-                        'url'  => $element->getCpEditUrl(),
-                    ];
-                    break;
+                $command = [
+                    'name' => $element->username,
+                    'info' => ($addElementTypeInfo ? $actualElementType::displayName() . ' | ' : '') . implode(' - ', $userInfo),
+                    'url' => $element->getCpEditUrl(),
+                ];
+            }
+            else {
+                $command = [
+                    'name' => $element->__toString(),
+                    'info' => ($addElementTypeInfo ? $actualElementType::displayName() . ' | ' : '') . Craft::t('app', 'URI') . ': ' . $element->uri,
+                    'url' => $element->getCpEditUrl(),
+                ];
             }
 
             // Is there an icon available?

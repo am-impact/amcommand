@@ -11,15 +11,30 @@ namespace amimpact\commandpalette;
 
 use amimpact\commandpalette\assetbundles\Palette\PaletteBundle;
 use amimpact\commandpalette\models\Settings;
-
 use Craft;
 use craft\base\Plugin;
 use craft\web\View;
-
 use yii\base\Event;
 
+/**
+ * Class CommandPalette
+ *
+ * @property Settings                                    $settings  The plugin's settings.
+ * @property \amimpact\commandpalette\services\Entries   $entries   The entries service.
+ * @property \amimpact\commandpalette\services\General   $general   The general service.
+ * @property \amimpact\commandpalette\services\Globals   $globals   The globals service.
+ * @property \amimpact\commandpalette\services\Plugins   $plugins   The plugins service.
+ * @property \amimpact\commandpalette\services\Search    $search    The search service.
+ * @property \amimpact\commandpalette\services\Tasks     $tasks     The tasks service.
+ * @property \amimpact\commandpalette\services\Utilities $utilities The utilities service.
+ * @property \amimpact\commandpalette\services\Users     $users     The users service.
+ * @method Settings getSettings()
+ */
 class CommandPalette extends Plugin
 {
+    /**
+     * @var CommandPalette
+     */
     public static $plugin;
 
     /**
@@ -65,6 +80,9 @@ class CommandPalette extends Plugin
      * block on the settings page.
      *
      * @return string The rendered settings HTML
+     * @throws \yii\base\Exception
+     * @throws \Twig_Error_Loader
+     * @throws \RuntimeException
      */
     protected function settingsHtml(): string
     {
@@ -86,15 +104,15 @@ class CommandPalette extends Plugin
     private function _registerServices()
     {
         $this->setComponents([
-            'entries' => \amimpact\commandpalette\services\Entries::class,
-            'general' => \amimpact\commandpalette\services\General::class,
-            'globals' => \amimpact\commandpalette\services\Globals::class,
-            'plugins' => \amimpact\commandpalette\services\Plugins::class,
-            'search' => \amimpact\commandpalette\services\Search::class,
-            'settings' => \amimpact\commandpalette\services\Settings::class,
-            'tasks' => \amimpact\commandpalette\services\Tasks::class,
-            'utilities' => \amimpact\commandpalette\services\Utilities::class,
-            'users' => \amimpact\commandpalette\services\Users::class,
+            'entries' => services\Entries::class,
+            'general' => services\General::class,
+            'globals' => services\Globals::class,
+            'plugins' => services\Plugins::class,
+            'search' => services\Search::class,
+            'settings' => services\Settings::class,
+            'tasks' => services\Tasks::class,
+            'utilities' => services\Utilities::class,
+            'users' => services\Users::class,
         ]);
     }
 
@@ -102,6 +120,10 @@ class CommandPalette extends Plugin
      * Register the palette.
      *
      * @return void
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\base\Exception
+     * @throws \Twig_Error_Loader
+     * @throws \RuntimeException
      */
     private function _registerPalette()
     {
@@ -120,7 +142,7 @@ class CommandPalette extends Plugin
             // Load palette
             Event::on(View::class, View::EVENT_END_BODY, function(Event $event) use ($viewService) {
                 echo $viewService->renderTemplate('command-palette/palette', [
-                    'commands' => $this->general->getCommands($this->getSettings()),
+                    'commands' => json_encode(CommandPalette::$plugin->general->getCommands()),
                 ]);
             });
         }

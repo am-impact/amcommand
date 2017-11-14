@@ -10,15 +10,15 @@
 namespace amimpact\commandpalette\controllers;
 
 use amimpact\commandpalette\CommandPalette;
-
 use Craft;
 use craft\web\Controller;
-use craft\web\View;
 
 class CommandsController extends Controller
 {
     /**
      * Trigger a command.
+     *
+     * @throws \yii\web\BadRequestHttpException
      */
     public function actionTriggerCommand()
     {
@@ -33,7 +33,7 @@ class CommandsController extends Controller
         $command  = $requestService->getBodyParam('command', false);
         $plugin   = $requestService->getBodyParam('plugin', false);
         $service  = $requestService->getBodyParam('service', false);
-        $vars     = $requestService->getBodyParam('vars', false);
+        $vars     = $requestService->getBodyParam('vars', []);
         $result   = CommandPalette::$plugin->general->triggerCommand($command, $plugin, $service, $vars);
         $title    = CommandPalette::$plugin->general->getReturnTitle();
         $message  = CommandPalette::$plugin->general->getReturnMessage();
@@ -51,23 +51,22 @@ class CommandsController extends Controller
         if ($result === false) {
             return $this->asJson([
                 'success' => false,
-                'message' => $message ? $message : Craft::t('command-palette', 'Couldn’t trigger the command.')
+                'message' => $message ?: Craft::t('command-palette', 'Couldn’t trigger the command.')
             ]);
         }
-        else {
-            return $this->asJson([
-                'success'       => true,
-                'title'         => $title,
-                'message'       => $message,
-                'result'        => $result,
-                'redirect'      => $redirect,
-                'isNewSet'      => !is_bool($result),
-                'isAction'      => $action,
-                'isHtml'        => CommandPalette::$plugin->general->getReturnHtml(),
-                'headHtml'      => $viewService->getHeadHtml(),
-                'footHtml'      => $viewService->getBodyHtml(),
-                'deleteCommand' => $delete
-            ]);
-        }
+
+        return $this->asJson([
+            'success'       => true,
+            'title'         => $title,
+            'message'       => $message,
+            'result'        => $result,
+            'redirect'      => $redirect,
+            'isNewSet'      => !is_bool($result),
+            'isAction'      => $action,
+            'isHtml'        => CommandPalette::$plugin->general->getReturnHtml(),
+            'headHtml'      => $viewService->getHeadHtml(),
+            'footHtml'      => $viewService->getBodyHtml(),
+            'deleteCommand' => $delete
+        ]);
     }
 }

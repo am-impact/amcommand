@@ -10,9 +10,9 @@
 namespace amimpact\commandpalette\services;
 
 use amimpact\commandpalette\CommandPalette;
-
 use Craft;
 use craft\base\Component;
+use craft\elements\GlobalSet;
 use craft\helpers\UrlHelper;
 
 class Settings extends Component
@@ -22,9 +22,9 @@ class Settings extends Component
      *
      * @return array
      */
-    public function createNewSetting()
+    public function createNewSetting(): array
     {
-        $commands = [
+        return [
             [
                 'name' => Craft::t('app', 'Create a new field'),
                 'url'  => UrlHelper::cpUrl('settings/fields/new')
@@ -60,7 +60,6 @@ class Settings extends Component
                 'url'  => UrlHelper::cpUrl('settings/assets/transforms/new')
             ]
         ];
-        return $commands;
     }
 
     /**
@@ -68,7 +67,7 @@ class Settings extends Component
      *
      * @return array
      */
-    public function createFieldInGroup()
+    public function createFieldInGroup(): array
     {
         // Gather commands
         $commands = [];
@@ -90,7 +89,7 @@ class Settings extends Component
      *
      * @return array
      */
-    public function editFields()
+    public function editFields(): array
     {
         // Gather commands
         $commands = [];
@@ -99,6 +98,7 @@ class Settings extends Component
         $fields = Craft::$app->getFields()->getAllFields();
         if ($fields) {
             foreach ($fields as $field) {
+                /** @var $field craft\base\Field */
                 $commands[] = [
                     'name' => $field->name,
                     'url'  => UrlHelper::cpUrl('settings/fields/edit/' . $field->id),
@@ -114,7 +114,7 @@ class Settings extends Component
      *
      * @return array
      */
-    public function editSections()
+    public function editSections(): array
     {
         // Gather commands
         $commands = [];
@@ -136,7 +136,7 @@ class Settings extends Component
      *
      * @return array
      */
-    public function editSectionEntryTypes()
+    public function editSectionEntryTypes(): array
     {
         // Gather commands
         $commands = [];
@@ -144,9 +144,9 @@ class Settings extends Component
         // Find available sections
         $sections = Craft::$app->getSections()->getAllSections();
         foreach ($sections as $section) {
-            $entryTypes      = $section->getEntryTypes();
+            $entryTypes = $section->getEntryTypes();
             $totalEntryTypes = count($entryTypes);
-            $sectionName     = $totalEntryTypes > 1 ? $section->name . ': ' : '';
+            $sectionName = $totalEntryTypes > 1 ? $section->name . ': ' : '';
             foreach ($entryTypes as $entryType) {
                 $commands[] = [
                     'name' => $sectionName . $entryType->name,
@@ -163,7 +163,7 @@ class Settings extends Component
      *
      * @return array
      */
-    public function editGlobalSets()
+    public function editGlobalSets(): array
     {
         // Gather commands
         $commands = [];
