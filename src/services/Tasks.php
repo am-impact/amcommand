@@ -44,12 +44,6 @@ class Tasks extends Component
                 'service' => 'tasks'
             ],
             [
-                'name'    => Craft::t('command-palette', 'Delete all tasks by type'),
-                'more'    => true,
-                'call'    => 'listTaskTypes',
-                'service' => 'tasks'
-            ],
-            [
                 'name'    => Craft::t('command-palette', 'Delete pending tasks'),
                 'warn'    => true,
                 'call'    => 'deletePendingTasks',
@@ -96,42 +90,6 @@ class Tasks extends Component
                         'taskId' => $task['id']
                     ]
                 ];
-            }
-        }
-
-        return $commands;
-    }
-
-    /**
-     * Get all task types.
-     *
-     * @return array
-     */
-    public function listTaskTypes(): array
-    {
-        // Gather commands
-        $commands = [];
-
-        // Find task types
-        $taskTypes = [];
-        $tasks = Craft::$app->getQueue()->getJobInfo();
-        if (! $tasks) {
-            CommandPalette::$plugin->general->setReturnMessage(Craft::t('command-palette', 'There are no tasks at the moment.'));
-        }
-        else {
-            foreach ($tasks as $task) {
-                if (! isset($taskTypes[ $task['job'] ])) {
-                    $taskTypes[ $task['job'] ] = true;
-                    $commands[] = [
-                        'name'    => $task['job'],
-                        'warn'    => true,
-                        'call'    => 'deleteAllTasksByType',
-                        'service' => 'tasks',
-                        'vars'    => [
-                            'taskType' => $task['job']
-                        ]
-                    ];
-                }
             }
         }
 
@@ -194,37 +152,6 @@ class Tasks extends Component
             ->select('*')
             ->from(['{{%queue}}'])
             ->where(['fail' => true])
-            ->all();
-
-        if ($tasks) {
-            $tasksService = Craft::$app->getQueue();
-            foreach ($tasks as $task) {
-                $tasksService->release($task['id']);
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Delete all tasks by type.
-     *
-     * @param array $variables
-     *
-     * @return bool
-     */
-    public function deleteAllTasksByType(array $variables = []): bool
-    {
-        // Do we have the required information?
-        if (! isset($variables['taskType'])) {
-            return false;
-        }
-
-        // Delete all tasks!
-        $tasks = (new Query())
-            ->select('*')
-            ->from(['{{%queue}}'])
-            ->where(['job' => $variables['taskType']])
             ->all();
 
         if ($tasks) {
