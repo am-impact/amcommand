@@ -75,7 +75,12 @@ Craft.Palette = Garnish.Base.extend(
     bindEvents: function() {
         var self = this;
 
-        self.addListener(self.$button, 'click', 'openPalette');
+        self.addListener(self.$button, 'click', function(ev) {
+            self.openPalette(ev);
+
+            // Don't close the palette because we're just opening it
+            ev.stopPropagation();
+        });
 
         self.addListener(self.$searchField, 'keyup', function(ev) {
             // Make sure we don't trigger ignored keys
@@ -152,8 +157,9 @@ Craft.Palette = Garnish.Base.extend(
                 self.$searchField.focus();
                 self.$commandsContainer.addClass('hidden');
             });
-            ev.preventDefault();
         }
+
+        ev.preventDefault();
     },
 
     /**
@@ -188,9 +194,10 @@ Craft.Palette = Garnish.Base.extend(
                 self.loadingRequest = false;
                 self.loadingElements = false;
             });
-            if (ev !== undefined) {
-                ev.preventDefault();
-            }
+        }
+
+        if (ev !== undefined) {
+            ev.preventDefault();
         }
     },
 
