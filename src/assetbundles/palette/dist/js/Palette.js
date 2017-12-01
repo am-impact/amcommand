@@ -194,10 +194,10 @@ Craft.Palette = Garnish.Base.extend(
                 self.loadingRequest = false;
                 self.loadingElements = false;
             });
-        }
 
-        if (ev !== undefined) {
-            ev.preventDefault();
+            if (ev !== undefined) {
+                ev.preventDefault();
+            }
         }
     },
 
