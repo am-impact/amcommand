@@ -2,7 +2,7 @@
     "name": "amimpact/command-palette",
     "description": "Command palette in Craft.",
     "type": "craft-plugin",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "keywords": [
         "craft",
         "cms",
