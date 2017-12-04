@@ -16,7 +16,7 @@ To install the plugin, follow these instructions.
 
 2. Then tell Composer to load the plugin:
 
-        composer require am-impact/amcommand dev-craft3
+        composer require am-impact/amcommand
 
 3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Command Palette.
 
