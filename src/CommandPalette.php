@@ -127,24 +127,23 @@ class CommandPalette extends Plugin
      */
     private function _registerPalette()
     {
-        // We only want to see the command palette in the backend, and want to initiate it once
-        $requestService = Craft::$app->getRequest();
-        if (! $requestService->getIsConsoleRequest() && $requestService->getIsCpRequest() && ! $requestService->getAcceptsJson() && ! Craft::$app->getUser()->getIsGuest()) {
-            // Load resources
-            $viewService = Craft::$app->getView();
-            $viewService->registerAssetBundle(PaletteBundle::class);
-            $viewService->registerTranslations('command-palette', [
-                'Command executed',
-                'Are you sure you want to execute this command?',
-                'There are no more commands available.'
-            ]);
+        Event::on(View::class, View::EVENT_END_BODY, function(Event $event) {
+            $requestService = Craft::$app->getRequest();
+            if (! $requestService->getIsConsoleRequest() && $requestService->getIsCpRequest() && ! $requestService->getAcceptsJson() && ! Craft::$app->getUser()->getIsGuest()) {
+                // Load resources
+                $viewService = Craft::$app->getView();
+                $viewService->registerAssetBundle(PaletteBundle::class);
+                $viewService->registerTranslations('command-palette', [
+                    'Command executed',
+                    'Are you sure you want to execute this command?',
+                    'There are no more commands available.'
+                ]);
 
-            // Load palette
-            Event::on(View::class, View::EVENT_END_BODY, function(Event $event) use ($viewService) {
+                // Load palette
                 echo $viewService->renderTemplate('command-palette/palette', [
                     'commands' => json_encode(CommandPalette::$plugin->general->getCommands()),
                 ]);
-            });
-        }
+            }
+        });
     }
 }
