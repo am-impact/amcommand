@@ -1,5 +1,5 @@
 {
-    "name": "amimpact/command-palette",
+    "name": "am-impact/amcommand",
     "description": "Command palette in Craft.",
     "type": "craft-plugin",
     "version": "3.1.1",
