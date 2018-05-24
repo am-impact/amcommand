@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.0.18 - 2018.05.24
+## 3.1.2 - 2018.05.24
 ### Changed
 * Fixed package name for composer install.
 
