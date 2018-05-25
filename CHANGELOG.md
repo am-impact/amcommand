@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+### Fixed
+* Fixed a PHP error that would occur on case-sensitive file systems.
+
 ## 3.1.2 - 2018.05.24
 ### Changed
 * Fixed package name for composer install.
