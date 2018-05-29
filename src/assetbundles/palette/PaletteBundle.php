@@ -7,7 +7,7 @@
  * @link      http://www.am-impact.nl
  */
 
-namespace amimpact\commandpalette\assetbundles\Palette;
+namespace amimpact\commandpalette\assetbundles\palette;
 
 use amimpact\commandpalette\CommandPalette;
 use craft\web\AssetBundle;
