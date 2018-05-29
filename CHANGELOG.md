@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.1.3 - 2018.05.29
 ### Fixed
 * Fixed a PHP error that would occur on case-sensitive file systems.
 
