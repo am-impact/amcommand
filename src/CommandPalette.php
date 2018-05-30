@@ -9,7 +9,7 @@
 
 namespace amimpact\commandpalette;
 
-use amimpact\commandpalette\assetbundles\Palette\PaletteBundle;
+use amimpact\commandpalette\assetbundles\palette\PaletteBundle;
 use amimpact\commandpalette\models\Settings;
 use Craft;
 use craft\base\Plugin;
