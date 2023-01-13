@@ -11,23 +11,37 @@ namespace amimpact\commandpalette;
 
 use amimpact\commandpalette\assetbundles\palette\PaletteBundle;
 use amimpact\commandpalette\models\Settings;
+use amimpact\commandpalette\services\Entries;
+use amimpact\commandpalette\services\General;
+use amimpact\commandpalette\services\Globals;
+use amimpact\commandpalette\services\Plugins;
+use amimpact\commandpalette\services\Search;
+use amimpact\commandpalette\services\Tasks;
+use amimpact\commandpalette\services\Users;
+use amimpact\commandpalette\services\Utilities;
 use Craft;
+use craft\base\Model;
 use craft\base\Plugin;
 use craft\web\View;
+use RuntimeException;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use yii\base\Event;
+use yii\base\Exception;
 
 /**
  * Class CommandPalette
  *
- * @property Settings                                    $settings  The plugin's settings.
- * @property \amimpact\commandpalette\services\Entries   $entries   The entries service.
- * @property \amimpact\commandpalette\services\General   $general   The general service.
- * @property \amimpact\commandpalette\services\Globals   $globals   The globals service.
- * @property \amimpact\commandpalette\services\Plugins   $plugins   The plugins service.
- * @property \amimpact\commandpalette\services\Search    $search    The search service.
- * @property \amimpact\commandpalette\services\Tasks     $tasks     The tasks service.
- * @property \amimpact\commandpalette\services\Utilities $utilities The utilities service.
- * @property \amimpact\commandpalette\services\Users     $users     The users service.
+ * @property Settings  $settings  The plugin's settings.
+ * @property Entries   $entries   The entries service.
+ * @property General   $general   The general service.
+ * @property Globals   $globals   The globals service.
+ * @property Plugins   $plugins   The plugins service.
+ * @property Search    $search    The search service.
+ * @property Tasks     $tasks     The tasks service.
+ * @property Utilities $utilities The utilities service.
+ * @property Users     $users     The users service.
  * @method Settings getSettings()
  */
 class CommandPalette extends Plugin
@@ -35,17 +49,17 @@ class CommandPalette extends Plugin
     /**
      * @var CommandPalette
      */
-    public static $plugin;
+    public static CommandPalette $plugin;
 
     /**
      * @inheritdoc
      */
-    public $schemaVersion = '3.0.0';
+    public string $schemaVersion = '4.0.0';
 
     /**
      * @inheritdoc
      */
-    public $hasCpSettings = true;
+    public bool $hasCpSettings = true;
 
     /**
      * Init Command.
@@ -68,9 +82,9 @@ class CommandPalette extends Plugin
     /**
      * Creates and returns the model used to store the plugin’s settings.
      *
-     * @return \craft\base\Model|null
+     * @return Model
      */
-    protected function createSettingsModel()
+    protected function createSettingsModel(): Model
     {
         return new Settings();
     }
@@ -80,9 +94,10 @@ class CommandPalette extends Plugin
      * block on the settings page.
      *
      * @return string The rendered settings HTML
-     * @throws \yii\base\Exception
-     * @throws \Twig_Error_Loader
-     * @throws \RuntimeException
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws Exception
      */
     protected function settingsHtml(): string
     {
@@ -101,7 +116,7 @@ class CommandPalette extends Plugin
      *
      * @return void
      */
-    private function _registerServices()
+    private function _registerServices(): void
     {
         $this->setComponents([
             'entries' => services\Entries::class,
@@ -120,12 +135,9 @@ class CommandPalette extends Plugin
      * Register the palette.
      *
      * @return void
-     * @throws \yii\base\InvalidConfigException
-     * @throws \yii\base\Exception
-     * @throws \Twig_Error_Loader
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
-    private function _registerPalette()
+    private function _registerPalette(): void
     {
         Event::on(View::class, View::EVENT_END_BODY, function(Event $event) {
             $requestService = Craft::$app->getRequest();
