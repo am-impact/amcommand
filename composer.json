@@ -2,7 +2,7 @@
     "name": "am-impact/amcommand",
     "description": "Command palette in Craft.",
     "type": "craft-plugin",
-    "version": "3.1.4",
+    "version": "4.0.0",
     "keywords": [
         "craft",
         "cms",
@@ -18,7 +18,7 @@
         }
     ],
     "require": {
-        "craftcms/cms": "^3.0.0-RC1"
+        "craftcms/cms": "^4.2.7"
     },
     "autoload": {
         "psr-4": {
@@ -28,8 +28,8 @@
     "extra": {
         "name": "Command Palette",
         "handle": "command-palette",
-        "version": "3.1.4",
-        "schemaVersion": "3.0.0",
+        "version": "4.0.0",
+        "schemaVersion": "4.0.0",
         "hasSettings": true,
         "hasCpSection": true,
         "developer": "a&m impact",
@@ -49,5 +49,11 @@
             "users": "amimpact\\commandpalette\\services\\Users"
         },
         "class": "amimpact\\commandpalette\\CommandPalette"
+    },
+    "config": {
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true,
+            "craftcms/plugin-installer": true
+        }
     }
 }
