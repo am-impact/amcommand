@@ -73,7 +73,7 @@ class General extends Component
     public function triggerCommand(string $command, string $pluginHandle, string $service, array $variables = [])
     {
         // Trigger a callback?
-        if ($pluginHandle !== false && $pluginHandle !== 'false' && $service !== false && $pluginHandle !== 'command-palette') {
+        if (!empty($pluginHandle) && $pluginHandle !== 'false' && $service !== false && $pluginHandle !== 'command-palette') {
             // Trigger a plugin's callback
             $actualPlugin = Craft::$app->getPlugins()->getPlugin($pluginHandle);
             if (! $actualPlugin) {
